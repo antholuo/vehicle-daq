@@ -26,7 +26,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-//#include "motion_fx_cm0p.h"
 #include "asm330lhh_reg.h"
 /* USER CODE END Includes */
 
@@ -38,10 +37,6 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 
-// Define MotionFX_CM0P core bits
-//#define MFX_STR_LENG 35
-//#define STATE_SIZE (size_t) (2450)
-//#define ENABLE_6X 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -53,11 +48,6 @@
 
 /* USER CODE BEGIN PV */
 
-// MotionFX_CM0P bits
-//char lib_version[MFX_STR_LENG];
-//static uint8_t mfxstate[STATE_SIZE ];
-//MFX_knobs_t iKnobs;
-//float LastTime;
 static int16_t data_raw_acceleration[3];
 static int16_t data_raw_angular_rate[3];
 static int16_t data_raw_temperature;
