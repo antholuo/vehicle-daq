@@ -8,3 +8,5 @@ sw/nucleo_testy/Debug/
 sw/nucleo_testy/Release/
 
 sw/tools/veh_daq_tools/
+
+sw/tools/esp-if-test1/target/
