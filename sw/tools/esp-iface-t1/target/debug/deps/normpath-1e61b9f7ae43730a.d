@@ -1,0 +1,11 @@
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\libnormpath-1e61b9f7ae43730a.rmeta: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\base.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\cmp.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\error.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\windows\mod.rs
+
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\libnormpath-1e61b9f7ae43730a.rlib: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\base.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\cmp.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\error.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\windows\mod.rs
+
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\normpath-1e61b9f7ae43730a.d: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\base.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\cmp.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\error.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\windows\mod.rs
+
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\lib.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\base.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\cmp.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\error.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\normpath-1.3.0\src\windows\mod.rs:

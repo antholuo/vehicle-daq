@@ -1,0 +1,11 @@
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\xtensa-esp32-espidf\debug\deps\liblibc-02a2d297c74fa9cc.rmeta: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\macros.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\fixed_width_ints.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\mod.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\newlib\mod.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\newlib\generic.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\newlib\espidf\mod.rs
+
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\xtensa-esp32-espidf\debug\deps\libc-02a2d297c74fa9cc.d: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\macros.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\fixed_width_ints.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\mod.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\newlib\mod.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\newlib\generic.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\newlib\espidf\mod.rs
+
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\lib.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\macros.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\fixed_width_ints.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\mod.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\newlib\mod.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\newlib\generic.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\libc-0.2.169\src\unix\newlib\espidf\mod.rs:

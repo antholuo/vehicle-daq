@@ -1,0 +1,14 @@
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\libclang_sys-225fc74063f98a33.rmeta: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\support.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\link.rs C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/macros.rs C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/common.rs C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/dynamic.rs
+
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\libclang_sys-225fc74063f98a33.rlib: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\support.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\link.rs C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/macros.rs C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/common.rs C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/dynamic.rs
+
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\clang_sys-225fc74063f98a33.d: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\support.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\link.rs C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/macros.rs C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/common.rs C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/dynamic.rs
+
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\lib.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\support.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\clang-sys-1.8.1\src\link.rs:
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/macros.rs:
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/common.rs:
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\build\clang-sys-e524cd8b49653888\out/dynamic.rs:
+
+# env-dep:OUT_DIR=C:\\Code\\vehicle-daq\\sw\\tools\\esp-iface-t1\\target\\debug\\build\\clang-sys-e524cd8b49653888\\out

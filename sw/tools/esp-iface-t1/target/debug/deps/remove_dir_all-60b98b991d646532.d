@@ -1,0 +1,11 @@
+/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/deps/libremove_dir_all-60b98b991d646532.rmeta: /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/lib.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/io.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/path_components.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/unix.rs
+
+/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/deps/libremove_dir_all-60b98b991d646532.rlib: /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/lib.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/io.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/path_components.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/unix.rs
+
+/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/deps/remove_dir_all-60b98b991d646532.d: /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/lib.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/io.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/path_components.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/unix.rs
+
+/home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/lib.rs:
+/home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl.rs:
+/home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/io.rs:
+/home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/path_components.rs:
+/home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/remove_dir_all-0.8.4/src/_impl/unix.rs:

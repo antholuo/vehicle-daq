@@ -1,0 +1,9 @@
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\esp_hal_procmacros-b80725fc1ad5ef0f.dll: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\blocking_main.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\builder.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\interrupt.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\ram.rs
+
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\esp_hal_procmacros-b80725fc1ad5ef0f.d: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\blocking_main.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\builder.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\interrupt.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\ram.rs
+
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\lib.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\blocking_main.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\builder.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\interrupt.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\esp-hal-procmacros-0.16.0\src\ram.rs:

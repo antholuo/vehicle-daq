@@ -1,0 +1,9 @@
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\num_enum_derive-d58d6fc0f25a0e66.dll: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\enum_attributes.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\parsing.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\utils.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\variant_attributes.rs
+
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\debug\deps\num_enum_derive-d58d6fc0f25a0e66.d: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\enum_attributes.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\parsing.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\utils.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\variant_attributes.rs
+
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\lib.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\enum_attributes.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\parsing.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\utils.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\num_enum_derive-0.7.3\src\variant_attributes.rs:

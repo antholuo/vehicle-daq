@@ -1,0 +1,10 @@
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\xtensa-esp32-espidf\debug\deps\libportable_atomic-f9cc6e5e08e95646.rmeta: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\cfgs.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\utils.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\gen\utils.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\imp\mod.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\imp\core_atomic.rs
+
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\xtensa-esp32-espidf\debug\deps\portable_atomic-f9cc6e5e08e95646.d: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\cfgs.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\utils.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\gen\utils.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\imp\mod.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\imp\core_atomic.rs
+
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\lib.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\cfgs.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\utils.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\gen\utils.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\imp\mod.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\portable-atomic-1.10.0\src\imp\core_atomic.rs:

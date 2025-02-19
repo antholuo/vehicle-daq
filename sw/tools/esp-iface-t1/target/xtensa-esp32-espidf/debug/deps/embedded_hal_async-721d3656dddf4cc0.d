@@ -1,0 +1,10 @@
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\xtensa-esp32-espidf\debug\deps\libembedded_hal_async-721d3656dddf4cc0.rmeta: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\delay.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\digital.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\i2c.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\spi.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\../README.md
+
+C:\Code\vehicle-daq\sw\tools\esp-iface-t1\target\xtensa-esp32-espidf\debug\deps\embedded_hal_async-721d3656dddf4cc0.d: C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\lib.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\delay.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\digital.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\i2c.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\spi.rs C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\../README.md
+
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\lib.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\delay.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\digital.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\i2c.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\spi.rs:
+C:\Users\antho\.cargo\registry\src\index.crates.io-6f17d22bba15001f\embedded-hal-async-1.0.0\src\../README.md:

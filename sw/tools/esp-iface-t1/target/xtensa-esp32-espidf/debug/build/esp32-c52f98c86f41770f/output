@@ -1,0 +1,3 @@
+cargo:rustc-link-search=/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/xtensa-esp32-espidf/debug/build/esp32-c52f98c86f41770f/out
+cargo:rerun-if-changed=device.x
+cargo:rerun-if-changed=build.rs

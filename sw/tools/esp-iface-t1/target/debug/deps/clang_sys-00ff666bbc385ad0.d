@@ -1,0 +1,14 @@
+/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/deps/libclang_sys-00ff666bbc385ad0.rmeta: /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/lib.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/support.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/link.rs /mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/macros.rs /mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/common.rs /mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/dynamic.rs
+
+/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/deps/libclang_sys-00ff666bbc385ad0.rlib: /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/lib.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/support.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/link.rs /mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/macros.rs /mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/common.rs /mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/dynamic.rs
+
+/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/deps/clang_sys-00ff666bbc385ad0.d: /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/lib.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/support.rs /home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/link.rs /mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/macros.rs /mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/common.rs /mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/dynamic.rs
+
+/home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/lib.rs:
+/home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/support.rs:
+/home/anni/.cargo/registry/src/index.crates.io-6f17d22bba15001f/clang-sys-1.8.1/src/link.rs:
+/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/macros.rs:
+/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/common.rs:
+/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out/dynamic.rs:
+
+# env-dep:OUT_DIR=/mnt/c/Code/vehicle-daq/sw/tools/esp-iface-t1/target/debug/build/clang-sys-6f55cb93ea24920b/out
