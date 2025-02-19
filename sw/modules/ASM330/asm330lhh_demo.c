@@ -6,6 +6,7 @@
  */
 
 #include "asm330lhh_demo.h"
+#include "asm330lhh_reg.h"
 #include "gpio.h"
 #include "spi.h"
 #include "usart.h"
@@ -69,16 +70,29 @@ void startAsm330lhhDemo(void)
     asm330lhh_reset_get(&dev_ctx, &rst); // reset the device to defaults
 
     HAL_Delay(100); // Wait device response
+	
 
-    do {
-        // asm330lhh_reset
-        // TODO: fix this shit
-    }
+    // do {
+    //     // asm330lhh_reset
+    //     // TODO: fix this shit
+	// 	asm330lhh_reset_get(&dev_ctx, &rst);
+    // } while (rst);
 
+	asm330lhh_xl_data_rate_set(&dev_ctx, ASM330LHH_XL_ODR_52Hz);
+	asm330lhh_xl_full_scale_set(&dev_ctx, ASM330LHH_4g);
 
     // This is a placeholder for the demo code
     while (1) {
         HAL_GPIO_TogglePin(GPIO_LED_GPIO_Port, GPIO_LED_Pin);
+
+    	memset(data_raw_acceleration, 0x00, 3 * sizeof(int16_t));
+
+    	asm330lhh_acceleration_raw_get(&dev_ctx, data_raw_acceleration);
+    	sprintf((char *)tx_buffer,
+    			              "AccelerationRaw :%d\t%d\t%d\r\n",
+    			              data_raw_acceleration[0], data_raw_acceleration[1], data_raw_acceleration[2]);
+
+    			tx_com(tx_buffer, strlen((char const *)tx_buffer));
 
         HAL_Delay(1000);
     }
