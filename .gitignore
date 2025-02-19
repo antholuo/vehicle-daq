@@ -10,3 +10,9 @@ sw/nucleo_testy/Release/
 sw/tools/veh_daq_tools/
 
 *.zip
+
+*.lck
+
+sw/nucleo_testy2/.settings/
+
+sw/nucleo_testy2/Release/

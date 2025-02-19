@@ -43,6 +43,7 @@ void start_demo() {
 
 	/* Restore default configuration. */
 	asm330lhh_reset_set(&dev_ctx, PROPERTY_ENABLE);
+	asm330lhh_fifo_ctrl3_t fifo_ctrl3_c;
 
 	/* Check device ID */
 	do {
@@ -50,6 +51,15 @@ void start_demo() {
 		snprintf((char*) tx_buffer, sizeof(tx_buffer),
 				"whoami is %d\r\n", whoamI);
 		tx_com(tx_buffer, strlen((char const*) tx_buffer));
+
+		HAL_Delay(10);
+
+		uint32_t ret = asm330lhh_read_reg(&dev_ctx, ASM330LHH_FIFO_CTRL3,
+					&fifo_ctrl3_c, 1);
+
+		HAL_Delay(10);
+
+		asm330lhh_xl_data_rate_set(&dev_ctx, ASM330LHH_XL_ODR_12Hz5);
 		HAL_Delay(100);
 	} while (whoamI != ASM330LHH_ID);
 
@@ -80,7 +90,6 @@ void start_demo() {
 	// Testing bits
 	/////////////////
 	// Read FIFO control registers
-	asm330lhh_fifo_ctrl3_t fifo_ctrl3_c;
 	uint32_t ret = asm330lhh_read_reg(&dev_ctx, ASM330LHH_FIFO_CTRL3,
 			&fifo_ctrl3_c, 1);
 
