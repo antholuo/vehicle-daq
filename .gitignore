@@ -16,3 +16,5 @@ sw/tools/veh_daq_tools/
 sw/nucleo_testy2/.settings/
 
 sw/nucleo_testy2/Release/
+
+sw/nucleo_testy2/Debug/

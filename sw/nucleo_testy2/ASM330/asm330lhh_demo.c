@@ -138,23 +138,23 @@ void start_demo() {
 			memset(data_raw_angular_rate, 0x00, 3 * sizeof(int16_t));
 			asm330lhh_angular_rate_raw_get(&dev_ctx, data_raw_angular_rate);
 			snprintf((char*) tx_buffer, sizeof(tx_buffer),
-					"Angular rate [mdps]:%d\td\tdf %lu\r\n",
+					"Angular rate [mdps]:%d\t%d\t%d %lu\r\n",
 					data_raw_angular_rate[0], data_raw_angular_rate[1],
 					data_raw_angular_rate[2], timestamp);
 			tx_com(tx_buffer, strlen((char const*) tx_buffer));
 		}
 
-		if (reg.status_reg.tda) {
-			/* Read temperature data */
-			memset(&data_raw_temperature, 0x00, sizeof(int16_t));
-			asm330lhh_temperature_raw_get(&dev_ctx, &data_raw_temperature);
-			temperature_degC = asm330lhh_from_lsb_to_celsius(
-					data_raw_temperature);
-			snprintf((char*) tx_buffer, sizeof(tx_buffer),
-					"Temperature [degC]:%d %lu\r\n", temperature_degC,
-					timestamp);
-			tx_com(tx_buffer, strlen((char const*) tx_buffer));
-		}
+//		if (reg.status_reg.tda) {
+//			/* Read temperature data */
+//			memset(&data_raw_temperature, 0x00, sizeof(int16_t));
+//			asm330lhh_temperature_raw_get(&dev_ctx, &data_raw_temperature);
+//			temperature_degC = asm330lhh_from_lsb_to_celsius(
+//					data_raw_temperature);
+//			snprintf((char*) tx_buffer, sizeof(tx_buffer),
+//					"Temperature [degC]:%d %lu\r\n", temperature_degC,
+//					timestamp);
+//			tx_com(tx_buffer, strlen((char const*) tx_buffer));
+//		}
 
 //		transmit_hello_world();
 		HAL_Delay(10);

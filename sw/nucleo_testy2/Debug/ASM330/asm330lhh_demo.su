@@ -1,6 +1,0 @@
-../ASM330/asm330lhh_demo.c:35:6:start_demo	72	static
-../ASM330/asm330lhh_demo.c:155:16:platform_write	32	static
-../ASM330/asm330lhh_demo.c:164:16:platform_read	32	static
-../ASM330/asm330lhh_demo.c:174:13:tx_com	24	static
-../ASM330/asm330lhh_demo.c:178:13:platform_delay	16	static
-../ASM330/asm330lhh_demo.c:182:6:transmit_hello_world	32	static
