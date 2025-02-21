@@ -100,7 +100,7 @@ void start_demo() {
 		/* Read output only if new value is available. */
 		asm330lhh_status_reg_get(&dev_ctx, &reg.status_reg);
 
-		raw_imu_data.sr = reg.status_reg;
+//		raw_imu_data.sr = reg.status_reg;
 
 		if (reg.status_reg.xlda || reg.status_reg.gda || reg.status_reg.tda) {
 			asm330lhh_timestamp_raw_get(&dev_ctx, &timestamp);
@@ -134,7 +134,7 @@ void start_demo() {
 			raw_imu_data.gy_z = data_raw_angular_rate[2];
 		}
 
-		raw_imu_data.ts = timestamp;
+//		raw_imu_data.ts = timestamp;
 
 //		if (reg.status_reg.tda) {
 //			/* Read temperature data */

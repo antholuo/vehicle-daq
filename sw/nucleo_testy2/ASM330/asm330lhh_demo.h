@@ -17,8 +17,8 @@ typedef struct {
 	int16_t gy_x;
 	int16_t gy_y;
 	int16_t gy_z;
-	uint32_t ts;
-	asm330lhh_status_reg_t sr;
+//	uint32_t ts;
+//	asm330lhh_status_reg_t sr;
 } RawImuDataPkg_S;
 
 void transmit_hello_world();
