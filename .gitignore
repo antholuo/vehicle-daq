@@ -22,3 +22,5 @@ sw/nucleo_testy2/.settings/
 sw/nucleo_testy2/.project
 
 sw/sensor_board/sensor_board_rev0/Debug/
+
+*.lck
