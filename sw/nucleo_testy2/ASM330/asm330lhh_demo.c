@@ -80,13 +80,6 @@ void start_demo() {
 	asm330lhh_xl_hp_path_on_out_set(&dev_ctx, ASM330LHH_LP_ODR_DIV_100);
 	asm330lhh_xl_filter_lp2_set(&dev_ctx, PROPERTY_ENABLE);
 
-	// Initialize gyroscope to 416Hz (High Performance mode) by writing CTRL2_G = 60h
-	// 0x60 == 0110 0000
-	// ODR 0110 (417Hz)
-	// FS 00 (250dps)
-//	asm330lhh_gy_data_rate_set(&dev_ctx, ASM330LHH_GY_ODR_417Hz);
-//	asm330lhh_gy_full_scale_set(&dev_ctx, ASM330LHH_250dps);
-
 	// Enable block data update
 	asm330lhh_block_data_update_set(&dev_ctx, PROPERTY_ENABLE);
 
@@ -95,12 +88,9 @@ void start_demo() {
 
 		asm330lhh_reg_t reg;
 		uint32_t timestamp;
-		RawImuDataPkg_S raw_imu_data;
 
 		/* Read output only if new value is available. */
 		asm330lhh_status_reg_get(&dev_ctx, &reg.status_reg);
-
-//		raw_imu_data.sr = reg.status_reg;
 
 		if (reg.status_reg.xlda || reg.status_reg.gda || reg.status_reg.tda) {
 			asm330lhh_timestamp_raw_get(&dev_ctx, &timestamp);
@@ -115,9 +105,6 @@ void start_demo() {
 					data_raw_acceleration[0], data_raw_acceleration[1],
 					data_raw_acceleration[2], timestamp);
 			tx_com(tx_buffer, strlen((char const*) tx_buffer));
-			raw_imu_data.xl_x = data_raw_acceleration[0];
-			raw_imu_data.xl_y = data_raw_acceleration[1];
-			raw_imu_data.xl_z = data_raw_acceleration[2];
 		}
 
 		if (reg.status_reg.gda) {
@@ -129,29 +116,8 @@ void start_demo() {
 					data_raw_angular_rate[0], data_raw_angular_rate[1],
 					data_raw_angular_rate[2], timestamp);
 			tx_com(tx_buffer, strlen((char const*) tx_buffer));
-			raw_imu_data.gy_x = data_raw_angular_rate[0];
-			raw_imu_data.gy_y = data_raw_angular_rate[1];
-			raw_imu_data.gy_z = data_raw_angular_rate[2];
 		}
 
-//		raw_imu_data.ts = timestamp;
-
-//		if (reg.status_reg.tda) {
-//			/* Read temperature data */
-//			memset(&data_raw_temperature, 0x00, sizeof(int16_t));
-//			asm330lhh_temperature_raw_get(&dev_ctx, &data_raw_temperature);
-//			temperature_degC = asm330lhh_from_lsb_to_celsius(
-//					data_raw_temperature);
-//			snprintf((char*) tx_buffer, sizeof(tx_buffer),
-//					"Temperature [degC]:%d %lu\r\n", temperature_degC,
-//					timestamp);
-//			tx_com(tx_buffer, strlen((char const*) tx_buffer));
-//		}
-
-//		transmit_hello_world();
-
-		// Transmit to the "ESP" all of our data.
-		esp_com(&raw_imu_data, sizeof(raw_imu_data));
 		HAL_Delay(100);
 	}
 }
