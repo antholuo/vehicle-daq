@@ -8,3 +8,15 @@ sw/nucleo_testy/Debug/
 sw/nucleo_testy/Release/
 
 sw/tools/veh_daq_tools/
+
+sw/nucleo_testy2/Debug/
+
+*.zip
+
+sw/tools/esp-if-test1/target/
+
+sw/nucleo_testy2/Release/
+
+sw/nucleo_testy2/.settings/
+
+sw/nucleo_testy2/.project
