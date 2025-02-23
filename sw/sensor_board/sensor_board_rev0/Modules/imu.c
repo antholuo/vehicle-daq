@@ -65,24 +65,27 @@ void run_imu_basic() {
 	asm330lhh_xl_hp_path_on_out_set(&dev_ctx, ASM330LHH_LP_ODR_DIV_100);
 	asm330lhh_xl_filter_lp2_set(&dev_ctx, PROPERTY_ENABLE);
 
+	imuRawData_S raw_data;
 	while (1) {
 		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_RESET);
-		asm330lhh_status_reg_get(&dev_ctx, &reg.status_reg);
+		asm330lhh_status_reg_get(&dev_ctx, &raw_data.status_reg);
 
-		if (reg.status_reg.xlda || reg.status_reg.gda) {
+		if (raw_data.status_reg.xlda || raw_data.status_reg.gda) {
 			asm330lhh_timestamp_raw_get(&dev_ctx, &timestamp);
+			raw_data.timestamp = timestamp;
 		}
 
-		if (reg.status_reg.xlda) {
+		if (raw_data.status_reg.xlda) {
 			asm330lhh_acceleration_raw_get(&dev_ctx,
 					data_raw_acceleration.u8bit);
+			raw_data.acceleration = data_raw_acceleration;
 #if DO_FP
 			acceleration_mg[0] = asm330lhh_from_fs2g_to_mg(
-					data_raw_acceleration.i16bit[0]);
+					raw_data.acceleration.i16bit[0]);
 			acceleration_mg[1] = asm330lhh_from_fs2g_to_mg(
-					data_raw_acceleration.i16bit[1]);
+					raw_data.acceleration.i16bit[1]);
 			acceleration_mg[2] = asm330lhh_from_fs2g_to_mg(
-					data_raw_acceleration.i16bit[2]);
+					raw_data.acceleration.i16bit[2]);
 
 			acceleration_g[0] = acceleration_mg[0] / 1000;
 			acceleration_g[1] = acceleration_mg[1] / 1000;
@@ -90,16 +93,17 @@ void run_imu_basic() {
 #endif
 		}
 
-		if (reg.status_reg.gda) {
+		if (raw_data.status_reg.gda) {
 			asm330lhh_angular_rate_raw_get(&dev_ctx,
 					data_raw_angular_rate.u8bit);
+			raw_data.angular_rate = data_raw_angular_rate;
 #if DO_FP
 			angular_rate_mdps[0] = asm330lhh_from_fs2000dps_to_mdps(
-					data_raw_angular_rate.i16bit[0]);
+					raw_data.angular_rate.i16bit[0]);
 			angular_rate_mdps[1] = asm330lhh_from_fs2000dps_to_mdps(
-					data_raw_angular_rate.i16bit[1]);
+					raw_data.angular_rate.i16bit[1]);
 			angular_rate_mdps[2] = asm330lhh_from_fs2000dps_to_mdps(
-					data_raw_angular_rate.i16bit[2]);
+					raw_data.angular_rate.i16bit[2]);
 
 			angular_rate_dps[0] = angular_rate_mdps[0] / 1000;
 			angular_rate_dps[1] = angular_rate_mdps[1] / 1000;

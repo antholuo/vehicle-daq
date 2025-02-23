@@ -22,6 +22,13 @@ typedef union {
 } axis3bit16_t;
 
 // TODO: build a struct of cool data
+typedef struct __attribute__((packed)) {
+	asm330lhh_status_reg_t status_reg;
+	uint32_t timestamp;
+	axis3bit16_t acceleration;
+	axis3bit16_t angular_rate;
+} imuRawData_S;
+
 
 static axis3bit16_t data_raw_acceleration;
 static axis3bit16_t data_raw_angular_rate;
