@@ -12,8 +12,9 @@
 
 #include "asm330lhh_reg.h"
 
-extern SPI_HandleTypeDef hspi1;
-extern TIM_HandleTypeDef htim3;
+extern SPI_HandleTypeDef hspi1;		// ASM330 SPI
+extern TIM_HandleTypeDef htim3;		// GPIO LED (1 & 2)
+extern UART_HandleTypeDef huart1;	// UART1 (No cts/rts) for sensor data output stream.
 
 void run_imu_basic() {
 	TIM3->CCR1 = TIM3->ARR / 2;
@@ -67,7 +68,7 @@ void run_imu_basic() {
 
 	imuRawData_S raw_data;
 	while (1) {
-		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_RESET);	// Turn LED2 on (indicating that we are calculating something)
 		asm330lhh_status_reg_get(&dev_ctx, &raw_data.status_reg);
 
 		if (raw_data.status_reg.xlda || raw_data.status_reg.gda) {
@@ -110,9 +111,13 @@ void run_imu_basic() {
 			angular_rate_dps[2] = angular_rate_mdps[2] / 1000;
 #endif
 		}
-		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_SET);
 
-		HAL_Delay(100);
+		// Transmit data over uart
+		HAL_UART_Transmit(&huart1, &raw_data, sizeof(raw_data), 100);
+
+		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_SET);	// Turn LED2 off (we are done!)
+
+		HAL_Delay(10);
 	}
 }
 
