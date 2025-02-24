@@ -18,9 +18,14 @@ extern UART_HandleTypeDef huart1;	// UART1 (No cts/rts) for sensor data output s
 
 void run_imu_basic() {
 	TIM3->CCR1 = TIM3->ARR / 2;
-//	TIM3->CCR2 = TIM3->ARR / 2;
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
-//	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+
+	// Protobuf setup
+	uint8_t workspace[300];
+	uint8_t encoded[300];
+	struct raw_imu_data_t *raw_imu_pb_p;
+	raw_imu_pb_p = raw_imu_data_new(&workspace[0], sizeof(workspace));
+
 
 // IMU Setup
 	stmdev_ctx_t dev_ctx;
@@ -78,8 +83,7 @@ void run_imu_basic() {
 
 		if (raw_data.status_reg.xlda) {
 			asm330lhh_acceleration_raw_get(&dev_ctx,
-					data_raw_acceleration.u8bit);
-			raw_data.acceleration = data_raw_acceleration;
+					data_raw_acceleration);
 #if DO_FP
 			acceleration_mg[0] = asm330lhh_from_fs2g_to_mg(
 					raw_data.acceleration.i16bit[0]);
@@ -96,8 +100,7 @@ void run_imu_basic() {
 
 		if (raw_data.status_reg.gda) {
 			asm330lhh_angular_rate_raw_get(&dev_ctx,
-					data_raw_angular_rate.u8bit);
-			raw_data.angular_rate = data_raw_angular_rate;
+					data_raw_angular_rate);
 #if DO_FP
 			angular_rate_mdps[0] = asm330lhh_from_fs2000dps_to_mdps(
 					raw_data.angular_rate.i16bit[0]);
@@ -112,13 +115,32 @@ void run_imu_basic() {
 #endif
 		}
 
-		// Transmit data over uart
-		HAL_UART_Transmit(&huart1, &raw_data, sizeof(raw_data), 100);
+		// Protobuf encode data
+		map_data_to_pb(raw_imu_pb_p, data_raw_acceleration, data_raw_angular_rate, &raw_data.status_reg, timestamp);
+		size_t pb_size = raw_imu_data_encode(raw_imu_pb_p, &encoded[0], sizeof(encoded));
+
+		// Transmit encoded data over uart
+		HAL_UART_Transmit(&huart1, &encoded, pb_size, 100);
 
 		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_SET);	// Turn LED2 off (we are done!)
 
-		HAL_Delay(10);
+		HAL_Delay(1000);
 	}
+}
+
+void map_data_to_pb(struct raw_imu_data_t *raw_pb, int16_t *data_raw_acceleration, int16_t *data_raw_angular_rate, asm330lhh_status_reg_t *sr, uint32_t ts) {
+	raw_pb->timestamp = ts;
+
+	raw_pb->accel_x = data_raw_acceleration[0];
+	raw_pb->accel_y = data_raw_acceleration[1];
+	raw_pb->accel_z = data_raw_acceleration[2];
+
+	raw_pb->gyro_x = data_raw_angular_rate[0];
+	raw_pb->gyro_y = data_raw_angular_rate[1];
+	raw_pb->gyro_z = data_raw_angular_rate[2];
+
+	raw_pb->gda = sr->gda;
+	raw_pb->xlda = sr->xlda;
 }
 
 static int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
