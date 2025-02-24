@@ -14,7 +14,7 @@
 
 extern SPI_HandleTypeDef hspi1;		// ASM330 SPI
 extern TIM_HandleTypeDef htim3;		// GPIO LED (1 & 2)
-extern UART_HandleTypeDef huart1;	// UART1 (No cts/rts) for sensor data output stream.
+extern UART_HandleTypeDef huart1;   // UART1 (No cts/rts) for sensor data output stream.
 
 void run_imu_basic() {
 	TIM3->CCR1 = TIM3->ARR / 2;
@@ -26,8 +26,7 @@ void run_imu_basic() {
 	struct raw_imu_data_t *raw_imu_pb_p;
 	raw_imu_pb_p = raw_imu_data_new(&workspace[0], sizeof(workspace));
 
-
-// IMU Setup
+	// IMU Setup
 	stmdev_ctx_t dev_ctx;
 	asm330lhh_reg_t reg;
 	uint32_t timestamp;
@@ -45,7 +44,6 @@ void run_imu_basic() {
 	if (asm330_wai != ASM330LHH_ID) {
 		TIM3->ARR = TIM3->ARR / 10;
 		TIM3->CCR1 = TIM3->ARR / 2;
-//		TIM3->CCR2 = 0;
 		while (1)
 			;
 	}
@@ -57,13 +55,13 @@ void run_imu_basic() {
 	} while (rst);
 
 	// Configure IMU
-	asm330lhh_device_conf_set(&dev_ctx, PROPERTY_ENABLE);// Set device configuration (no clue what this does)
-	asm330lhh_block_data_update_set(&dev_ctx, PROPERTY_ENABLE);	// Enable block data update
-	asm330lhh_xl_data_rate_set(&dev_ctx, ASM330LHH_XL_ODR_417Hz);// TODO: determine the correct output rates
+	asm330lhh_device_conf_set(&dev_ctx, PROPERTY_ENABLE); 			// Set device configuration (no clue what this does)
+	asm330lhh_block_data_update_set(&dev_ctx, PROPERTY_ENABLE);		// Enable block data update
+	asm330lhh_xl_data_rate_set(&dev_ctx, ASM330LHH_XL_ODR_417Hz);	// TODO: determine the correct output rates
 	asm330lhh_gy_data_rate_set(&dev_ctx, ASM330LHH_GY_ODR_417Hz);
-	asm330lhh_xl_full_scale_set(&dev_ctx, ASM330LHH_2g);// TODO: determine the correct scaling
+	asm330lhh_xl_full_scale_set(&dev_ctx, ASM330LHH_2g);			// TODO: determine the correct scaling
 	asm330lhh_gy_full_scale_set(&dev_ctx, ASM330LHH_2000dps);
-	asm330lhh_timestamp_set(&dev_ctx, PROPERTY_ENABLE);	// Enable timestamping
+	asm330lhh_timestamp_set(&dev_ctx, PROPERTY_ENABLE);				// Enable timestamping
 
 	/* Configure filtering chain(No aux interface)
 	 * Accelerometer - LPF1 + LPF2 path
@@ -73,7 +71,7 @@ void run_imu_basic() {
 
 	imuRawData_S raw_data;
 	while (1) {
-		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_RESET);	// Turn LED2 on (indicating that we are calculating something)
+		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_RESET);// Turn LED2 on (indicating that we are calculating something)
 		asm330lhh_status_reg_get(&dev_ctx, &raw_data.status_reg);
 
 		if (raw_data.status_reg.xlda || raw_data.status_reg.gda) {
@@ -82,8 +80,7 @@ void run_imu_basic() {
 		}
 
 		if (raw_data.status_reg.xlda) {
-			asm330lhh_acceleration_raw_get(&dev_ctx,
-					data_raw_acceleration);
+			asm330lhh_acceleration_raw_get(&dev_ctx, data_raw_acceleration);
 #if DO_FP
 			acceleration_mg[0] = asm330lhh_from_fs2g_to_mg(
 					raw_data.acceleration.i16bit[0]);
@@ -99,8 +96,7 @@ void run_imu_basic() {
 		}
 
 		if (raw_data.status_reg.gda) {
-			asm330lhh_angular_rate_raw_get(&dev_ctx,
-					data_raw_angular_rate);
+			asm330lhh_angular_rate_raw_get(&dev_ctx, data_raw_angular_rate);
 #if DO_FP
 			angular_rate_mdps[0] = asm330lhh_from_fs2000dps_to_mdps(
 					raw_data.angular_rate.i16bit[0]);
@@ -116,19 +112,22 @@ void run_imu_basic() {
 		}
 
 		// Protobuf encode data
-		map_data_to_pb(raw_imu_pb_p, data_raw_acceleration, data_raw_angular_rate, &raw_data.status_reg, timestamp);
-		size_t pb_size = raw_imu_data_encode(raw_imu_pb_p, &encoded[0], sizeof(encoded));
-
+		map_data_to_pb(raw_imu_pb_p, data_raw_acceleration,
+				data_raw_angular_rate, &raw_data.status_reg, timestamp);
+		size_t pb_size = raw_imu_data_encode(raw_imu_pb_p, &encoded[0],
+				sizeof(encoded));
 		// Transmit encoded data over uart
 		HAL_UART_Transmit(&huart1, &encoded, pb_size, 100);
 
-		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_SET);	// Turn LED2 off (we are done!)
+		HAL_GPIO_WritePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin, GPIO_PIN_SET);// Turn LED2 off (we are done!)
 
 		HAL_Delay(1000);
 	}
 }
 
-void map_data_to_pb(struct raw_imu_data_t *raw_pb, int16_t *data_raw_acceleration, int16_t *data_raw_angular_rate, asm330lhh_status_reg_t *sr, uint32_t ts) {
+void map_data_to_pb(struct raw_imu_data_t *raw_pb,
+		int16_t *data_raw_acceleration, int16_t *data_raw_angular_rate,
+		asm330lhh_status_reg_t *sr, uint32_t ts) {
 	raw_pb->timestamp = ts;
 
 	raw_pb->accel_x = data_raw_acceleration[0];
