@@ -54,41 +54,43 @@ void start_parsing_data() {
 	}
 }
 
-void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
-	indx = Size;
-	new_data_available = true;
-	HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
-	HAL_UARTEx_ReceiveToIdle_IT(&huart1, encoded, sizeof(encoded));
-}
-
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-//	acceleration_mg[0] = asm330lhh_from_fs2g_to_mg(
-//			raw_data.acceleration.i16bit[0]);
-//	acceleration_mg[1] = asm330lhh_from_fs2g_to_mg(
-//			raw_data.acceleration.i16bit[1]);
-//	acceleration_mg[2] = asm330lhh_from_fs2g_to_mg(
-//			raw_data.acceleration.i16bit[2]);
 //
-//	acceleration_g[0] = acceleration_mg[0] / 1000;
-//	acceleration_g[1] = acceleration_mg[1] / 1000;
-//	acceleration_g[2] = acceleration_mg[2] / 1000;
-//	angular_rate_mdps[0] = asm330lhh_from_fs2000dps_to_mdps(
-//			raw_data.angular_rate.i16bit[0]);
-//	angular_rate_mdps[1] = asm330lhh_from_fs2000dps_to_mdps(
-//			raw_data.angular_rate.i16bit[1]);
-//	angular_rate_mdps[2] = asm330lhh_from_fs2000dps_to_mdps(
-//			raw_data.angular_rate.i16bit[2]);
+//void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
+//	indx = Size;
+//	new_data_available = true;
+//	HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
+//	HAL_UARTEx_ReceiveToIdle_IT(&huart1, encoded, sizeof(encoded));
+//}
+
+// UNCOMMENT THIS IF USING PARSER CODE...
+//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+//{
+////	acceleration_mg[0] = asm330lhh_from_fs2g_to_mg(
+////			raw_data.acceleration.i16bit[0]);
+////	acceleration_mg[1] = asm330lhh_from_fs2g_to_mg(
+////			raw_data.acceleration.i16bit[1]);
+////	acceleration_mg[2] = asm330lhh_from_fs2g_to_mg(
+////			raw_data.acceleration.i16bit[2]);
+////
+////	acceleration_g[0] = acceleration_mg[0] / 1000;
+////	acceleration_g[1] = acceleration_mg[1] / 1000;
+////	acceleration_g[2] = acceleration_mg[2] / 1000;
+////	angular_rate_mdps[0] = asm330lhh_from_fs2000dps_to_mdps(
+////			raw_data.angular_rate.i16bit[0]);
+////	angular_rate_mdps[1] = asm330lhh_from_fs2000dps_to_mdps(
+////			raw_data.angular_rate.i16bit[1]);
+////	angular_rate_mdps[2] = asm330lhh_from_fs2000dps_to_mdps(
+////			raw_data.angular_rate.i16bit[2]);
+////
+////	angular_rate_dps[0] = angular_rate_mdps[0] / 1000;
+////	angular_rate_dps[1] = angular_rate_mdps[1] / 1000;
+////	angular_rate_dps[2] = angular_rate_mdps[2] / 1000;
 //
-//	angular_rate_dps[0] = angular_rate_mdps[0] / 1000;
-//	angular_rate_dps[1] = angular_rate_mdps[1] / 1000;
-//	angular_rate_dps[2] = angular_rate_mdps[2] / 1000;
-
-	HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
-	new_data_available = true;
-
-	HAL_UART_Receive_IT(&huart1, encoded, sizeof(encoded));
-}
+//	HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
+//	new_data_available = true;
+//
+//	HAL_UART_Receive_IT(&huart1, encoded, sizeof(encoded));
+//}
 
 
 static void tx_com(uint8_t *tx_buffer, uint16_t len)
