@@ -71,6 +71,8 @@ void Error_Handler(void);
 #define VCP_RX_GPIO_Port GPIOA
 #define GPIO_LED2_Pin GPIO_PIN_3
 #define GPIO_LED2_GPIO_Port GPIOB
+#define GPS_VIO_Pin GPIO_PIN_5
+#define GPS_VIO_GPIO_Port GPIOB
 
 /* USER CODE BEGIN Private defines */
 

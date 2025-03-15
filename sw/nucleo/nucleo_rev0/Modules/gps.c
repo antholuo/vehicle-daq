@@ -38,6 +38,9 @@ void run_gnss_demo() {
 
 	HAL_UARTEx_ReceiveToIdle_DMA(&huart1, nmea_raw, sizeof(nmea_raw));
 
+	// activate the uart transmission AFTER we are ready to receive
+	HAL_GPIO_WritePin(GPS_VIO_GPIO_Port, GPS_VIO_Pin, GPIO_PIN_SET);
+
 	while (1) {
 		if (new_data_ready >= 1) {
 			// Simply dump out the data for now....

@@ -379,11 +379,19 @@ void NMEA_ParseRmc(uint8_t *ptr) {
 	// Parse Longitude
 	NMEA_ParseLatLon(&ptr, 3, &data_RMC.lon_microdeg, &data_RMC.lon_char);
 
-	// Horizontal speed (kts)
-	data_RMC.speed_kts = atoi_flt(&ptr);
+	// Horizontal speed (kts, but atoi turns it into /1000 (micro knot))
+	if (ptr[0] != ',') {
+		data_RMC.speed_mkts = atoi_flt(&ptr);
+	} else {
+		ptr++;
+	}
 
 	// Course
-	data_RMC.course_deg = atoi_flt(&ptr);
+	if (ptr[0] != ',') {
+		data_RMC.course_deg = atoi_flt(&ptr);
+	} else {
+		ptr++;
+	}
 
 	// Date of fix
 	if (*ptr != ',') {
@@ -452,12 +460,12 @@ void NMEA_ParseBuf(uint8_t *buf, uint16_t *length) {
 			ptr += 3; // Skip past the GP / GL series
 			uint32_t hdr = ptr[0] << 16 | ptr[1] << 8 | ptr[2];
 
-			switch (hdr) {	// Not sure why this was easier than doing a strcmp...but here we are
+			switch (hdr) {// Not sure why this was easier than doing a strcmp...but here we are
 			case 0x474741:  // GGA == 0x47 47 41
 				// GGA Message
 				break;
 			case 0x524d43: // RMC == 0x52 4D 43
-				ptr += 5; // Skip past RMC, to point to whatever is AFTER the comma
+				ptr += 4; // Skip past RMC, to point to whatever is AFTER the comma
 				NMEA_ParseRmc(ptr);
 				break;
 			default:

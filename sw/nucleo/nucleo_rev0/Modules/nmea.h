@@ -79,7 +79,7 @@ typedef struct {
 	uint8_t lat_char;			// latitude direction indicator (N/S)
 	int32_t lon_microdeg;		// longitude in microdegrees
 	uint8_t lon_char;			// longitude direction indicator (E/W)
-	uint32_t speed_kts;			// Speed in knots?
+	uint32_t speed_mkts;		// Speed in (micro) knots?
 	uint32_t course_deg;		// Track angle relative to north (degrees)
 	NmeaDate_T utc_date;		// UTC Date
 	// Ignoring magnetic variation
