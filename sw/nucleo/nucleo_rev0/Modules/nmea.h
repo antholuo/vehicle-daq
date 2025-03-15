@@ -34,7 +34,7 @@ enum NmeaSentenceType_E {
 };
 
 typedef struct {
-	uint8_t *start;		// pointer to first byte of dat
+	uint8_t *start;		// pointer to first byte of data
 	uint8_t *data;		// pointer to first term
 	uint8_t *end;		// pointer to last byte
 	uint8_t type;		// Sentence type
@@ -54,15 +54,15 @@ typedef struct {
 
 // TODO: rest of the structs. We're going to bring this on ONE AT A TIME!!!! slow and steady...
 typedef struct {
-	NmeaTime_T time;			// UTC Time
+	NmeaTime_T time_utc;			// UTC Time
 	int32_t lat_microdeg;		// latitude in microdegrees
 	uint8_t lat_char;			// latitude direction indicator (N/S)
 	int32_t lon_microdeg;		// longitude in microdegrees
 	uint8_t lon_char;			// longitude indicator (E/W)
 	uint8_t quality;			// 0 = no fix, 1 = autonomous Gnss, 2 = differential gnss, 4 = rtk fied, 5 = rtk float, 6 = estimated/dead reckoning
-	uint8_t num_sat;			// Number of satellites used (0-12)
+	uint8_t num_sats;			// Number of satellites used (0-12)
 	uint32_t hdop;				// Horizontal Dilution of Precision
-	int32_t altitude;			// Altitude above MSL
+	int32_t altitude_m;			// Altitude above MSL
 	uint8_t alt_unit;			// M, meters, altitude unit
 	int32_t geoid_sep;			// Geoid separation (wtf)
 	uint8_t sep_char;			// M, meters, geoid separation unit
@@ -73,7 +73,7 @@ typedef struct {
 
 // Struct of recommended minimum data...
 typedef struct {
-	NmeaTime_T utc_time;		// UTC Time of fix
+	NmeaTime_T time_utc;		// UTC Time of fix
 	bool data_valid;			// *Technically a character for data validity, but we only care about t/f
 	int32_t lat_microdeg;		// latitude in microdegrees
 	uint8_t lat_char;			// latitude direction indicator (N/S)
@@ -85,16 +85,5 @@ typedef struct {
 	// Ignoring magnetic variation
 	uint8_t pos_mode;			// Position mode. A=autonomous, D=differential, E=estimated, R=coarse, S=simulator, N=not valid
 } RmcData_T;
-
-
-/**
- * Calculates NMEA message CRC
- */
-uint8_t NMEA_CalcCRC(char *str);
-
-/**
- * Parses the ENTIRE nmea buffer, potentiall containing multiple sentences.
- */
-void NMEA_ParseBuf(uint8_t *buf, uint16_t *len);
 
 #endif /* NMEA_H_ */

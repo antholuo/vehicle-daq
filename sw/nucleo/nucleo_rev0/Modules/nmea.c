@@ -361,7 +361,7 @@ void NMEA_ParseLatLon(uint8_t **buf, uint8_t deg_len, int32_t *value,
 //   buf - pointer to the data buffer
 void NMEA_ParseRmc(uint8_t *ptr) {
 	// Time
-	NMEA_ParseTime(&ptr, &data_RMC.utc_time);
+	NMEA_ParseTime(&ptr, &data_RMC.time_utc);
 
 	// validity
 	if (*ptr != ',') {
@@ -441,36 +441,30 @@ void NMEA_ParseSentence(NmeaSentence_T *sentence) {
 // input:
 //   buf - pointer to the buffer with GPS data
 //   length - pointer to the variable with number of bytes in the data buffer
+// Be careful not to modify the buf pointer
 void NMEA_ParseBuf(uint8_t *buf, uint16_t *length) {
-	NmeaSentence_T sentence;
 	uint8_t *buf_end = buf + *length;
+	uint8_t *ptr = buf;
 
-	while (buf < buf_end) {
-		NMEA_FindSentence(&sentence, buf, buf_end);
+	while (ptr < buf_end) {
+		// Find the sentence
+		if (ptr[0] == '$') { // Found the start of a sentence
+			ptr += 3; // Skip past the GP / GL series
+			uint32_t hdr = ptr[0] << 16 | ptr[1] << 8 | ptr[2];
 
-		if (sentence.type != NMEA_NOT_FOUND) {
-			// Validate a sentence by CRC check
-			if (atoi_hex(sentence.end - 3)
-					== NMEA_CalcCRC((char*) sentence.start)) {
-				// Sentence validation passed
-				if (sentence.type != NMEA_UNKNOWN) {
-					// Supported sentence found -> parse it
-					NMEA_ParseSentence(&sentence);
-				} else {
-					// Unsupported sentence found -> skip it
-				}
-			} else {
-				// Sentence validation failed
-				sentence.type = NMEA_INVALID;
+			switch (hdr) {	// Not sure why this was easier than doing a strcmp...but here we are
+			case 0x474741:  // GGA == 0x47 47 41
+				// GGA Message
+				break;
+			case 0x524d43: // RMC == 0x52 4D 43
+				ptr += 5; // Skip past RMC, to point to whatever is AFTER the comma
+				NMEA_ParseRmc(ptr);
+				break;
+			default:
+				break;
 			}
 		}
-
-		// move buffer pointer forward
-		buf = sentence.end + 1;
+		// Dumb increment to the next location
+		ptr++;
 	}
-
-	// reset the length to 0
-	// uncertain if this is strictly necessary
-	*length = 0;
 }
-
