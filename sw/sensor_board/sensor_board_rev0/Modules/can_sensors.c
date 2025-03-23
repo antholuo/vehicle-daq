@@ -91,7 +91,11 @@ void can_imu_loop(void){
     }
 
     if (raw_data.status_reg.xlda) {
-        asm330lhh_acceleration_raw_get(&dev_ctx, data_raw_acceleration);
+        int16_t raw_acceleration[3];
+        asm330lhh_acceleration_raw_get(&dev_ctx, raw_acceleration);
+        raw_data.acceleration.i16bit[0] = raw_acceleration[0];
+        raw_data.acceleration.i16bit[1] = raw_acceleration[1];
+        raw_data.acceleration.i16bit[2] = raw_acceleration[2];
 #if DO_FP
         acceleration_mg[0] = asm330lhh_from_fs2g_to_mg(
                 raw_data.acceleration.i16bit[0]);
@@ -109,7 +113,11 @@ void can_imu_loop(void){
     }
 
     if (raw_data.status_reg.gda) {
-        asm330lhh_angular_rate_raw_get(&dev_ctx, data_raw_angular_rate);
+    	int16_t raw_angular_rate[3];
+        asm330lhh_angular_rate_raw_get(&dev_ctx, raw_angular_rate);
+        raw_data.angular_rate.i16bit[0] = raw_angular_rate[0];
+		raw_data.angular_rate.i16bit[1] = raw_angular_rate[1];
+		raw_data.angular_rate.i16bit[2] = raw_angular_rate[2];
 #if DO_FP
         angular_rate_mdps[0] = asm330lhh_from_fs2000dps_to_mdps(
                 raw_data.angular_rate.i16bit[0]);
