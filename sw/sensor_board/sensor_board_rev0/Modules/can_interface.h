@@ -9,6 +9,9 @@
 #define CAN_INTERFACE_H_
 
 #include "can.h"
+#include "canard.h"
+#include "dronecan_msgs.h"
+#include "can_sensors.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -16,6 +19,18 @@ extern "C" {
 
 /* start the can bus and transmit/receive routine */
 void can_start_basic(void);
+
+/* the main can loop that handles transmission and initiate receive callback */
+void can_main(void);
+
+/* this is the functions that goes before the while(1) */
+void can_main_setup(void);
+
+/* this is the function that goes inside the while(1) */
+void can_main_loop(void);
+
+/* setup the can filter config */
+void can_set_filter(void);
 
 /**
   * @author Roni Kant
@@ -28,7 +43,7 @@ void can_start_basic(void);
   * 		stored.
   * @retval ret == 1: OK, ret < 0: CANARD_ERROR, ret == 0: Check hcan->ErrorCode
   */
-// int16_t canardSTM32Recieve(CAN_HandleTypeDef *hcan, uint32_t RxLocation, CanardCANFrame *const rx_frame);
+int16_t canardSTM32Recieve(CAN_HandleTypeDef *hcan, uint32_t RxLocation, CanardCANFrame *const rx_frame);
 
 /**
   * @author Roni Kant
@@ -39,7 +54,44 @@ void can_start_basic(void);
   * 		transmit.
   * @retval ret == 1: OK, ret < 0: CANARD_ERROR, ret == 0: Check hcan->ErrorCode
   */
-// int16_t canardSTM32Transmit(CAN_HandleTypeDef *hcan, const CanardCANFrame* const tx_frame);
+int16_t canardSTM32Transmit(CAN_HandleTypeDef *hcan, const CanardCANFrame* const tx_frame);
+
+/* handling get node info request from other can node */
+void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer);
+
+/* handling the node state notification from other can node */
+void handle_NotifyState(CanardInstance *ins, CanardRxTransfer *transfer);
+
+/* handling node status info from other can node */
+void handle_NodeStatus(CanardInstance *ins, CanardRxTransfer *transfer);
+
+/* handling raw imu data received from other can node */
+void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer);
+
+/* broadcast this node's status on can bus */
+void send_NodeStatus(void);
+
+/* broadcast this node's IMU data on can bus */
+void send_RawIMU(struct uavcan_equipment_ahrs_SensorIMU raw_imu);
+
+
+/* CANARD Util: a software can filter on which message to handle */
+bool shouldAcceptTransfer(const CanardInstance *ins,
+                          uint64_t *out_data_type_signature,
+                          uint16_t data_type_id,
+                          CanardTransferType transfer_type,
+                          uint8_t source_node_id);
+
+/* CANARD Util: CAN message handle coordinator */
+void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer);
+
+/* transmit tx data in the mailbox when CAN bus is clear */
+void processCanardTxQueue(CAN_HandleTypeDef *hcan);
+
+/*
+  get a 16 byte unique ID for this node, this should be based on the CPU unique ID or other unique ID
+ */
+void getUniqueID(uint8_t id[16]);
 
 #ifdef __cplusplus
 }

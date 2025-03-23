@@ -43,12 +43,12 @@ static float_t angular_rate_mdps[3];
 static float_t angular_rate_dps[3];
 #endif // DO_FP
 
-static int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
+int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
                               uint16_t len);
-static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
+int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
                              uint16_t len);
 //static void tx_com( uint8_t *tx_buffer, uint16_t len );
-static void platform_delay(uint32_t ms);
+void platform_delay(uint32_t ms);
 
 void run_imu_basic();
 

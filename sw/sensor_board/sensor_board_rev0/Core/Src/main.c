@@ -99,10 +99,10 @@ int main(void)
   MX_TIM16_Init();
   MX_TIM17_Init();
   MX_TIM2_Init();
-  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   // run_imu_basic();
-  can_start_basic();
+  can_main_setup();
+  imu_setup();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -112,6 +112,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  can_main_loop();
+	  can_imu_loop();
   }
   /* USER CODE END 3 */
 }
