@@ -142,7 +142,7 @@ void map_data_to_pb(struct raw_imu_data_t *raw_pb,
 	raw_pb->xlda = sr->xlda;
 }
 
-static int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
+int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
 		uint16_t len) {
 	HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
 	HAL_SPI_Transmit(handle, &reg, 1, 1000);
@@ -151,7 +151,7 @@ static int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp,
 	return 0;
 }
 
-static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
+int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
 		uint16_t len) {
 	reg |= 0x80;
 	HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
@@ -161,6 +161,6 @@ static int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
 	return 0;
 }
 
-static void platform_delay(uint32_t ms) {
+void platform_delay(uint32_t ms) {
 	HAL_Delay(ms);
 }
