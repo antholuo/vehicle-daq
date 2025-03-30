@@ -1,0 +1,14 @@
+**/*.a
+**/*.o
+**/*.d
+**/*.su
+**/*.cyclo
+**/*.list
+**/*.mk
+**/*.list
+**/*.mk
+**/*.elf
+**/*.map
+**/*.xml
+Makefile
+
