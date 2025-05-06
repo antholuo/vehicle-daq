@@ -26,6 +26,7 @@ extern UART_HandleTypeDef huartt1; // Where we are receiving the raw GNSS data
 extern UART_HandleTypeDef huart2; // where we send the pretty data (our computer)
 
 extern RmcData_T data_RMC;
+extern GgaData_T data_GGA;
 
 uint8_t console_buf2[100];
 uint8_t nmea_raw[2000];	// Encoded NMEA data. Usually around ~500 bytes long.

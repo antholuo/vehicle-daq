@@ -61,10 +61,10 @@ typedef struct {
 	uint8_t lon_char;			// longitude indicator (E/W)
 	uint8_t quality;			// 0 = no fix, 1 = autonomous Gnss, 2 = differential gnss, 4 = rtk fied, 5 = rtk float, 6 = estimated/dead reckoning
 	uint8_t num_sats;			// Number of satellites used (0-12)
-	uint32_t hdop;				// Horizontal Dilution of Precision
-	int32_t altitude_m;			// Altitude above MSL
+	uint32_t hdop_scaled;				// Horizontal Dilution of Precision, scaled by 1000
+	int32_t altitude_mm;			// Altitude above MSL, mm
 	uint8_t alt_unit;			// M, meters, altitude unit
-	int32_t geoid_sep;			// Geoid separation (wtf)
+	int32_t geoid_sep_scaled;			// Geoid separation (wtf)
 	uint8_t sep_char;			// M, meters, geoid separation unit
 	uint8_t diff_age;			// Age of differential corrections (Null when not using DGPS)
 	uint8_t diff_station;		// ID of station providing differential corrections (null when not used)

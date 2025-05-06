@@ -5,6 +5,8 @@
  *      Author: antho
  *
  *  Library to parse a buffer of NMEA messages.
+ *
+ *  Format of messages taken from UBX-13003221 - R28
  */
 
 // C Libs
@@ -19,6 +21,7 @@
 // Buffer variables!
 /////////////////////////////
 RmcData_T data_RMC;
+GgaData_T data_GGA;
 
 /////////////////////////////
 // Helper functions
@@ -427,9 +430,63 @@ void NMEA_ParseRmc(uint8_t *ptr) {
 	}
 }
 
+void NMEA_ParseGga(uint8_t *ptr) {
+	// Time
+	NMEA_ParseTime(&ptr, &data_GGA.time_utc);
+
+	// LatLon
+	NMEA_ParseLatLon(&ptr, 2, &data_GGA.lat_microdeg, &data_GGA.lat_char);
+	NMEA_ParseLatLon(&ptr, 3, &data_GGA.lon_microdeg, &data_GGA.lon_char);
+
+	// Quality
+	if (ptr[0] != ',') {
+		data_GGA.quality = atoi_len(&ptr, 1);
+	} else {
+		ptr++;
+	}
+
+	// num sats
+	if (ptr[0] != ',') {
+		data_GGA.num_sats = atoi_len(&ptr, 2);
+	} else {
+		ptr++;
+	}
+
+	// HDOP
+	if (ptr[0] != ',') {
+		data_GGA.hdop_scaled = atoi_flt(&ptr) * 1000;
+	} else {
+		ptr++;
+	}
+
+	// Alt
+	if (ptr[0] != ',') {
+		data_GGA.altitude_mm = atoi_flt(&ptr) * 1000;
+	} else {
+		ptr++;
+	}
+	NMEA_NextTerm(&ptr);	// Alt Unit (always M)
+
+	// Geoid separation
+	if (ptr[0] != ',') {
+		data_GGA.geoid_sep_scaled = atoi_flt(&ptr) * 1000;
+	} else {
+		ptr++;
+	}
+
+	// Age of differential corrections
+	if (ptr[0] != ',') {
+		data_GGA.diff_age = atoi_flt(&ptr);
+	} else {
+		ptr++;
+	}
+	// Differential station ID
+	NMEA_NextTerm(&ptr);
+
+}
+
 void NMEA_ParseSentence(NmeaSentence_T *sentence) {
 	uint8_t *ptr = sentence->data;
-	uint32_t tmp;
 
 	switch (sentence->type) {
 	case NMEA_xxRMC:
@@ -460,9 +517,11 @@ void NMEA_ParseBuf(uint8_t *buf, uint16_t *length) {
 			ptr += 3; // Skip past the GP / GL series
 			uint32_t hdr = ptr[0] << 16 | ptr[1] << 8 | ptr[2];
 
+			// TODO: make the headers defines somewhere
 			switch (hdr) {// Not sure why this was easier than doing a strcmp...but here we are
 			case 0x474741:  // GGA == 0x47 47 41
 				// GGA Message
+				NMEA_ParseGga(ptr);
 				break;
 			case 0x524d43: // RMC == 0x52 4D 43
 				ptr += 4; // Skip past RMC, to point to whatever is AFTER the comma
