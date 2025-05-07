@@ -29,8 +29,9 @@ extern GgaData_T data_GGA;
 uint8_t console_buf2[100];
 uint8_t nmea_raw[2000];	// Encoded NMEA data. Usually around ~500 bytes long.
 uint16_t nmea_idx = 0;
+// Initialize 'new_data_ready' with -5 to represent an initial state where no data has been received yet.
+// This value ensures that the variable must reach a positive threshold before processing begins.
 int8_t new_data_ready = -5;
-
 static void tx_com(uint8_t *tx_buffer, uint16_t len);
 
 void run_gnss_demo() {
