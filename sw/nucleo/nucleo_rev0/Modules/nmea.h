@@ -4,7 +4,7 @@
  *  Created on: Mar 2, 2025
  *      Author: antho
  *
- *  Library to parse a buffer of NMEA messges.
+ *  Library to parse a buffer of NMEA messages.
  */
 
 #ifndef NMEA_H_

@@ -12,7 +12,6 @@
  *  Created on: Mar 1, 2025
  *      Author: antho
  */
-#include <nmea.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -22,7 +21,7 @@
 #include "nmea.h"
 #include "gps.h"
 
-extern UART_HandleTypeDef huartt1; // Where we are receiving the raw GNSS data
+extern UART_HandleTypeDef huart1; // Where we are receiving the raw GNSS data
 extern UART_HandleTypeDef huart2; // where we send the pretty data (our computer)
 
 extern RmcData_T data_RMC;
