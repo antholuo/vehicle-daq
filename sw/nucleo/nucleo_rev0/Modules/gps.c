@@ -50,10 +50,12 @@ void run_gnss_demo() {
 
 			// this is non-functional logic.... don't use it.
 			NMEA_ParseBuf(nmea_raw, &nmea_idx);
-			snprintf((char*) console_buf2, sizeof(console_buf2),
-					"Received GPS data with lat (microdeg) %d and lon (microdeg) %d\r\n",
-					data_RMC.lat_microdeg, data_RMC.lon_microdeg);
-			tx_com(console_buf2, strlen((char const *) console_buf2));
+			if (data_RMC.data_valid) {
+				snprintf((char*) console_buf2, sizeof(console_buf2),
+						"Received GPS data with lat (microdeg) %ld and lon (microdeg) %ld\r\n",
+						data_RMC.lat_microdeg, data_RMC.lon_microdeg);
+				tx_com(console_buf2, strlen((char const *) console_buf2));
+			}
 			new_data_ready = 0;
 		}
 		HAL_Delay(10);

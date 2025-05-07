@@ -86,4 +86,6 @@ typedef struct {
 	uint8_t pos_mode;			// Position mode. A=autonomous, D=differential, E=estimated, R=coarse, S=simulator, N=not valid
 } RmcData_T;
 
+void NMEA_ParseBuf(uint8_t *buf, uint16_t *length);
+
 #endif /* NMEA_H_ */
