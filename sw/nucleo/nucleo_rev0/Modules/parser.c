@@ -45,7 +45,7 @@ void start_parsing_data() {
 			size_t data_size = raw_imu_data_decode(raw_data_p, encoded, indx);
 
 			snprintf((char*) console_buf, sizeof(console_buf),
-					"Received new data with size: %ld and count %ld\r\n",
+					"Received new data with size: %zu and count %ld\r\n",
 					data_size, raw_data_p->timestamp);
 
 			tx_com(console_buf, strlen((char const *) console_buf));
