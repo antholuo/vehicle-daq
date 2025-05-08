@@ -26,3 +26,5 @@ sw/sensor_board/sensor_board_rev0/Debug/
 *.lck
 
 sw/nucleo/nucleo_rev0/Debug/
+
+sw/nucleo/nucleo_rev0/.settings/language.settings.xml
