@@ -24,6 +24,4 @@ void imu_dronecan_transform_pb (struct uavcan_equipment_ahrs_SensorIMU *dronecan
 /* handling raw imu data received from other can node */
 void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer);
 
-void
-
 #endif /* CAN_SENSORS_H_ */
