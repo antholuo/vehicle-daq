@@ -410,20 +410,6 @@ void handle_NodeStatus(CanardInstance *ins, CanardRxTransfer *transfer) {
 	}
 }
 
-void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer){
-	struct uavcan_equipment_ahrs_SensorIMU rawIMU;
-
-	if (uavcan_equipment_ahrs_SensorIMU_decode(transfer, &rawIMU)) {
-		return;
-	}
-
-	/* TODO: add formal IMU package handling */
-
-	/* toggle a LED when rx call back is trigger, for debugging */
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
-	return;
-}
-
 
 /*
   send the 1Hz NodeStatus message. This is what allows a node to show

@@ -65,9 +65,6 @@ void handle_NotifyState(CanardInstance *ins, CanardRxTransfer *transfer);
 /* handling node status info from other can node */
 void handle_NodeStatus(CanardInstance *ins, CanardRxTransfer *transfer);
 
-/* handling raw imu data received from other can node */
-void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer);
-
 /* broadcast this node's status on can bus */
 void send_NodeStatus(void);
 
