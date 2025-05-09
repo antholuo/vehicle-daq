@@ -16,7 +16,7 @@
 extern CAN_HandleTypeDef hcan;
 
 /* global canard instance */
-static CanardInstance canard;
+CanardInstance canard;
 
 /* global node status info */
 static struct uavcan_protocol_NodeStatus node_status;
@@ -456,22 +456,6 @@ void send_NodeStatus(void) {
                     len);
 }
 
-
-void send_RawIMU(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
-	uint8_t buffer[UAVCAN_EQUIPMENT_AHRS_SENSORIMU_MAX_SIZE];
-
-	uint32_t len = uavcan_equipment_ahrs_SensorIMU_encode(&raw_imu, buffer);
-
-	static uint8_t transfer_id;
-
-    canardBroadcast(&canard,
-					UAVCAN_EQUIPMENT_AHRS_SENSORIMU_SIGNATURE,
-                    UAVCAN_EQUIPMENT_AHRS_SENSORIMU_ID,
-                    &transfer_id,
-                    CANARD_TRANSFER_PRIORITY_LOW,
-                    buffer,
-                    len);
-}
 /*
   get a 16 byte unique ID for this node, this should be based on the CPU unique ID or other unique ID
  */

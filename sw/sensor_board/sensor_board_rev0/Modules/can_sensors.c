@@ -7,9 +7,11 @@
 
 #include "can_sensors.h"
 #include "spi.h"
+#include "canard.h"
 
 /* IMU static variables */
 extern SPI_HandleTypeDef hspi1;		// ASM330 SPI
+extern CanardInstance canard;		// from can_interface.c
 static stmdev_ctx_t dev_ctx;
 static asm330lhh_reg_t reg;
 static uint32_t timestamp;
@@ -29,6 +31,60 @@ raw_imu_transform_dronecan (imuRawData_S data){
     }
     
     return dronecan_data;
+}
+
+void send_RawIMU(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
+	uint8_t buffer[UAVCAN_EQUIPMENT_AHRS_SENSORIMU_MAX_SIZE];
+
+	uint32_t len = uavcan_equipment_ahrs_SensorIMU_encode(&raw_imu, buffer);
+
+	static uint8_t transfer_id;
+
+    canardBroadcast(&canard,
+					UAVCAN_EQUIPMENT_AHRS_SENSORIMU_SIGNATURE,
+                    UAVCAN_EQUIPMENT_AHRS_SENSORIMU_ID,
+                    &transfer_id,
+                    CANARD_TRANSFER_PRIORITY_LOW,
+                    buffer,
+                    len);
+}
+
+struct uavcan_equipment_gnss_SensorGPS
+raw_gps_transform_dronecan (GpsData_T data){
+	struct uavcan_equipment_gnss_SensorGPS dronecan_data;
+
+	/* TODO: How to make the GPS's ts aligned with IMU's ts? */
+	dronecan_data.timestamp = 0;
+
+	/* really rough, MVP sorta */
+	dronecan_data.hours = data.time_utc.hours;
+	dronecan_data.minutes = data.time_utc.minutes;
+	dronecan_data.seconds = data.time_utc.seconds;
+	dronecan_data.lat_microdeg = data.lat_microdeg;
+	dronecan_data.lon_microdeg = data.lon_microdeg;
+	dronecan_data.altitude_m = data.altitude_m;
+	dronecan_data.speed_kts = data.speed_kts;
+	dronecan_data.heading_deg = data.heading_deg;
+	dronecan_data.num_sats = data.num_sats;
+	dronecan_data.fix_status = data.fix_status;
+
+	return dronecan_data;
+}
+
+void send_RawGPS(struct uavcan_equipment_gnss_SensorGPS raw_gps){
+	uint8_t buffer[UAVCAN_EQUIPMENT_GNSS_SENSORGPS_MAX_SIZE];
+
+	uint32_t len = uavcan_equipment_gnss_SensorGPS_encode(&raw_gps, buffer);
+
+	static uint8_t transfer_id;
+
+	canardBroadcast(&canard,
+					UAVCAN_EQUIPMENT_GNSS_SENSORGPS_SIGNATURE,
+					UAVCAN_EQUIPMENT_GNSS_SENSORGPS_ID,
+					&transfer_id,
+					CANARD_TRANSFER_PRIORITY_LOW,
+					buffer,
+					len);
 }
 
 /* a lot of copy paste from anni's code, just for testing */
