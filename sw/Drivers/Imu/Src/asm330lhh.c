@@ -71,10 +71,6 @@ ImuStatus_E setup_imu_asm330lhh() {
     // Accelerometer - LPF1 + LPF2 path
     asm330lhh_xl_hp_path_on_out_set(&asm330lhh_dev_ctx, ASM330LHH_LP_ODR_DIV_100);
 
-    while(1) {
-        HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
-        HAL_Delay(500);
-    }
     return retVal;
 }
 
