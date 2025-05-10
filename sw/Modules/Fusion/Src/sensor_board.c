@@ -13,7 +13,7 @@
 #include "gpio.h"
 
 #define NUM_IMUS 1
-static const imuType_T imu_types[NUM_IMUS] = {IMU_ASM330LHH};
+static const ImuType_T imu_types[NUM_IMUS] = {IMU_ASM330LHH};
 
 static bool setup_sensor_board() {
     bool returnVal = true;
@@ -28,7 +28,6 @@ void run_sensor_board() {
 
     while(1) {
         blinky();
-        HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
     }
 
     //

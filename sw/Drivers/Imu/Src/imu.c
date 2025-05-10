@@ -9,13 +9,14 @@
  */
 
 #include "imu.h"
+#include "asm330lhh.h"
 
-bool setup_imus(const imuType_T * const imu_type, size_t num_imus) {
-    bool returnVal = true;
+ImuStatus_E setup_imus(const ImuType_T * const imu_type, const size_t num_imus) {
+    ImuStatus_E retVal = IMU_STATUS_OK;
     for (size_t i = 0; i < num_imus; ++i) {
         switch(imu_type[i]) {
         case IMU_ASM330LHH:
-            /* returnVal &= setup_imu_asm330lhh(); */
+            if(setup_imu_asm330lhh() != IMU_STATUS_OK) { retVal = IMU_STATUS_ERR; }
             break;
         default:
             // throw an error?
@@ -23,10 +24,10 @@ bool setup_imus(const imuType_T * const imu_type, size_t num_imus) {
         }
     }
 
-    return returnVal;
+    return retVal;
 }
 
 
-bool poll_imus(imuType_T *imu_type, size_t num_imus, imuData_S *imu_data) {
+ImuStatus_E poll_imus(ImuType_T *imu_type, size_t num_imus, ImuData_S *imu_data) {
     return false;
 }

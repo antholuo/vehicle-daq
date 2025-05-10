@@ -19,7 +19,14 @@ typedef enum {
     IMU_NOT_AVAIL = 0,
     IMU_ASM330LHH = 1,
     // IMU_BMX160 = 2,
-} imuType_T;
+} ImuType_T;
+
+typedef enum {
+    IMU_STATUS_OK = 0,
+    IMU_STATUS_ERR = 1,
+    IMU_STATUS_SETUP_FAILURE = 2,
+    // Future error types?
+} ImuStatus_E;
 
 /**
 * imu data struct
@@ -40,11 +47,11 @@ typedef struct __attribute__((packed)) {
     bool accel_data_valid;
     bool gyro_data_valid;
     bool mag_data_valid;
-} imuData_S;
+} ImuData_S;
 
-bool setup_imus(const imuType_T * const imu_type, size_t num_imus);
+ImuStatus_E setup_imus(const ImuType_T * const imu_type, const size_t num_imus);
 
-bool poll_imus(imuType_T *imu_type, size_t num_imus, imuData_S *imu_data);
+ImuStatus_E poll_imus(ImuType_T *imu_type, size_t num_imus, ImuData_S *imu_data);
 
 #endif // IMU_H
 
