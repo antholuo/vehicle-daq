@@ -26,6 +26,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "sensor_board.h"
 // #include "imu.h"
 // #include "can_interface.h"
 #include "blinky.h"
@@ -101,6 +102,11 @@ int main(void)
   MX_TIM17_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+
+  run_sensor_board();
+
+  // PANIC IF WE REACH HERE
+  NVIC_SystemReset();
   // run_imu_basic();
   /* can_main_setup(); */
   /* imu_setup(); */
