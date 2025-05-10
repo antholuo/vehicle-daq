@@ -43,6 +43,7 @@ file(GLOB_RECURSE C_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.c
                             ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F0xx_HAL_Driver/Src/*.c
                             ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/*.c
                             ${MODULES_C_SRCS}
+                            ${DRIVERS_C_SRCS}
                             # ${OLD_C_SRCS}
                             # ${OLD_CANARD_SRCS}
 )
