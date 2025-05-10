@@ -19,6 +19,7 @@
 
 #define NUM_IMUS 1
 static const ImuType_T imu_types[NUM_IMUS] = {IMU_ASM330LHH};
+static ImuData_S imu_data[NUM_IMUS];
 
 static bool setup_peripherals() {
     bool returnVal = true;
@@ -29,6 +30,12 @@ static bool setup_peripherals() {
     return returnVal;
 }
 
+static bool poll_peripherals() {
+    poll_imus(imu_types, NUM_IMUS, imu_data);
+
+    return true;
+}
+
 void run_sensor_board() {
     (void)setup_peripherals();
 
@@ -37,6 +44,7 @@ void run_sensor_board() {
     HAL_TIM_Base_Start_IT(&htim17);
 
     while(1) {
+        poll_peripherals();
         /* blinky(); */
     }
 
