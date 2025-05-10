@@ -19,9 +19,12 @@ struct uavcan_equipment_ahrs_SensorIMU
 raw_imu_transform_dronecan (imuRawData_S data);
 
 /* DroneCAN IMU format converts to pd format */
-void imu_dronecan_transform_pb (struct uavcan_equipment_ahrs_SensorIMU *dronecan_data, struct raw_imu_data_t *pd_data);
+void imu_dronecan_transform_pb (struct uavcan_equipment_ahrs_SensorIMU dronecan_data, struct raw_imu_data_t *pd_data);
 
 /* handling raw imu data received from other can node */
 void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer);
+
+/* run before while loop, prepare for handling can data */
+void can_sensor_receiption_setup(void);
 
 #endif /* CAN_SENSORS_H_ */

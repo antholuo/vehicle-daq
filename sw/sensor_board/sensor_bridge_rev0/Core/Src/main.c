@@ -98,6 +98,7 @@ int main(void)
   MX_USART2_UART_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
+  can_sensor_receiption_setup();
   can_main_setup();
 
   /* USER CODE END 2 */
@@ -109,6 +110,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+	HAL_Delay(500);
   }
   /* USER CODE END 3 */
 }
