@@ -27,14 +27,20 @@ int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
 //static void tx_com( uint8_t *tx_buffer, uint16_t len );
 void platform_delay(uint32_t ms);
 
+// TODO: consider moving these to their own file?
+void acceleration_from_fs2000dps_to_mdps(int16_t *data_raw, ImuData_S *imu_data);
+void angular_rate_from_fs2000dps_to_mdps(int16_t *data_raw, ImuData_S *imu_data);
+
 //////// // Eventually we need these to be configurable...
 extern SPI_HandleTypeDef hspi1;     // ASM330LHH SPI
 
 ////////
 // Private variables
 static stmdev_ctx_t asm330lhh_dev_ctx;
-static asm330lhh_reg_t asm330lhh_reg;
-static uint_fast32_t timestamp;
+// static asm330lhh_reg_t asm330lhh_reg;
+asm330lhh_status_reg_t status_reg;
+int16_t data_raw_acceleration[3];
+int16_t data_raw_angular_rate[3];
 static uint8_t asm330lhh_whoami, rst;
 
 ImuStatus_E setup_imu_asm330lhh() {
@@ -74,6 +80,33 @@ ImuStatus_E setup_imu_asm330lhh() {
     return retVal;
 }
 
+ImuStatus_E poll_imu_asm330lhh(ImuData_S *imu_data) {
+    asm330lhh_status_reg_get(&asm330lhh_dev_ctx, &status_reg);
+
+    if (status_reg.xlda || status_reg.gda) {
+        asm330lhh_timestamp_raw_get(&asm330lhh_dev_ctx, &imu_data->timestamp);
+        // if there is data (something new) and our TS changes ,invalidated all the data.
+        imu_data->accel_data_valid = false;
+        imu_data->gyro_data_valid = false;
+        imu_data->mag_data_valid = false;
+    }
+
+    if (status_reg.xlda) {
+        asm330lhh_acceleration_raw_get(&asm330lhh_dev_ctx, data_raw_acceleration);
+        imu_data->accel_data_valid = true;
+    }
+    if (status_reg.gda) {
+        asm330lhh_angular_rate_raw_get(&asm330lhh_dev_ctx, data_raw_angular_rate);
+        imu_data->gyro_data_valid = true;
+    }
+
+    // Convert from our scale to mg/mdps
+    acceleration_from_fs2000dps_to_mdps(data_raw_acceleration, imu_data);
+    angular_rate_from_fs2000dps_to_mdps(data_raw_angular_rate, imu_data);
+
+    return IMU_STATUS_OK;
+}
+
 ////////
 // platform functions for IMU setup
 int32_t platform_write(void *handle, uint8_t reg, const uint8_t *bufp, uint16_t len) {
@@ -97,4 +130,18 @@ int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp, uint16_t len) {
 
 void platform_delay(uint32_t ms) {
     HAL_Delay(ms);
+}
+
+////////
+// Bulky internal conversion functions
+void acceleration_from_fs2000dps_to_mdps(int16_t *data_raw, ImuData_S *imu_data) {
+    imu_data->accel_x_mg = asm330lhh_from_fs2g_to_mg(data_raw[0]);
+    imu_data->accel_y_mg = asm330lhh_from_fs2g_to_mg(data_raw[1]);
+    imu_data->accel_z_mg = asm330lhh_from_fs2g_to_mg(data_raw[2]);
+}
+
+void angular_rate_from_fs2000dps_to_mdps(int16_t *data_raw, ImuData_S *imu_data) {
+    imu_data->gyro_x_mdps = asm330lhh_from_fs2000dps_to_mdps(data_raw[0]);
+    imu_data->gyro_y_mdps = asm330lhh_from_fs2000dps_to_mdps(data_raw[1]);
+    imu_data->gyro_z_mdps = asm330lhh_from_fs2000dps_to_mdps(data_raw[2]);
 }

@@ -28,6 +28,16 @@ ImuStatus_E setup_imus(const ImuType_T * const imu_type, const size_t num_imus) 
 }
 
 
-ImuStatus_E poll_imus(ImuType_T *imu_type, size_t num_imus, ImuData_S *imu_data) {
+ImuStatus_E poll_imus(const ImuType_T * const imu_type, const size_t num_imus, ImuData_S *imu_data) {
+    for (size_t i = 0; i < num_imus; ++i) {
+        switch(imu_type[i]) {
+        case IMU_ASM330LHH:
+            poll_imu_asm330lhh(&imu_data[i]);
+            break;
+        default:
+            // throw an error?
+            break;
+        }
+    }
     return false;
 }
