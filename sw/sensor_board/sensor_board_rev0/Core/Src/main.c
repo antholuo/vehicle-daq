@@ -192,7 +192,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     HAL_IncTick();
   }
   /* USER CODE BEGIN Callback 1 */
-
+  else if (htim->Instance == TIM16) {
+    task_100hz();
+  } else if (htim->Instance == TIM17) {
+    task_800hz();
+  }
   /* USER CODE END Callback 1 */
 }
 

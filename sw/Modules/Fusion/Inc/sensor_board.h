@@ -10,6 +10,9 @@
 #ifndef FUSION_SENSOR_BOARD_H
 #define FUSION_SENSOR_BOARD_H
 
+void task_100hz();
+void task_800hz();
+
 void run_sensor_board();
 
 #endif // FUSION_SENSOR_BOARD_H
