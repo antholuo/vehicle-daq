@@ -17,10 +17,11 @@ extern SPI_HandleTypeDef hspi1;		// ASM330 SPI
 
 /* protobuf */
 extern UART_HandleTypeDef huart2;	// pb comm
-#define PROTOBUF_SIZE 512
-static uint8_t pb[PROTOBUF_SIZE];
-static uint8_t encoded[PROTOBUF_SIZE];
+
+static uint8_t imu_pb[IMU_PROTOBUF_SIZE];
 static struct raw_imu_data_t *pb_imu_p;
+static CircularQueue imu_tx_queue;
+static uint8_t dma_busy;
 
 struct uavcan_equipment_ahrs_SensorIMU
 raw_imu_transform_dronecan (imuRawData_S data){
@@ -64,17 +65,69 @@ void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer){
 	}
 
 	// preparing for the pb data
-	 imu_dronecan_transform_pb(rawIMU, pb_imu_p);
-	 int pb_size = raw_imu_data_encode(pb_imu_p, &encoded[0], PROTOBUF_SIZE);
+	imu_dronecan_transform_pb(rawIMU, pb_imu_p);
+	uint8_t encoded[IMU_PROTOBUF_SIZE];
+	int pb_size = raw_imu_data_encode(pb_imu_p, encoded, IMU_PROTOBUF_SIZE);
 
-	 // then we transmit it through UART
-	 HAL_UART_Transmit(&huart2, &encoded[0], (uint16_t)pb_size, 100);
+	// then we add it to the queue, it will be transmit by DMA in main loop
+	cq_enqueue(&imu_tx_queue, encoded, pb_size);
 
 	/* toggle a LED when rx call back is trigger, for debugging */
 	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
 	return;
 }
 
-void can_sensor_receiption_setup(void){
-	pb_imu_p = raw_imu_data_new(&pb, PROTOBUF_SIZE);
+void can_sensor_reception_setup(void){
+	pb_imu_p = raw_imu_data_new(&imu_pb, IMU_PROTOBUF_SIZE);
+	cq_init(&imu_tx_queue);
 }
+
+void can_sensor_reception_loop(void){
+	uint8_t *imu_encoded_q  = NULL;
+	uint16_t len;
+	if (dma_busy == 0) {
+		if (cq_dequeue(&imu_tx_queue, &imu_encoded_q, &len)){
+			HAL_StatusTypeDef ret = HAL_UART_Transmit_DMA(&huart2, imu_encoded_q, len);
+			if (ret == HAL_OK){
+				dma_busy = 1;
+			}
+		}
+	}
+}
+
+
+void cq_init(CircularQueue *q) {
+    q->head = 0;
+    q->tail = 0;
+    q->count = 0;
+}
+
+int cq_enqueue(CircularQueue *q, const uint8_t *data, uint16_t len) {
+    if (q->count >= CQ_DEPTH || len > IMU_PROTOBUF_SIZE)
+        return 0;
+
+    memcpy(q->buffer[q->tail], data, len);
+    q->lengths[q->tail] = len;
+    q->tail = (q->tail + 1) % CQ_DEPTH;
+    q->count++;
+    return 1;
+}
+
+int cq_dequeue(CircularQueue *q, uint8_t **data, uint16_t *len) {
+    if (q->count == 0)
+        return 0;
+
+    *data = q->buffer[q->head];
+    *len = q->lengths[q->head];
+    q->head = (q->head + 1) % CQ_DEPTH;
+    q->count--;
+    return 1;
+}
+
+void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
+    if (huart == &huart2) {
+		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+        dma_busy = 0; // ready for next one
+    }
+}
+
