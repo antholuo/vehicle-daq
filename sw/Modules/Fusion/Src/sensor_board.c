@@ -22,6 +22,7 @@
 #define NUM_GNSS 1
 static const ImuType_T imu_types[NUM_IMUS] = {IMU_ASM330LHH};
 static ImuData_S imu_data[NUM_IMUS];
+static const GpsType_T gps_types[NUM_GNSS] = {GPS_NEO_M8N};
 static GpsData_S gps_data[NUM_GNSS];
 
 static bool setup_peripherals() {
@@ -30,7 +31,7 @@ static bool setup_peripherals() {
     // Setup sensors
     returnVal &= setup_imus(imu_types, NUM_IMUS);
 
-    start_gnss_rx();
+    gnss_start_rx(gps_types, NUM_GNSS);
 
     return returnVal;
 }
@@ -38,9 +39,7 @@ static bool setup_peripherals() {
 static bool poll_peripherals() {
     poll_imus(imu_types, NUM_IMUS, imu_data);
 
-    if (new_gnss_data_available()) {
-        parse_gnss_data(&gps_data[0]); // only 1 gps for now
-    }
+    (void)gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
     return true;
 }
 
@@ -78,7 +77,9 @@ void task_800hz() {
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
-    if (huart->Instance == M8N_UART_INSTANCE) {
-        process_incoming_gnss_data(Size);
+    if (gnss_process_incoming_data(huart, Size)) {
+        return;
+    } else {
+        // Empty for now, but check other UART messages here
     }
 }

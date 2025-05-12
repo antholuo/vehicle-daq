@@ -1,24 +1,26 @@
 /**
  * gps.h
  *
- * Created on: 2025-MAY-10
+ * Created on: 2025-MAY-12
  *     Author: Anni
- *   Modified: 2025-MAY-10
  *
- * Contains common GPS functionality & Data structures
+ * Contains common GPS structs.
  */
 
 #ifndef GPS_H
 #define GPS_H
 
-#include "nmea.h"
+#include "nmea.h"  // UTC TIME
+
+#include "usart.h"
 
 #include <stdbool.h>
 #include <stdint.h>
 
-// This is quite large, but the size of the internal UART buffer for receiving messages
-// must be larger than the largest message we can expect to receieve over UART
-#define GPS_UART_BUFFER_SIZE (800);
+typedef enum {
+    GPS_NOT_AVAIL = 0,
+    GPS_NEO_M8N       = 1,
+} GpsType_T;
 
 typedef struct {
     NmeaTime_T time_utc;
@@ -34,12 +36,11 @@ typedef struct {
     bool data_valid;
 } GpsData_S;
 
-void start_gnss_rx();
+bool gnss_process_incoming_data(UART_HandleTypeDef *huart, uint16_t size);
 
-bool new_gnss_data_available();
+void gnss_start_rx(const GpsType_T * const gps_type, const size_t num_gps);
 
-void parse_gnss_data(GpsData_S *gps_data);
-
-void process_incoming_gnss_data(uint16_t size);
+// returns true if data was parsed
+bool parse_gnss_data_if_available(const GpsType_T * const gps_type, const size_t num_gps, GpsData_S *gps_data);
 
 #endif // GPS_H
