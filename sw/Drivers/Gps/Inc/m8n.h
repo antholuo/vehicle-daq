@@ -17,10 +17,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-// This is quite large, but the size of the internal UART buffer for receiving messages
-// must be larger than the largest message we can expect to receieve over UART
-#define GPS_UART_BUFFER_SIZE (800);
-
 void gnss_m8n_start_rx();
 
 bool gnss_m8n_is_data_available();

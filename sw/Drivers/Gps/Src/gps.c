@@ -44,7 +44,7 @@ bool gnss_parse_data_if_available(const GpsType_T * const gps_type, const size_t
 
 bool gnss_process_incoming_data(UART_HandleTypeDef *huart, uint16_t size) {
     bool retval = false;
-    if (huart->Instance == M8N_UART_INSTANCE) {
+    if (huart->Instance == M8N_UART_INSTANCE && size > 0) {
         retval = true;
         gnss_m8n_process_incoming_data(size);
     }

@@ -15,8 +15,8 @@
 #include "gps.h"
 
 typedef struct __attribute__((packed)) {
-    imuData_S imu_data;
-    gpsData_S gps_data;
-} motionDataRaw_S;
+    ImuData_S imu_data;
+    GpsData_S gps_data;
+} MotionDataRaw_S;
 
 #endif // FUSION_DATATYPES_H

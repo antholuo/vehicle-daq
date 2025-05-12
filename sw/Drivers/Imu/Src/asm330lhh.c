@@ -28,7 +28,7 @@ int32_t platform_read(void *handle, uint8_t reg, uint8_t *bufp,
 void platform_delay(uint32_t ms);
 
 // TODO: consider moving these to their own file?
-void acceleration_from_fs2000dps_to_mdps(int16_t *data_raw, ImuData_S *imu_data);
+void acceleration_from_fs2g_to_mg(int16_t *data_raw, ImuData_S *imu_data);
 void angular_rate_from_fs2000dps_to_mdps(int16_t *data_raw, ImuData_S *imu_data);
 
 //////// // Eventually we need these to be configurable...
@@ -101,7 +101,7 @@ ImuStatus_E poll_imu_asm330lhh(ImuData_S *imu_data) {
     }
 
     // Convert from our scale to mg/mdps
-    acceleration_from_fs2000dps_to_mdps(data_raw_acceleration, imu_data);
+    acceleration_from_fs2g_to_mg(data_raw_acceleration, imu_data);
     angular_rate_from_fs2000dps_to_mdps(data_raw_angular_rate, imu_data);
 
     return IMU_STATUS_OK;
@@ -134,7 +134,7 @@ void platform_delay(uint32_t ms) {
 
 ////////
 // Bulky internal conversion functions
-void acceleration_from_fs2000dps_to_mdps(int16_t *data_raw, ImuData_S *imu_data) {
+void acceleration_from_fs2g_to_mg(int16_t *data_raw, ImuData_S *imu_data) {
     imu_data->accel_x_mg = asm330lhh_from_fs2g_to_mg(data_raw[0]);
     imu_data->accel_y_mg = asm330lhh_from_fs2g_to_mg(data_raw[1]);
     imu_data->accel_z_mg = asm330lhh_from_fs2g_to_mg(data_raw[2]);

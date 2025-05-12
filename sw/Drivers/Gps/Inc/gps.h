@@ -41,6 +41,6 @@ bool gnss_process_incoming_data(UART_HandleTypeDef *huart, uint16_t size);
 void gnss_start_rx(const GpsType_T * const gps_type, const size_t num_gps);
 
 // returns true if data was parsed
-bool parse_gnss_data_if_available(const GpsType_T * const gps_type, const size_t num_gps, GpsData_S *gps_data);
+bool gnss_parse_data_if_available(const GpsType_T * const gps_type, const size_t num_gps, GpsData_S *gps_data);
 
 #endif // GPS_H
