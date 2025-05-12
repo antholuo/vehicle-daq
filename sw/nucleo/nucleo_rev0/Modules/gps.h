@@ -12,10 +12,6 @@
 #include "usart.h"
 #include "nmea.h"
 
-// Size of the internal UART buffer for receiving messages.
-// Must be larger than the largest message we can expect to receive over UART
-#define GPS_UART_BUFFER_SIZE 800
-
 // TODO: add other fields: HDOP, VDOP, diff age (dgps)
 typedef struct {
 	NmeaTime_T time_utc;
