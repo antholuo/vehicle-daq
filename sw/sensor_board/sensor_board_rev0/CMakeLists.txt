@@ -21,6 +21,9 @@ include_directories(
 
   # Project specific includes
   ${PROJECT_ROOT_DIR}/Modules/Fusion/Inc # Data Fusion
+  ${PROJECT_ROOT_DIR}/Modules/Dsdlc_generated/Inc # DroneCAN message Libraries
+  ${PROJECT_ROOT_DIR}/Modules/Comms/Inc # Inter-board Communications
+  ${PROJECT_ROOT_DIR}/Modules/Canard/Inc # Canard Library
   ${PROJECT_ROOT_DIR}/Drivers/Imu/Inc    # Imu Driver
   ${PROJECT_ROOT_DIR}/Drivers/Gps/Inc    # Gps Driver
 
@@ -31,10 +34,18 @@ include_directories(
 
 ### Sources ### # Eventually - we'll want specific control on our source files
 set(MODULES_DIR ${PROJECT_ROOT_DIR}/Modules)
-set(MODULES_C_SRCS ${MODULES_DIR}/**/Src/*.c)
+set(MODULES_C_SRCS
+  ${MODULES_DIR}/Fusion/Src/*.c
+  ${MODULES_DIR}/Dsdlc_generated/Src/*.c
+  ${MODULES_DIR}/Comms/Src/*.c
+  ${MODULES_DIR}/Canard/Src/*.c
+)
 
 set(DRIVERS_DIR ${PROJECT_ROOT_DIR}/Drivers)
-set(DRIVERS_C_SRCS ${DRIVERS_DIR}/**/Src/*.c)
+set(DRIVERS_C_SRCS
+  ${DRIVERS_DIR}/Imu/Src/*.c
+  ${DRIVERS_DIR}/Gps/Src/*.c
+)
 
 # set(OLD_C_SRCS ${PROJECT_SOURCE_DIR}/Modules/*.c)
 # set(OLD_CANARD_SRCS ${PROJECT_SOURCE_DIR}/Modules/canard_files/Src/*.c)
@@ -59,6 +70,10 @@ add_executable(${ELF_NAME} ${C_SOURCES} ${STARTUP_ASM})
 
 # Add project-specific linker flags (.ld script, .map file)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T${LINKER_SCRIPT} -Wl,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map,--cref")
+
+# Enable optimization to this project
+set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
+set(CMAKE_C_FLAGS_DEBUG   "-O1 -g")
 
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 

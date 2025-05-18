@@ -15,25 +15,21 @@ static uint32_t timestamp;
 /* time stamp mark*/
 static uint64_t next_10hz_service_at;
 
-struct uavcan_equipment_ahrs_SensorIMU
-raw_imu_transform_dronecan (ImuData_S data){
-    struct uavcan_equipment_ahrs_SensorIMU dronecan_data;
-
-    dronecan_data.timestamp = data.timestamp;
-    dronecan_data.accelerometer_latest[0] = data.accel_x_mg;
-    dronecan_data.rate_gyro_latest[0] = data.gyro_x_mdps;
-    dronecan_data.magnetometer_latest[0] = data.mag_x_microT;
-    dronecan_data.accelerometer_latest[1] = data.accel_y_mg;
-    dronecan_data.rate_gyro_latest[1] = data.gyro_y_mdps;
-    dronecan_data.magnetometer_latest[1] = data.mag_y_microT;
-    dronecan_data.accelerometer_latest[2] = data.accel_z_mg;
-    dronecan_data.rate_gyro_latest[2] = data.gyro_z_mdps;
-    dronecan_data.magnetometer_latest[2] = data.mag_z_microT;
-    dronecan_data.accel_data_valid = data.accel_data_valid;
-    dronecan_data.gyro_data_valid = data.gyro_data_valid;
-    dronecan_data.mag_data_valid = data.mag_data_valid;
-    
-    return dronecan_data;
+void
+convertImuToDroneCAN (const ImuData_S *src, struct uavcan_equipment_ahrs_SensorIMU *dst){
+    dst->timestamp = src->timestamp;
+    dst->accelerometer_latest[0] = src->accel_x_mg;
+    dst->rate_gyro_latest[0] = src->gyro_x_mdps;
+    dst->magnetometer_latest[0] = src->mag_x_microT;
+    dst->accelerometer_latest[1] = src->accel_y_mg;
+    dst->rate_gyro_latest[1] = src->gyro_y_mdps;
+    dst->magnetometer_latest[1] = src->mag_y_microT;
+    dst->accelerometer_latest[2] = src->accel_z_mg;
+    dst->rate_gyro_latest[2] = src->gyro_z_mdps;
+    dst->magnetometer_latest[2] = src->mag_z_microT;
+    dst->accel_data_valid = src->accel_data_valid;
+    dst->gyro_data_valid = src->gyro_data_valid;
+    dst->mag_data_valid = src->mag_data_valid;
 }
 
 /* a lot of copy paste from anni's code, just for testing */
@@ -86,28 +82,28 @@ void can_imu_loop(void){
 //     next_10hz_service_at += 100ULL;
 
 //     ImuData_S raw_data;
-//     asm330lhh_status_reg_get(&dev_ctx, &raw_data.status_reg);
+//     asm330lhh_status_reg_get(&dev_ctx, &raw_src->status_reg);
 
-//     if (raw_data.status_reg.xlda || raw_data.status_reg.gda) {
+//     if (raw_src->status_reg.xlda || raw_src->status_reg.gda) {
 //         asm330lhh_timestamp_raw_get(&dev_ctx, &timestamp);
-//         raw_data.timestamp = timestamp;
+//         raw_src->timestamp = timestamp;
 //     } else {
 //         return;
 //     }
 
-//     if (raw_data.status_reg.xlda) {
+//     if (raw_src->status_reg.xlda) {
 //         int16_t raw_acceleration[3];
 //         asm330lhh_acceleration_raw_get(&dev_ctx, raw_acceleration);
-//         raw_data.acceleration.i16bit[0] = raw_acceleration[0];
-//         raw_data.acceleration.i16bit[1] = raw_acceleration[1];
-//         raw_data.acceleration.i16bit[2] = raw_acceleration[2];
+//         raw_src->acceleration.i16bit[0] = raw_acceleration[0];
+//         raw_src->acceleration.i16bit[1] = raw_acceleration[1];
+//         raw_src->acceleration.i16bit[2] = raw_acceleration[2];
 // #if DO_FP
 //         acceleration_mg[0] = asm330lhh_from_fs2g_to_mg(
-//                 raw_data.acceleration.i16bit[0]);
+//                 raw_src->acceleration.i16bit[0]);
 //         acceleration_mg[1] = asm330lhh_from_fs2g_to_mg(
-//                 raw_data.acceleration.i16bit[1]);
+//                 raw_src->acceleration.i16bit[1]);
 //         acceleration_mg[2] = asm330lhh_from_fs2g_to_mg(
-//                 raw_data.acceleration.i16bit[2]);
+//                 raw_src->acceleration.i16bit[2]);
 
 //         acceleration_g[0] = acceleration_mg[0] / 1000;
 //         acceleration_g[1] = acceleration_mg[1] / 1000;
@@ -117,19 +113,19 @@ void can_imu_loop(void){
 //         return;
 //     }
 
-//     if (raw_data.status_reg.gda) {
+//     if (raw_src->status_reg.gda) {
 //     	int16_t raw_angular_rate[3];
 //         asm330lhh_angular_rate_raw_get(&dev_ctx, raw_angular_rate);
-//         raw_data.angular_rate.i16bit[0] = raw_angular_rate[0];
-// 		raw_data.angular_rate.i16bit[1] = raw_angular_rate[1];
-// 		raw_data.angular_rate.i16bit[2] = raw_angular_rate[2];
+//         raw_src->angular_rate.i16bit[0] = raw_angular_rate[0];
+// 		raw_src->angular_rate.i16bit[1] = raw_angular_rate[1];
+// 		raw_src->angular_rate.i16bit[2] = raw_angular_rate[2];
 // #if DO_FP
 //         angular_rate_mdps[0] = asm330lhh_from_fs2000dps_to_mdps(
-//                 raw_data.angular_rate.i16bit[0]);
+//                 raw_src->angular_rate.i16bit[0]);
 //         angular_rate_mdps[1] = asm330lhh_from_fs2000dps_to_mdps(
-//                 raw_data.angular_rate.i16bit[1]);
+//                 raw_src->angular_rate.i16bit[1]);
 //         angular_rate_mdps[2] = asm330lhh_from_fs2000dps_to_mdps(
-//                 raw_data.angular_rate.i16bit[2]);
+//                 raw_src->angular_rate.i16bit[2]);
 
 //         angular_rate_dps[0] = angular_rate_mdps[0] / 1000;
 //         angular_rate_dps[1] = angular_rate_mdps[1] / 1000;

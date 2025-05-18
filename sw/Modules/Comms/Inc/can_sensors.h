@@ -11,12 +11,8 @@
 #include "dronecan_msgs.h"
 #include "imu.h"
 
-
-/* IMU data conversion to dronecan format
- * TODO: USE custome imu message instead of dronecan's
- */
-struct uavcan_equipment_ahrs_SensorIMU
-raw_imu_transform_dronecan (ImuData_S data);
+void
+convertImuToDroneCAN (const ImuData_S *src, struct uavcan_equipment_ahrs_SensorIMU *dst);
 
 void imu_setup(void);
 void can_imu_loop(void);

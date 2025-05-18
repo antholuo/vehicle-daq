@@ -457,7 +457,7 @@ void send_NodeStatus(void) {
 }
 
 
-void send_RawIMU(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
+void can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
 	uint8_t buffer[UAVCAN_EQUIPMENT_AHRS_SENSORIMU_MAX_SIZE];
 
 	uint32_t len = uavcan_equipment_ahrs_SensorIMU_encode(&raw_imu, buffer);

@@ -17,6 +17,9 @@
 #include "tim.h"
 #include "usart.h"
 
+#include "can_sensors.h"
+#include "can_interface.h"
+
 ////////
 // Private function prototypes
 
@@ -29,7 +32,7 @@ static const ImuType_T imu_types[NUM_IMUS] = {IMU_ASM330LHH};
 static ImuData_S imu_data[NUM_IMUS];
 static const GpsType_T gps_types[NUM_GNSS] = {GPS_NEO_M8N};
 static GpsData_S gps_data[NUM_GNSS];
-bool flag_send_motion_data;
+bool flag_100hz;
 
 static bool setup_peripherals() {
     bool returnVal = true;
@@ -43,26 +46,46 @@ static bool setup_peripherals() {
     return returnVal;
 }
 
+static bool update_imus_safely() {
+    ImuData_S local_imu_data;
+    if (poll_imus(imu_types, NUM_IMUS, &local_imu_data) != IMU_STATUS_OK){
+        return false;
+    }
+    /* critical section */
+    __disable_irq();
+    imu_data[0] = local_imu_data;
+    __enable_irq();
+
+    return true;
+}
+
 static bool poll_peripherals() {
     poll_imus(imu_types, NUM_IMUS, imu_data);
 
-    (void)gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
+    gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
     return true;
 }
 
 void run_sensor_board() {
     (void)setup_peripherals();
+    can_main_setup();
 
     // Start task timers
     HAL_TIM_Base_Start_IT(&htim16);
     HAL_TIM_Base_Start_IT(&htim17);
 
     while(1) {
-        poll_peripherals();
+        update_imus_safely();
+        can_main_loop();
 
-        // TODO: check motion_data available, send CAN message
-        if (flag_send_motion_data) {
-            flag_send_motion_data = false;
+        // TODO: check gps data availability, transmit gps data on CAN
+
+        if (flag_100hz) {
+            struct uavcan_equipment_ahrs_SensorIMU can_imu_pkt;
+            convertImuToDroneCAN(&imu_data[0], &can_imu_pkt);
+            can_send_ImuData(can_imu_pkt);
+            flag_100hz = false;
+            HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
         }
     }
 
@@ -73,15 +96,9 @@ void run_sensor_board() {
 // Callbacks
 
 void task_100hz() {
-    MotionDataRaw_S motion_data;
-    static uint8_t count = 0;
-    if (count++ > 99) {
-        /* HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin); */
-        count = 0;
-    }
+    // MotionDataRaw_S motion_data;
 
-    // TODO: set a flag that allows us to send a CAN message inside of `run_sensor_board()`
-    flag_send_motion_data = true;
+    flag_100hz = true;
 }
 
 void task_800hz() {
@@ -93,7 +110,7 @@ void task_800hz() {
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
-    HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
+    /* HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin); */
     if (gnss_process_incoming_data(huart, Size)) {
         return;
     } else {
@@ -102,7 +119,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
+    /* HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin); */
 }
 // Restarts the DMA reception on UART3 whenever a framing error occurs
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)

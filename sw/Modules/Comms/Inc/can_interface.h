@@ -72,7 +72,7 @@ void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer);
 void send_NodeStatus(void);
 
 /* broadcast this node's IMU data on can bus */
-void send_RawIMU(struct uavcan_equipment_ahrs_SensorIMU raw_imu);
+void can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu);
 
 
 /* CANARD Util: a software can filter on which message to handle */
