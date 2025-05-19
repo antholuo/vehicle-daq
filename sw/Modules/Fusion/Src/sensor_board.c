@@ -25,6 +25,8 @@
 
 #define NUM_IMUS 1
 #define NUM_GNSS 1
+// /* TODO: intruduce this macro in build system instead, plus making this configurable in build */
+// #define IMU_ID   10
 
 extern UART_HandleTypeDef huart1;
 
@@ -74,18 +76,22 @@ void run_sensor_board() {
     HAL_TIM_Base_Start_IT(&htim16);
     HAL_TIM_Base_Start_IT(&htim17);
 
+    uint8_t blink_cnt = 0;
     while(1) {
         update_imus_safely();
         can_main_loop();
 
         // TODO: check gps data availability, transmit gps data on CAN
-
         if (flag_100hz) {
             struct uavcan_equipment_ahrs_SensorIMU can_imu_pkt;
             convertImuToDroneCAN(&imu_data[0], &can_imu_pkt);
             can_send_ImuData(can_imu_pkt);
             flag_100hz = false;
-            HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
+            if (blink_cnt == 10){
+                HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
+                blink_cnt = 0;
+            }
+            blink_cnt++;
         }
     }
 

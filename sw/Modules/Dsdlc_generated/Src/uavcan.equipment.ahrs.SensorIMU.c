@@ -107,22 +107,6 @@ struct uavcan_equipment_ahrs_SensorIMU sample_uavcan_equipment_ahrs_SensorIMU_ms
 
 
 
-    for (size_t i=0; i < 3; i++) {
-
-
-
-
-        msg.magnetometer_latest[i] = (int16_t)random_bitlen_signed_val(16);
-
-
-
-    }
-
-
-
-
-
-
     msg.accel_data_valid = (bool)random_bitlen_unsigned_val(1);
 
 
@@ -132,14 +116,6 @@ struct uavcan_equipment_ahrs_SensorIMU sample_uavcan_equipment_ahrs_SensorIMU_ms
 
 
     msg.gyro_data_valid = (bool)random_bitlen_unsigned_val(1);
-
-
-
-
-
-
-
-    msg.mag_data_valid = (bool)random_bitlen_unsigned_val(1);
 
 
 

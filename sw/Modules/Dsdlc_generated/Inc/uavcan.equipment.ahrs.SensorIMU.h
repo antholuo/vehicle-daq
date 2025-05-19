@@ -7,8 +7,8 @@
 
 
 
-#define UAVCAN_EQUIPMENT_AHRS_SENSORIMU_MAX_SIZE 23
-#define UAVCAN_EQUIPMENT_AHRS_SENSORIMU_SIGNATURE (0x4B0725C6F79B19AFULL)
+#define UAVCAN_EQUIPMENT_AHRS_SENSORIMU_MAX_SIZE 17
+#define UAVCAN_EQUIPMENT_AHRS_SENSORIMU_SIGNATURE (0x1A910D95EA9423AFULL)
 
 #define UAVCAN_EQUIPMENT_AHRS_SENSORIMU_ID 2100
 
@@ -42,19 +42,11 @@ struct uavcan_equipment_ahrs_SensorIMU {
 
 
 
-    int16_t magnetometer_latest[3];
-
-
-
     bool accel_data_valid;
 
 
 
     bool gyro_data_valid;
-
-
-
-    bool mag_data_valid;
 
 
 
@@ -131,23 +123,6 @@ void _uavcan_equipment_ahrs_SensorIMU_encode(uint8_t* buffer, uint32_t* bit_ofs,
 
 
 
-    for (size_t i=0; i < 3; i++) {
-
-
-
-
-        canardEncodeScalar(buffer, *bit_ofs, 16, &msg->magnetometer_latest[i]);
-
-        *bit_ofs += 16;
-
-
-    }
-
-
-
-
-
-
     canardEncodeScalar(buffer, *bit_ofs, 1, &msg->accel_data_valid);
 
     *bit_ofs += 1;
@@ -158,15 +133,6 @@ void _uavcan_equipment_ahrs_SensorIMU_encode(uint8_t* buffer, uint32_t* bit_ofs,
 
 
     canardEncodeScalar(buffer, *bit_ofs, 1, &msg->gyro_data_valid);
-
-    *bit_ofs += 1;
-
-
-
-
-
-
-    canardEncodeScalar(buffer, *bit_ofs, 1, &msg->mag_data_valid);
 
     *bit_ofs += 1;
 
@@ -238,25 +204,6 @@ bool _uavcan_equipment_ahrs_SensorIMU_decode(const CanardRxTransfer* transfer, u
 
 
 
-    for (size_t i=0; i < 3; i++) {
-
-
-
-
-        canardDecodeScalar(transfer, *bit_ofs, 16, true, &msg->magnetometer_latest[i]);
-
-        *bit_ofs += 16;
-
-
-    }
-
-
-
-
-
-
-
-
     canardDecodeScalar(transfer, *bit_ofs, 1, false, &msg->accel_data_valid);
 
     *bit_ofs += 1;
@@ -268,16 +215,6 @@ bool _uavcan_equipment_ahrs_SensorIMU_decode(const CanardRxTransfer* transfer, u
 
 
     canardDecodeScalar(transfer, *bit_ofs, 1, false, &msg->gyro_data_valid);
-
-    *bit_ofs += 1;
-
-
-
-
-
-
-
-    canardDecodeScalar(transfer, *bit_ofs, 1, false, &msg->mag_data_valid);
 
     *bit_ofs += 1;
 

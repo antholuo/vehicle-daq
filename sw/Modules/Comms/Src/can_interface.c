@@ -9,7 +9,8 @@
 #include "string.h"
 
 /* ATTENTION: NODE ID needs to be hard-coded differently between boards! */
-#define NODE_ID 0x10
+/* TODO: This sucks! Make it configurable through build system */
+#define NODE_ID 0x20
 
 
 /* the master hal can handler*/
@@ -22,7 +23,7 @@ static CanardInstance canard;
 static struct uavcan_protocol_NodeStatus node_status;
 
 /* canard memory pool */
-static uint8_t memory_pool[1024];
+static uint8_t memory_pool[1282];
 
 /* an variable that keeps track of time */
 static uint64_t next_1hz_service_at;
@@ -97,7 +98,9 @@ void can_main_setup(void){
 	/* Start can bus */
 	HAL_CAN_Start(&hcan);
 	/* Activate can rx call back */
+	#ifndef SENSOR_BOARD_CAN_RECEPTION_DISABLE
 	HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
+	#endif
 
 	/* Initialize canard library */
 	canardInit(&canard, memory_pool, sizeof(memory_pool),
@@ -123,7 +126,7 @@ void can_main_loop(void){
 		send_NodeStatus();
 
 		/* toggling an led light, could be commented*/
-		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
+		HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
 	}
 }
 
@@ -151,14 +154,13 @@ void processCanardTxQueue(CAN_HandleTypeDef *hcan) {
 		const int16_t tx_res = canardSTM32Transmit(hcan, tx_frame);
 
 		if (tx_res <= 0) {
-			// printf("Transmit error %d\n", tx_res);
-			HAL_Delay(1); // for debugging
+			// try again later
 		} else if (tx_res > 0) {
 			// printf("Successfully transmitted message\n");
+			canardPopTxQueue(&canard);
+		} else {
+			canardPopTxQueue(&canard);
 		}
-
-		// Pop canardTxQueue either way
-		canardPopTxQueue(&canard);
 	}
 }
 
@@ -231,10 +233,12 @@ int16_t canardSTM32Transmit(CAN_HandleTypeDef *hcan, const CanardCANFrame* const
 	TxHeader.TransmitGlobalTime = DISABLE;
 	memcpy(TxData, tx_frame->data, TxHeader.DLC);
 
-	if (HAL_CAN_AddTxMessage(hcan, &TxHeader, TxData, &TxMailbox) == HAL_OK) {
-		return 1;
+	// checking mailbox availability before adding message
+	if ((CAN->TSR & CAN_TSR_TME0) || (CAN->TSR & CAN_TSR_TME1) || (CAN->TSR & CAN_TSR_TME2)) {
+		if (HAL_CAN_AddTxMessage(hcan, &TxHeader, TxData, &TxMailbox) == HAL_OK) {
+			return 1;
+		}
 	}
-
 	return 0;
 }
 
@@ -420,7 +424,7 @@ void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer){
 	/* TODO: add formal IMU package handling */
 
 	/* toggle a LED when rx call back is trigger, for debugging */
-	HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_4);
+	HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
 	return;
 }
 
@@ -464,13 +468,16 @@ void can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
 
 	static uint8_t transfer_id;
 
-    canardBroadcast(&canard,
+    int16_t frame_num = canardBroadcast(&canard,
 					UAVCAN_EQUIPMENT_AHRS_SENSORIMU_SIGNATURE,
                     UAVCAN_EQUIPMENT_AHRS_SENSORIMU_ID,
                     &transfer_id,
                     CANARD_TRANSFER_PRIORITY_LOW,
                     buffer,
                     len);
+	if (frame_num <= 0 ){
+		// then something is wrong
+	}
 }
 /*
   get a 16 byte unique ID for this node, this should be based on the CPU unique ID or other unique ID

@@ -6,6 +6,10 @@
 #   Auther: Hardy Yu
 
 #
+# IMU ID for differentiate different IMU boards
+#
+# uint8   imu_id
+#
 # Data acquisition timestamp in the bus shared time base.
 # The value is expressed as a 32-bit word and the bit resolution is 25 μs.
 #
@@ -32,8 +36,8 @@ int16[3] rate_gyro_latest                 # Latest sample, dps
 #
 # Magnetometer data samples in micro-tesla.
 #
-int16[3] magnetometer_latest                 # Latest sample, micro-tesla
+# int16[3] magnetometer_latest                 # Latest sample, micro-tesla
 
 bool    accel_data_valid
 bool    gyro_data_valid
-bool    mag_data_valid
+# uint8    mag_data_valid

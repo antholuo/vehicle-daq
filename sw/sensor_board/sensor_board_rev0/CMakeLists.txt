@@ -11,6 +11,9 @@ set(PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 # Set project source dir to "sensor_board_rev0"
 set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+# Disabling the can reception handle for now... for the sake of binary size
+add_definitions(-DSENSOR_BOARD_CAN_RECEPTION_DISABLE)
+
 ### Includes ###
 include_directories(
   # Default STM32 HAL Libraries
@@ -35,7 +38,7 @@ include_directories(
 ### Sources ### # Eventually - we'll want specific control on our source files
 set(MODULES_DIR ${PROJECT_ROOT_DIR}/Modules)
 set(MODULES_C_SRCS
-  ${MODULES_DIR}/Fusion/Src/*.c
+  ${MODULES_DIR}/Fusion/Src/sensor_board.c
   ${MODULES_DIR}/Dsdlc_generated/Src/*.c
   ${MODULES_DIR}/Comms/Src/*.c
   ${MODULES_DIR}/Canard/Src/*.c

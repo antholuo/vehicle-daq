@@ -12,7 +12,9 @@
 #include "imu.h"
 
 void
-convertImuToDroneCAN (const ImuData_S *src, struct uavcan_equipment_ahrs_SensorIMU *dst);
+convertImuToDroneCAN (const ImuData_S *src,
+                    // const uint8_t imu_id,
+                    struct uavcan_equipment_ahrs_SensorIMU *dst);
 
 void imu_setup(void);
 void can_imu_loop(void);

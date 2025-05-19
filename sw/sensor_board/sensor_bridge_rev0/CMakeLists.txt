@@ -36,7 +36,7 @@ include_directories(
 ### Sources ### # Eventually - we'll want specific control on our source files
 set(MODULES_DIR ${PROJECT_ROOT_DIR}/Modules)
 set(MODULES_C_SRCS
-  ${MODULES_DIR}/Fusion/Src/*.c
+  ${MODULES_DIR}/Fusion/Src/sensor_bridge.c
   ${MODULES_DIR}/Dsdlc_generated/Src/*.c
   ${MODULES_DIR}/Comms/Src/*.c
   ${MODULES_DIR}/Canard/Src/*.c
