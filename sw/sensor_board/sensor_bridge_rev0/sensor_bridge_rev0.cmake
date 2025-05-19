@@ -1,6 +1,6 @@
 set(FOLDER_NAME sensor_bridge_rev0)
-set(STARTUP_ASM sensor_bridge_rev0/Core/Startup/startup_stm32f042k6tx.s)
-set(LINKER_SCRIPT sensor_bridge_rev0/STM32F042K6TX_FLASH.ld)
+set(STARTUP_ASM sensor_bridge_rev0/Core/Startup/startup_stm32f042k6ux.s)
+set(LINKER_SCRIPT sensor_bridge_rev0/STM32F042K6UX_FLASH.ld)
 set(PROJ_NAME sensor_bridge_rev0)
 set(FAMILY_NAME STM32F0xx)
 set(CMAKE_SYSTEM_NAME Generic)

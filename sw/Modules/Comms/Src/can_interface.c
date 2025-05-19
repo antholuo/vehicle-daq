@@ -9,7 +9,7 @@
 #include "string.h"
 
 /* ATTENTION: NODE ID needs to be hard-coded differently between boards! */
-/* TODO: This sucks! Make it configurable through build system */
+/* TODO: Configurable NODE ID through build system */
 #define NODE_ID 0x20
 
 
@@ -23,7 +23,7 @@ static CanardInstance canard;
 static struct uavcan_protocol_NodeStatus node_status;
 
 /* canard memory pool */
-static uint8_t memory_pool[1282];
+static uint8_t memory_pool[1024];
 
 /* an variable that keeps track of time */
 static uint64_t next_1hz_service_at;
