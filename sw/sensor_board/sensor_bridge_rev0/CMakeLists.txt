@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.5)
-project(sensor_board_rev0 C ASM) # no CXX
+project(sensor_bridge_rev0 C ASM) # no CXX
 
 set (ELF_NAME ${PROJECT_NAME}.elf)
 set (HEX_NAME ${PROJECT_NAME}.hex)
@@ -8,11 +8,8 @@ set (BIN_NAME ${PROJECT_NAME}.bin)
 # Set project root to "sw"
 set(PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 
-# Set project source dir to "sensor_board_rev0"
+# Set project source dir to "sensor_bridge_rev0"
 set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-
-# Disabling the can reception handle for now... for the sake of binary size
-add_definitions(-DSENSOR_BOARD_CAN_RECEPTION_DISABLE)
 
 ### Includes ###
 include_directories(
@@ -30,6 +27,7 @@ include_directories(
   ${PROJECT_ROOT_DIR}/Drivers/Imu/Inc    # Imu Driver
   ${PROJECT_ROOT_DIR}/Drivers/Gps/Inc    # Gps Driver
 
+
   # OLD PROJECT INCLUDES
   # ${PROJECT_SOURCE_DIR}/Modules
   # ${PROJECT_SOURCE_DIR}/Modules/canard_files/Inc
@@ -38,17 +36,15 @@ include_directories(
 ### Sources ### # Eventually - we'll want specific control on our source files
 set(MODULES_DIR ${PROJECT_ROOT_DIR}/Modules)
 set(MODULES_C_SRCS
-  ${MODULES_DIR}/Fusion/Src/sensor_board.c
+  ${MODULES_DIR}/Fusion/Src/sensor_bridge.c
   ${MODULES_DIR}/Dsdlc_generated/Src/*.c
   ${MODULES_DIR}/Comms/Src/*.c
   ${MODULES_DIR}/Canard/Src/*.c
 )
 
-set(DRIVERS_DIR ${PROJECT_ROOT_DIR}/Drivers)
-set(DRIVERS_C_SRCS
-  ${DRIVERS_DIR}/Imu/Src/*.c
-  ${DRIVERS_DIR}/Gps/Src/*.c
-)
+# no need of using driver in sensor bridge board
+# set(DRIVERS_DIR ${PROJECT_ROOT_DIR}/Drivers)
+# set(DRIVERS_C_SRCS ${DRIVERS_DIR}/**/Src/*.c)
 
 # set(OLD_C_SRCS ${PROJECT_SOURCE_DIR}/Modules/*.c)
 # set(OLD_CANARD_SRCS ${PROJECT_SOURCE_DIR}/Modules/canard_files/Src/*.c)
@@ -63,8 +59,8 @@ file(GLOB_RECURSE C_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.c
 )
 
 
-set(STARTUP_ASM ${CMAKE_CURRENT_SOURCE_DIR}/Core/Startup/startup_stm32f042k6tx.s)
-set(LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/STM32F042K6TX_FLASH.ld)
+set(STARTUP_ASM ${CMAKE_CURRENT_SOURCE_DIR}/Core/Startup/startup_stm32f042k6ux.s) # I just realize this one uses a slightly different model
+set(LINKER_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/STM32F042K6UX_FLASH.ld)
 
 add_executable(${ELF_NAME} ${C_SOURCES} ${STARTUP_ASM})
 
@@ -73,10 +69,6 @@ add_executable(${ELF_NAME} ${C_SOURCES} ${STARTUP_ASM})
 
 # Add project-specific linker flags (.ld script, .map file)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T${LINKER_SCRIPT} -Wl,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map,--cref")
-
-# Enable optimization to this project
-set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
-set(CMAKE_C_FLAGS_DEBUG   "-O1 -g")
 
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 
