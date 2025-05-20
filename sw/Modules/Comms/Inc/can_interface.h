@@ -17,17 +17,13 @@
 extern "C" {
 #endif
 
-/* start the can bus and transmit/receive routine */
-void can_start_basic(void);
-
-/* the main can loop that handles transmission and initiate receive callback */
-void can_main(void);
+extern CanardInstance canard;
 
 /* this is the functions that goes before the while(1) */
-void can_main_setup(void);
+void setup_comms(void);
 
 /* this is the function that goes inside the while(1) */
-void can_main_loop(void);
+void loop_comms(void);
 
 /* setup the can filter config */
 void can_set_filter(void);
@@ -65,15 +61,8 @@ void handle_NotifyState(CanardInstance *ins, CanardRxTransfer *transfer);
 /* handling node status info from other can node */
 void handle_NodeStatus(CanardInstance *ins, CanardRxTransfer *transfer);
 
-/* handling raw imu data received from other can node */
-void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer);
-
 /* broadcast this node's status on can bus */
 void send_NodeStatus(void);
-
-/* broadcast this node's IMU data on can bus */
-void can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu);
-
 
 /* CANARD Util: a software can filter on which message to handle */
 bool shouldAcceptTransfer(const CanardInstance *ins,

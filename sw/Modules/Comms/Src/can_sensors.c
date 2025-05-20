@@ -6,14 +6,8 @@
  */
 
 #include "can_sensors.h"
-#include "spi.h"
 
-/* IMU static variables */
-extern SPI_HandleTypeDef hspi1;		// ASM330 SPI
-static uint32_t timestamp;
-
-/* time stamp mark*/
-static uint64_t next_10hz_service_at;
+extern CanardInstance canard;
 
 void
 convertImuToDroneCAN (const ImuData_S *src,
@@ -33,4 +27,37 @@ convertImuToDroneCAN (const ImuData_S *src,
     dst->accel_data_valid = src->accel_data_valid;
     dst->gyro_data_valid = src->gyro_data_valid;
     // dst->mag_data_valid = src->mag_data_valid;
+}
+
+CAN_COMMS_STATUS_E can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
+	uint8_t buffer[UAVCAN_EQUIPMENT_AHRS_SENSORIMU_MAX_SIZE];
+
+	uint32_t len = uavcan_equipment_ahrs_SensorIMU_encode(&raw_imu, buffer);
+
+	static uint8_t transfer_id;
+
+    int16_t frame_num = canardBroadcast(&canard,
+					UAVCAN_EQUIPMENT_AHRS_SENSORIMU_SIGNATURE,
+                    UAVCAN_EQUIPMENT_AHRS_SENSORIMU_ID,
+                    &transfer_id,
+                    CANARD_TRANSFER_PRIORITY_LOW,
+                    buffer,
+                    len);
+	if (frame_num <= 0 ){
+		return COMMS_STATUS_ERR;
+	}
+
+    return COMMS_STATUS_OK;
+}
+
+void handle_ImuData(CanardInstance *ins, CanardRxTransfer *transfer){
+	struct uavcan_equipment_ahrs_SensorIMU rawIMU;
+
+	if (uavcan_equipment_ahrs_SensorIMU_decode(transfer, &rawIMU)) {
+		return;
+	}
+
+	/* TODO: add formal IMU package handling */
+    
+	return;
 }

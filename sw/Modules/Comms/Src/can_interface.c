@@ -17,7 +17,7 @@
 extern CAN_HandleTypeDef hcan;
 
 /* global canard instance */
-static CanardInstance canard;
+CanardInstance canard;
 
 /* global node status info */
 static struct uavcan_protocol_NodeStatus node_status;
@@ -28,79 +28,16 @@ static uint8_t memory_pool[1024];
 /* an variable that keeps track of time */
 static uint64_t next_1hz_service_at;
 
-/* for simple testing */
-void can_start_basic(void){
-	CAN_TxHeaderTypeDef txHeader; //CAN Bus Receive Header
-	uint32_t canMailbox; //CAN Bus Mail box variable
-	txHeader.DLC = 8;
-	txHeader.IDE = CAN_ID_STD;
-	txHeader.RTR = CAN_RTR_DATA;
-	txHeader.StdId = 0x030;
-	txHeader.ExtId = 0x02;
-	txHeader.TransmitGlobalTime = DISABLE;
-
-	can_set_filter();
-	HAL_CAN_Start(&hcan);
-	HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
-
-	while (1)
-	{
-		/* USER CODE END WHILE */
-
-		/* USER CODE BEGIN 3 */
-		uint8_t csend[] = {0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08};
-		HAL_StatusTypeDef ret = HAL_CAN_AddTxMessage(&hcan,&txHeader,csend,&canMailbox);
-
-		HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-
-		HAL_Delay(100);
-
-	}
-}
-
-void can_main(void){
-	/* Setup can filter */
-	can_set_filter();
-	/* Start can bus */
-	HAL_CAN_Start(&hcan);
-	/* Activate can rx call back */
-	HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
-
-	/* Initialize canard library */
-	canardInit(&canard, memory_pool, sizeof(memory_pool),
-				onTransferReceived, shouldAcceptTransfer, NULL);
-
-	/* Hardcodinig a node id for this can node */
-	canard.node_id = NODE_ID;
-
-	uint64_t next_1hz_service_at_ = HAL_GetTick();
-
-	while (1)
-	  {
-		  processCanardTxQueue(&hcan);
-
-		  const uint64_t ts = HAL_GetTick();
-
-		  if (ts >= next_1hz_service_at){
-			  next_1hz_service_at_ += 1000ULL;
-			  /* process 1 Hz Tasks */
-			  canardCleanupStaleTransfers(&canard, ts);
-			  send_NodeStatus();
-			  HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_5);
-		  }
-	  }
-}
-
 /* this is the functions that goes before the while(1) */
-void can_main_setup(void){
+void setup_comms(void){
 	/* Setup can filter */
 	can_set_filter();
 	/* Start can bus */
 	HAL_CAN_Start(&hcan);
 	/* Activate can rx call back */
-	#ifndef SENSOR_BOARD_CAN_RECEPTION_DISABLE
+#ifndef SENSOR_BOARD_CAN_RECEPTION_DISABLE
 	HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
-	#endif
+#endif
 
 	/* Initialize canard library */
 	canardInit(&canard, memory_pool, sizeof(memory_pool),
@@ -114,7 +51,7 @@ void can_main_setup(void){
 }
 
 /* this is the function that goes inside the while(1) */
-void can_main_loop(void){
+void loop_comms(void){
 	processCanardTxQueue(&hcan);
 
 	const uint64_t ts = HAL_GetTick();
@@ -303,7 +240,7 @@ void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer) {
 		// check if we want to handle a specific broadcast message
 		switch (transfer->data_type_id) {
 		case UAVCAN_EQUIPMENT_AHRS_SENSORIMU_ID:{
-			handle_RawIMU(ins, transfer);
+			handle_ImuData(ins, transfer);
 			break;
 		}
 		case UAVCAN_PROTOCOL_NODESTATUS_ID: {
@@ -414,21 +351,6 @@ void handle_NodeStatus(CanardInstance *ins, CanardRxTransfer *transfer) {
 	}
 }
 
-void handle_RawIMU(CanardInstance *ins, CanardRxTransfer *transfer){
-	struct uavcan_equipment_ahrs_SensorIMU rawIMU;
-
-	if (uavcan_equipment_ahrs_SensorIMU_decode(transfer, &rawIMU)) {
-		return;
-	}
-
-	/* TODO: add formal IMU package handling */
-
-	/* toggle a LED when rx call back is trigger, for debugging */
-	HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
-	return;
-}
-
-
 /*
   send the 1Hz NodeStatus message. This is what allows a node to show
   up in the DroneCAN GUI tool and in the flight controller logs
@@ -461,24 +383,7 @@ void send_NodeStatus(void) {
 }
 
 
-void can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
-	uint8_t buffer[UAVCAN_EQUIPMENT_AHRS_SENSORIMU_MAX_SIZE];
 
-	uint32_t len = uavcan_equipment_ahrs_SensorIMU_encode(&raw_imu, buffer);
-
-	static uint8_t transfer_id;
-
-    int16_t frame_num = canardBroadcast(&canard,
-					UAVCAN_EQUIPMENT_AHRS_SENSORIMU_SIGNATURE,
-                    UAVCAN_EQUIPMENT_AHRS_SENSORIMU_ID,
-                    &transfer_id,
-                    CANARD_TRANSFER_PRIORITY_LOW,
-                    buffer,
-                    len);
-	if (frame_num <= 0 ){
-		// then something is wrong
-	}
-}
 /*
   get a 16 byte unique ID for this node, this should be based on the CPU unique ID or other unique ID
  */

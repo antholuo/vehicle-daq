@@ -7,8 +7,8 @@
  * Prototypes for setting up and running the sensor board
  */
 
-#ifndef FUSION_SENSOR_BOARD_H
-#define FUSION_SENSOR_BOARD_H
+#ifndef FUSION_SENSOR_BRIDGE_H
+#define FUSION_SENSOR_BRIDGE_H
 
 #define M8N_UART_INSTANCE       (USART1)
 

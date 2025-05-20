@@ -2,5 +2,5 @@
 #include "can_interface.h"
 
 void run_sensor_bridge(){
-    can_main_setup();
+    setup_comms();
 }

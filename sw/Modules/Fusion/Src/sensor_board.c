@@ -48,29 +48,17 @@ static bool setup_peripherals() {
     return returnVal;
 }
 
-static bool update_imus_safely() {
-    ImuData_S local_imu_data;
-    if (poll_imus(imu_types, NUM_IMUS, &local_imu_data) != IMU_STATUS_OK){
-        return false;
-    }
-    /* critical section */
-    __disable_irq();
-    imu_data[0] = local_imu_data;
-    __enable_irq();
-
-    return true;
-}
-
 static bool poll_peripherals() {
     poll_imus(imu_types, NUM_IMUS, imu_data);
 
-    gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
+    /* disabling GPS for now, will add it back later */
+    // (void)gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
     return true;
 }
 
 void run_sensor_board() {
     (void)setup_peripherals();
-    can_main_setup();
+    setup_comms();
 
     // Start task timers
     HAL_TIM_Base_Start_IT(&htim16);
@@ -78,14 +66,14 @@ void run_sensor_board() {
 
     uint8_t blink_cnt = 0;
     while(1) {
-        update_imus_safely();
-        can_main_loop();
+        poll_peripherals();
+        loop_comms();
 
         // TODO: check gps data availability, transmit gps data on CAN
         if (flag_100hz) {
             struct uavcan_equipment_ahrs_SensorIMU can_imu_pkt;
             convertImuToDroneCAN(&imu_data[0], &can_imu_pkt);
-            can_send_ImuData(can_imu_pkt);
+            (void)can_send_ImuData(can_imu_pkt);
             flag_100hz = false;
             if (blink_cnt == 10){
                 HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
