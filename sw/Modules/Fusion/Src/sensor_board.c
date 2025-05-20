@@ -72,7 +72,7 @@ void run_sensor_board() {
         // TODO: check gps data availability, transmit gps data on CAN
         if (flag_100hz) {
             struct uavcan_equipment_ahrs_SensorIMU can_imu_pkt;
-            convertImuToDroneCAN(&imu_data[0], &can_imu_pkt);
+            can_pack_ImuData(&imu_data[0], &can_imu_pkt);
             (void)can_send_ImuData(can_imu_pkt);
             flag_100hz = false;
             if (blink_cnt == 10){

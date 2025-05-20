@@ -8,10 +8,11 @@
 #ifndef CAN_INTERFACE_H_
 #define CAN_INTERFACE_H_
 
-#include "can.h"
 #include "canard.h"
 #include "dronecan_msgs.h"
 #include "can_sensors.h"
+
+#include "can.h"
 
 #ifdef __cplusplus
 extern "C" {

@@ -9,27 +9,21 @@
 
 extern CanardInstance canard;
 
-void
-convertImuToDroneCAN (const ImuData_S *src,
-					// const uint8_t imu_id,
-					struct uavcan_equipment_ahrs_SensorIMU *dst){
-	// dst->imu_id = imu_id;
+void can_pack_ImuData (const ImuData_S *src,
+					       struct uavcan_equipment_ahrs_SensorIMU *dst){
+    /* magnetometer data is unsupported unfortunately */
     dst->timestamp = src->timestamp;
     dst->accelerometer_latest[0] = src->accel_x_mg;
     dst->rate_gyro_latest[0] = src->gyro_x_mdps;
-    // dst->magnetometer_latest[0] = src->mag_x_microT;
     dst->accelerometer_latest[1] = src->accel_y_mg;
     dst->rate_gyro_latest[1] = src->gyro_y_mdps;
-    // dst->magnetometer_latest[1] = src->mag_y_microT;
     dst->accelerometer_latest[2] = src->accel_z_mg;
     dst->rate_gyro_latest[2] = src->gyro_z_mdps;
-    // dst->magnetometer_latest[2] = src->mag_z_microT;
     dst->accel_data_valid = src->accel_data_valid;
     dst->gyro_data_valid = src->gyro_data_valid;
-    // dst->mag_data_valid = src->mag_data_valid;
 }
 
-CAN_COMMS_STATUS_E can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
+CanCommsStatus_E can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
 	uint8_t buffer[UAVCAN_EQUIPMENT_AHRS_SENSORIMU_MAX_SIZE];
 
 	uint32_t len = uavcan_equipment_ahrs_SensorIMU_encode(&raw_imu, buffer);
@@ -50,7 +44,7 @@ CAN_COMMS_STATUS_E can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_i
     return COMMS_STATUS_OK;
 }
 
-void handle_ImuData(CanardInstance *ins, CanardRxTransfer *transfer){
+void can_receive_ImuData(CanardInstance *ins, CanardRxTransfer *transfer){
 	struct uavcan_equipment_ahrs_SensorIMU rawIMU;
 
 	if (uavcan_equipment_ahrs_SensorIMU_decode(transfer, &rawIMU)) {

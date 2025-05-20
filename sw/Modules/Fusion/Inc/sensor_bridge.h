@@ -14,4 +14,4 @@
 
 void run_sensor_bridge();
 
-#endif // FUSION_SENSOR_BOARD_H
+#endif // FUSION_SENSOR_BRIDGE_H

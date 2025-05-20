@@ -240,7 +240,7 @@ void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer) {
 		// check if we want to handle a specific broadcast message
 		switch (transfer->data_type_id) {
 		case UAVCAN_EQUIPMENT_AHRS_SENSORIMU_ID:{
-			handle_ImuData(ins, transfer);
+			can_receive_ImuData(ins, transfer);
 			break;
 		}
 		case UAVCAN_PROTOCOL_NODESTATUS_ID: {
