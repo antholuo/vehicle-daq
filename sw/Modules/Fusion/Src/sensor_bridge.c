@@ -39,10 +39,11 @@ void can_sensor_reception_setup(){
             imu_tx_queue_data_lengths,
             IMU_CQ_SLOT_SIZE_BYTE,
             IMU_CQ_CAPACITY);
+	imu_reception_f_ptr = can_sensor_bridge_imu_handler;
 }
 
 void can_sensor_reception_loop(){
-    uint8_t *imu_encoded_q  = NULL;
+    uint8_t imu_encoded_q[IMU_CQ_SLOT_SIZE_BYTE];
 	uint16_t len;
 	if (dma_busy == 0) {
 		if (cq_pop(&imu_tx_queue, imu_encoded_q, &len) == CQ_OK){
