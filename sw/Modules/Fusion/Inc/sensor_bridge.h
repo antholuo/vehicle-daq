@@ -10,7 +10,7 @@
 #ifndef FUSION_SENSOR_BRIDGE_H
 #define FUSION_SENSOR_BRIDGE_H
 
-#include "circular_queue.h"
+#include "can_sensors.h"
 
 #define PROTOBUF_UART_INSTANCE       (USART2)
 

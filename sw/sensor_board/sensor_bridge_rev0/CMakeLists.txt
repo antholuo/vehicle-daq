@@ -24,13 +24,14 @@ include_directories(
   ${PROJECT_ROOT_DIR}/Modules/Dsdlc_generated/Inc # DroneCAN message Libraries
   ${PROJECT_ROOT_DIR}/Modules/Comms/Inc # Inter-board Communications
   ${PROJECT_ROOT_DIR}/Modules/Canard/Inc # Canard Library
+
   ${PROJECT_ROOT_DIR}/Drivers/Imu/Inc    # Imu Driver
   ${PROJECT_ROOT_DIR}/Drivers/Gps/Inc    # Gps Driver
 
+  ${PROJECT_ROOT_DIR}/Protos/Generated/Inc    # Generated Protobuf Library
+  ${PROJECT_ROOT_DIR}/Protos/Pb_libs/Inc    # Protobuf Library
 
-  # OLD PROJECT INCLUDES
-  # ${PROJECT_SOURCE_DIR}/Modules
-  # ${PROJECT_SOURCE_DIR}/Modules/canard_files/Inc
+  ${PROJECT_ROOT_DIR}/Utils/Circular_queue/Inc    # Circular Queue Library
 )
 
 ### Sources ### # Eventually - we'll want specific control on our source files
@@ -42,20 +43,23 @@ set(MODULES_C_SRCS
   ${MODULES_DIR}/Canard/Src/*.c
 )
 
+set(PROTOBUF_DIR ${PROJECT_ROOT_DIR}/Protos)
+set(PROTOBUF_C_SRCS ${PROTOBUF_DIR}/**/Src/*.c)
+
+set(UTILS_DIR ${PROJECT_ROOT_DIR}/Utils)
+set(UTILS_C_SRCS ${UTILS_DIR}/**/Src/*.c)
+
 # no need of using driver in sensor bridge board
 # set(DRIVERS_DIR ${PROJECT_ROOT_DIR}/Drivers)
 # set(DRIVERS_C_SRCS ${DRIVERS_DIR}/**/Src/*.c)
-
-# set(OLD_C_SRCS ${PROJECT_SOURCE_DIR}/Modules/*.c)
-# set(OLD_CANARD_SRCS ${PROJECT_SOURCE_DIR}/Modules/canard_files/Src/*.c)
 
 file(GLOB_RECURSE C_SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/Core/*.c
                             ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/STM32F0xx_HAL_Driver/Src/*.c
                             ${CMAKE_CURRENT_SOURCE_DIR}/Drivers/CMSIS/*.c
                             ${MODULES_C_SRCS}
                             ${DRIVERS_C_SRCS}
-                            # ${OLD_C_SRCS}
-                            # ${OLD_CANARD_SRCS}
+                            ${PROTOBUF_C_SRCS}
+                            ${UTILS_C_SRCS}
 )
 
 
@@ -69,6 +73,10 @@ add_executable(${ELF_NAME} ${C_SOURCES} ${STARTUP_ASM})
 
 # Add project-specific linker flags (.ld script, .map file)
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -T${LINKER_SCRIPT} -Wl,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map,--cref")
+
+# Enable optimization to this project
+set(CMAKE_C_FLAGS_RELEASE "-O2 -DNDEBUG")
+set(CMAKE_C_FLAGS_DEBUG   "-O1 -g")
 
 set(BIN_FILE ${PROJECT_BINARY_DIR}/${PROJECT_NAME}.bin)
 

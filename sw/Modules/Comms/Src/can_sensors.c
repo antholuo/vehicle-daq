@@ -27,7 +27,7 @@ void can_pack_ImuData (const ImuData_S *src,
     dst->gyro_data_valid = src->gyro_data_valid;
 }
 
-void protobuf_pack_ImuData (struct uavcan_equipment_ahrs_SensorIMU *src, 
+void protobuf_pack_ImuData (const struct uavcan_equipment_ahrs_SensorIMU *src, 
                             struct imu_data_t *dst){
 	if (src == NULL || dst == NULL){
 		return;

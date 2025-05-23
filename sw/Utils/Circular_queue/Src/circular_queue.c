@@ -3,7 +3,7 @@
 
 #include <string.h>
 
-CircularBuffer cq_init(CircularQueue *q,
+CQErrorTypes_E cq_init(CircularQueue *q,
                     uint8_t *data_block,
                     uint16_t *data_lengths,
                     uint16_t slot_size_bytes,
@@ -17,6 +17,7 @@ CircularBuffer cq_init(CircularQueue *q,
     q->slot_size_bytes = slot_size_bytes;
     q->capacity = capacity;
     q->read_index = q->write_index = q->items_stored = 0;
+    return CQ_OK;
 }
 
 CQErrorTypes_E cq_push(CircularQueue *q, const void *data, uint16_t len){
@@ -56,7 +57,7 @@ CQErrorTypes_E cq_pop(CircularQueue *q, void *out, uint16_t *len_out){
     }
 
     uint8_t *slot = q->data_block + (q->read_index * q->slot_size_bytes);
-    uint16_t len = q->lengths ? q->lengths[q->read_index] : q->slot_size_bytes;
+    uint16_t len = q->data_lengths ? q->data_lengths[q->read_index] : q->slot_size_bytes;
 
     memcpy(out, slot, len);
     if (len_out) *len_out = len;

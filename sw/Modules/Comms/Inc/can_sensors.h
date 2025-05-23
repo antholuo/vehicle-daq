@@ -30,7 +30,7 @@ void can_pack_ImuData (const ImuData_S *src,
                            struct uavcan_equipment_ahrs_SensorIMU *dst);
 
 /* DroneCAN IMU format converts to pb format */
-void protobuf_pack_ImuData (struct uavcan_equipment_ahrs_SensorIMU *src, 
+void protobuf_pack_ImuData (const struct uavcan_equipment_ahrs_SensorIMU *src, 
                             struct imu_data_t *dst);
 
 /* broadcast this node's IMU data on can bus */
