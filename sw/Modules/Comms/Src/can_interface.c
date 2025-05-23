@@ -35,14 +35,15 @@ void setup_comms(void){
 	can_set_filter();
 	/* Start can bus */
 	HAL_CAN_Start(&hcan);
+	
+	/* Initialize canard library */
+	canardInit(&canard, memory_pool, sizeof(memory_pool),
+				onTransferReceived, shouldAcceptTransfer, NULL);
+
 	/* Activate can rx call back */
 #ifndef SENSOR_BOARD_CAN_RECEPTION_DISABLE
 	HAL_CAN_ActivateNotification(&hcan, CAN_IT_RX_FIFO0_MSG_PENDING);
 #endif
-
-	/* Initialize canard library */
-	canardInit(&canard, memory_pool, sizeof(memory_pool),
-				onTransferReceived, shouldAcceptTransfer, NULL);
 
 	/* Hardcodinig a node id for this can node */
 	canard.node_id = NODE_ID;

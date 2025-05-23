@@ -9,7 +9,7 @@ extern IMUReceptionFunc     imu_reception_f_ptr;
 extern UART_HandleTypeDef   huart2;
 
 #define IMU_CQ_CAPACITY 3
-#define IMU_CQ_SLOT_SIZE_BYTE 72
+#define IMU_CQ_SLOT_SIZE_BYTE 88
 /* 2 bytes - Magic Number Header, 1 bytes - CAN ID, 2 bytes - pb length */
 #define IMU_RPROTOBUF_HEADER_LENGTH_BYTE 5
 #define IMU_PROTOBUF_MAGIC_HEADER_1     0xAA
@@ -28,8 +28,14 @@ void run_sensor_bridge(){
     can_sensor_reception_setup();
     setup_comms();
 
+	uint32_t cnt = 0;
     while(1){
         can_sensor_reception_loop();
+		if (cnt > 500000){
+			cnt = 0;
+			HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
+		}
+		cnt++;
     }
 }
 
@@ -81,7 +87,7 @@ void can_sensor_bridge_imu_handler(const struct uavcan_equipment_ahrs_SensorIMU*
 	memcpy(encode_w_header + IMU_RPROTOBUF_HEADER_LENGTH_BYTE, encoded, pb_size);
 
 	// then we add it to the queue, it will be transmit by DMA in main loop
-	(void)cq_push(&imu_tx_queue, encode_w_header, pb_size + 4);
+	(void)cq_push(&imu_tx_queue, encode_w_header, pb_size + IMU_RPROTOBUF_HEADER_LENGTH_BYTE);
 
 	/* debugging feature, delete if no longer needed */
 	if (blink_cnt1 >= 10){
@@ -96,4 +102,11 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart) {
     if (huart == &huart2) {
         dma_busy = 0; // ready for next one
     }
+}
+
+void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+{
+	if(huart == &huart2){
+		HAL_UART_DMAStop(huart);
+	}
 }
