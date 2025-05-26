@@ -33,12 +33,12 @@ void protobuf_pack_ImuData (const struct uavcan_equipment_ahrs_SensorIMU *src,
 		return;
 	}
 	dst->timestamp = (int32_t)src->timestamp;
-	dst->accel_x_mg = src->accelerometer_latest[0];
-	dst->accel_y_mg = src->accelerometer_latest[1];
-	dst->accel_z_mg = src->accelerometer_latest[2];
-	dst->gyro_x_mdps = src->rate_gyro_latest[0];
-	dst->gyro_y_mdps = src->rate_gyro_latest[1];
-	dst->gyro_z_mdps = src->rate_gyro_latest[2];
+	dst->accel_x_mg = (int32_t)src->accelerometer_latest[0];
+	dst->accel_y_mg = (int32_t)src->accelerometer_latest[1];
+	dst->accel_z_mg = (int32_t)src->accelerometer_latest[2];
+	dst->gyro_x_mdps = (int32_t)src->rate_gyro_latest[0];
+	dst->gyro_y_mdps = (int32_t)src->rate_gyro_latest[1];
+	dst->gyro_z_mdps = (int32_t)src->rate_gyro_latest[2];
 	dst->gyro_data_valid = src->accel_data_valid;
 	dst->accel_data_valid = src->accel_data_valid;
 }
