@@ -2,13 +2,13 @@ syntax="proto3";
 
 // Keeping this super duper simple for now - don't want to overcomplicate it at all
 message ImuData {
-    int32 timestamp = 1;
-    int32 accel_x_mg = 2;
-    int32 accel_y_mg = 3;
-    int32 accel_z_mg = 4;
-    int32 gyro_x_mdps = 5;
-    int32 gyro_y_mdps = 6;
-    int32 gyro_z_mdps = 7;
+    sint32 timestamp = 1;
+    sint32 accel_x_mg = 2;
+    sint32 accel_y_mg = 3;
+    sint32 accel_z_mg = 4;
+    sint32 gyro_x_mdps = 5;
+    sint32 gyro_y_mdps = 6;
+    sint32 gyro_z_mdps = 7;
     bool gyro_data_valid = 8;
     bool accel_data_valid = 9;
     enum FilterMode {

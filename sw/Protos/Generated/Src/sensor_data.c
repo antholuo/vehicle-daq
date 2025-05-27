@@ -57,13 +57,13 @@ void imu_data_encode_inner(
 {
     pbtools_encoder_write_bool(encoder_p, 9, self_p->accel_data_valid);
     pbtools_encoder_write_bool(encoder_p, 8, self_p->gyro_data_valid);
-    pbtools_encoder_write_int32(encoder_p, 7, self_p->gyro_z_mdps);
-    pbtools_encoder_write_int32(encoder_p, 6, self_p->gyro_y_mdps);
-    pbtools_encoder_write_int32(encoder_p, 5, self_p->gyro_x_mdps);
-    pbtools_encoder_write_int32(encoder_p, 4, self_p->accel_z_mg);
-    pbtools_encoder_write_int32(encoder_p, 3, self_p->accel_y_mg);
-    pbtools_encoder_write_int32(encoder_p, 2, self_p->accel_x_mg);
-    pbtools_encoder_write_int32(encoder_p, 1, self_p->timestamp);
+    pbtools_encoder_write_sint32(encoder_p, 7, self_p->gyro_z_mdps);
+    pbtools_encoder_write_sint32(encoder_p, 6, self_p->gyro_y_mdps);
+    pbtools_encoder_write_sint32(encoder_p, 5, self_p->gyro_x_mdps);
+    pbtools_encoder_write_sint32(encoder_p, 4, self_p->accel_z_mg);
+    pbtools_encoder_write_sint32(encoder_p, 3, self_p->accel_y_mg);
+    pbtools_encoder_write_sint32(encoder_p, 2, self_p->accel_x_mg);
+    pbtools_encoder_write_sint32(encoder_p, 1, self_p->timestamp);
 }
 
 void imu_data_decode_inner(
@@ -76,31 +76,31 @@ void imu_data_decode_inner(
         switch (pbtools_decoder_read_tag(decoder_p, &wire_type)) {
 
         case 1:
-            self_p->timestamp = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->timestamp = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 2:
-            self_p->accel_x_mg = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->accel_x_mg = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 3:
-            self_p->accel_y_mg = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->accel_y_mg = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 4:
-            self_p->accel_z_mg = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->accel_z_mg = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 5:
-            self_p->gyro_x_mdps = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->gyro_x_mdps = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 6:
-            self_p->gyro_y_mdps = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->gyro_y_mdps = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 7:
-            self_p->gyro_z_mdps = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->gyro_z_mdps = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 8:

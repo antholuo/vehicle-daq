@@ -7,6 +7,12 @@
 
 #include "can_sensors.h"
 
+
+/* global imu reception handler function allowing configuration */
+IMUReceptionFunc imu_reception_f_ptr = NULL;
+
+/* using canard instance */
+
 extern CanardInstance canard;
 
 void can_pack_ImuData (const ImuData_S *src,
@@ -21,6 +27,23 @@ void can_pack_ImuData (const ImuData_S *src,
     dst->rate_gyro_latest[2] = src->gyro_z_mdps;
     dst->accel_data_valid = src->accel_data_valid;
     dst->gyro_data_valid = src->gyro_data_valid;
+}
+
+
+void protobuf_pack_ImuData (const struct uavcan_equipment_ahrs_SensorIMU *src, 
+                            struct imu_data_t *dst){
+	if (src == NULL || dst == NULL){
+		return;
+	}
+	dst->timestamp = (int32_t)src->timestamp;
+	dst->accel_x_mg = (int32_t)src->accelerometer_latest[0];
+	dst->accel_y_mg = (int32_t)src->accelerometer_latest[1];
+	dst->accel_z_mg = (int32_t)src->accelerometer_latest[2];
+	dst->gyro_x_mdps = (int32_t)src->rate_gyro_latest[0];
+	dst->gyro_y_mdps = (int32_t)src->rate_gyro_latest[1];
+	dst->gyro_z_mdps = (int32_t)src->rate_gyro_latest[2];
+	dst->gyro_data_valid = src->accel_data_valid;
+	dst->accel_data_valid = src->accel_data_valid;
 }
 
 CanCommsStatus_E can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu){
@@ -51,7 +74,12 @@ void can_receive_ImuData(CanardInstance *ins, CanardRxTransfer *transfer){
 		return;
 	}
 
-	/* TODO: add formal IMU package handling */
+	/* If the imu reception handler is defined elsewhere, then run the handler function */
+    if (imu_reception_f_ptr != NULL){
+        uint8_t can_id = 10; // fake data 
+        imu_reception_f_ptr(&rawIMU, can_id);
+    }
+
     
 	return;
 }
