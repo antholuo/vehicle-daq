@@ -7,10 +7,12 @@
 
 #include "can_sensors.h"
 
+
 /* global imu reception handler function allowing configuration */
 IMUReceptionFunc imu_reception_f_ptr = NULL;
 
 /* using canard instance */
+
 extern CanardInstance canard;
 
 void can_pack_ImuData (const ImuData_S *src,
@@ -26,6 +28,7 @@ void can_pack_ImuData (const ImuData_S *src,
     dst->accel_data_valid = src->accel_data_valid;
     dst->gyro_data_valid = src->gyro_data_valid;
 }
+
 
 void protobuf_pack_ImuData (const struct uavcan_equipment_ahrs_SensorIMU *src, 
                             struct imu_data_t *dst){
@@ -76,6 +79,7 @@ void can_receive_ImuData(CanardInstance *ins, CanardRxTransfer *transfer){
         uint8_t can_id = 10; // fake data 
         imu_reception_f_ptr(&rawIMU, can_id);
     }
+
     
 	return;
 }

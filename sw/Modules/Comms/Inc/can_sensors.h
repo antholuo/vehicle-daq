@@ -11,7 +11,9 @@
 #include "dronecan_msgs.h"
 
 #include "imu.h"
+
 #include "sensor_data.h"
+
 
 #include <stdint.h>
 
@@ -21,6 +23,7 @@ typedef enum {
     COMMS_STATUS_OK = 0,
     COMMS_STATUS_ERR = 1,
 } CanCommsStatus_E;
+
 
 typedef void (*IMUReceptionFunc)(const struct uavcan_equipment_ahrs_SensorIMU*, uint8_t);
 

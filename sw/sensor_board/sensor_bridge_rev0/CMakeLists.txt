@@ -32,6 +32,7 @@ include_directories(
   ${PROJECT_ROOT_DIR}/Protos/Pb_libs/Inc    # Protobuf Library
 
   ${PROJECT_ROOT_DIR}/Utils/Circular_queue/Inc    # Circular Queue Library
+
 )
 
 ### Sources ### # Eventually - we'll want specific control on our source files
@@ -42,6 +43,7 @@ set(MODULES_C_SRCS
   ${MODULES_DIR}/Comms/Src/*.c
   ${MODULES_DIR}/Canard/Src/*.c
 )
+
 
 set(PROTOBUF_DIR ${PROJECT_ROOT_DIR}/Protos)
 set(PROTOBUF_C_SRCS ${PROTOBUF_DIR}/**/Src/*.c)

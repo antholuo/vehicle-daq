@@ -26,6 +26,7 @@ static struct uavcan_protocol_NodeStatus node_status;
 #define CANARD_MEMOERY_POOL_BYTES 1024
 static uint8_t memory_pool[CANARD_MEMOERY_POOL_BYTES];
 
+
 /* an variable that keeps track of time */
 static uint64_t next_1hz_service_at;
 
@@ -35,7 +36,7 @@ void setup_comms(void){
 	can_set_filter();
 	/* Start can bus */
 	HAL_CAN_Start(&hcan);
-	
+
 	/* Initialize canard library */
 	canardInit(&canard, memory_pool, sizeof(memory_pool),
 				onTransferReceived, shouldAcceptTransfer, NULL);
@@ -315,6 +316,7 @@ void handle_GetNodeInfo(CanardInstance *ins, CanardRxTransfer *transfer) {
 
 /* basically, empty function... */
 void handle_NodeStatus(CanardInstance *ins, CanardRxTransfer *transfer) {
+
 	struct uavcan_protocol_NodeStatus nodeStatus;
 
 	if (uavcan_protocol_NodeStatus_decode(transfer, &nodeStatus)) {
