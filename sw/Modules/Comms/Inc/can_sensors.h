@@ -42,4 +42,10 @@ CanCommsStatus_E can_send_ImuData(struct uavcan_equipment_ahrs_SensorIMU raw_imu
 /* handling imu data received from other can node */
 void can_receive_ImuData(CanardInstance *ins, CanardRxTransfer *transfer);
 
+/* Packing gps data to DroneCAN format */
+void can_pack_GpsData (const GpsData_S *src,
+                       struct uavcan_equipment_gnss_SensorGPS *dst);
+
+/* broadcast this node's GPS data on can bus */
+CanCommsStatus_E can_send_GpsData(struct uavcan_equipment_gnss_SensorGPS gps_data);
 #endif /* CAN_SENSORS_H_ */

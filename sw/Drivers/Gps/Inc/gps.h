@@ -23,7 +23,7 @@ typedef enum {
 } GpsType_T;
 
 typedef struct {
-    NmeaTime_T time_utc;
+    NmeaTime_T nmea_time;
     int32_t lat_microdeg;   // latitude, microdegrees. Sign indicates direction (+n, -s)
     int32_t lon_microdeg;   // longitude, microdegrees. Sign indicates direction (+e, -w)
     int16_t altitude_mm;    // altitude, millimeters. Sign indicates above/below MSL

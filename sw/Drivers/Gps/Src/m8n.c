@@ -44,7 +44,7 @@ bool gnss_m8n_is_data_available() {
 
 void gnss_m8n_parse_data(GpsData_S *gps_data) {
     NMEA_ParseBuf(nmea_raw, &nmea_raw_idx);
-    gps_data->time_utc = data_RMC.time_utc;
+    gps_data->nmea_time = data_RMC.nmea_time;
     gps_data->lat_microdeg = data_RMC.lat_microdeg;
     gps_data->lon_microdeg = data_RMC.lon_microdeg;
     gps_data->altitude_mm = data_GGA.altitude_mm;

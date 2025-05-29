@@ -83,3 +83,43 @@ void can_receive_ImuData(CanardInstance *ins, CanardRxTransfer *transfer){
     
 	return;
 }
+
+void can_pack_GpsData (const GpsData_S *src,
+                       struct uavcan_equipment_gnss_SensorGPS *dst){
+	dst->hours = src->nmea_time.time_utc.hours;
+	dst->minutes = src->nmea_time.time_utc.minutes;
+	dst->seconds = src->nmea_time.time_utc.seconds;
+	dst->year = src->nmea_time.date_utc.year;
+	dst->month = src->nmea_time.date_utc.month;
+	dst->day = src->nmea_time.date_utc.day;
+	dst->lat_microdeg = src->lat_microdeg;
+	dst->lon_microdeg = src->lon_microdeg;
+	dst->altitude_m = src->altitude_m;
+	dst->speed_kts = src->speed_kts; 
+	dst->course_deg = src->course_deg;
+	dst->num_sats = src->num_sats;
+	dst->fix_status = src->fix_status;
+	dst->data_valid = src->data_valid;
+}
+
+/* broadcast this node's GPS data on can bus */
+CanCommsStatus_E can_send_GpsData(struct uavcan_equipment_gnss_SensorGPS gps_data){
+	uint8_t buffer[UAVCAN_EQUIPMENT_GNSS_SENSORGPS_MAX_SIZE];
+
+	uint32_t len = uavcan_equipment_gnss_SensorGPS_encode(&gps_data, buffer);
+
+	static uint8_t transfer_id;
+
+    int16_t frame_num = canardBroadcast(&canard,
+					UAVCAN_EQUIPMENT_GNSS_SENSORGPS_SIGNATURE,
+                    UAVCAN_EQUIPMENT_GNSS_SENSORGPS_ID,
+                    &transfer_id,
+                    CANARD_TRANSFER_PRIORITY_LOW,
+                    buffer,
+                    len);
+	if (frame_num <= 0 ){
+		return COMMS_STATUS_ERR;
+	}
+
+    return COMMS_STATUS_OK;
+}

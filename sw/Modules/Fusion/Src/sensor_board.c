@@ -48,12 +48,11 @@ static bool setup_peripherals() {
     return returnVal;
 }
 
+/* poll IMU data, return the availability of the GPS data only */
 static bool poll_peripherals() {
-    poll_imus(imu_types, NUM_IMUS, imu_data);
+    (void)poll_imus(imu_types, NUM_IMUS, imu_data);
 
-    /* disabling GPS for now, will add it back later */
-    // (void)gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
-    return true;
+    return gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
 }
 
 void run_sensor_board() {
@@ -66,10 +65,12 @@ void run_sensor_board() {
 
     uint8_t blink_cnt = 0;
     while(1) {
-        poll_peripherals();
-        loop_comms();
+        if (poll_peripherals()){
+            struct uavcan_equipment_gnss_SensorGPS can_gps_pkt;
+            can_send_GpsData(&gps_data[0], &)can_gps_pkt;
+            (void)can_send_GpsData(can_gps_pkt);
+        }
 
-        // TODO: check gps data availability, transmit gps data on CAN
         if (flag_100hz) {
             struct uavcan_equipment_ahrs_SensorIMU can_imu_pkt;
             can_pack_ImuData(&imu_data[0], &can_imu_pkt);
@@ -81,6 +82,8 @@ void run_sensor_board() {
             }
             blink_cnt++;
         }
+
+        loop_comms();
     }
 
     //
