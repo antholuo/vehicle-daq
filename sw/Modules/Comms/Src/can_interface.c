@@ -66,7 +66,7 @@ void loop_comms(void){
 		send_NodeStatus();
 
 		/* toggling an led light, could be commented*/
-		HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
+		// HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
 	}
 }
 

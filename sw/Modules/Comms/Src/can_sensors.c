@@ -106,21 +106,21 @@ void can_pack_GpsData (const GpsData_S *src,
 }
 
 /* DroneCAN GPS format converts to pb format */
-void protobuf_pack_GpsData (const struct uavcan_equipment_ahrs_SensorGPS *src, 
+void protobuf_pack_GpsData (const struct uavcan_equipment_gnss_SensorGPS *src, 
                             struct gps_data_t *dst){
-	dst->hours = src->nmea_time.time_utc.hours;
-	dst->minutes = src->nmea_time.time_utc.minutes;
-	dst->seconds = src->nmea_time.time_utc.seconds;
-	dst->year = src->nmea_time.date_utc.year;
-	dst->month = src->nmea_time.date_utc.month;
-	dst->day = src->nmea_time.date_utc.day;
+	// dst->hours = src->nmea_time.time_utc.hours;
+	// dst->minutes = src->nmea_time.time_utc.minutes;
+	// dst->seconds = src->nmea_time.time_utc.seconds;
+	// dst->year = src->nmea_time.date_utc.year;
+	// dst->month = src->nmea_time.date_utc.month;
+	// dst->day = src->nmea_time.date_utc.day;
 	dst->lat_microdeg = src->lat_microdeg;
 	dst->lon_microdeg = src->lon_microdeg;
 	dst->altitude_mm = src->altitude_mm;
 	dst->speed_mkts = src->speed_mkts; 
 	dst->course_deg = src->course_deg;
 	dst->num_sats = src->num_sats;
-	dst->fix_status = src->fix_status;
+	dst->quality = src->fix_status;
 	dst->data_valid = src->data_valid;
 }
 
@@ -147,9 +147,9 @@ CanCommsStatus_E can_send_GpsData(struct uavcan_equipment_gnss_SensorGPS gps_dat
 }
 
 void can_receive_GpsData(CanardInstance *ins, CanardRxTransfer *transfer){
-	struct uavcan_equipment_ahrs_SensorGPS gps_data;
+	struct uavcan_equipment_gnss_SensorGPS gps_data;
 
-	if (uavcan_equipment_ahrs_SensorGPS_decode(transfer, &gps_data)) {
+	if (uavcan_equipment_gnss_SensorGPS_decode(transfer, &gps_data)) {
 		return;
 	}
 

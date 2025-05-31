@@ -27,7 +27,7 @@ typedef enum {
 
 
 typedef void (*IMUReceptionFunc)(const struct uavcan_equipment_ahrs_SensorIMU*, uint8_t);
-typedef void (*GPSReceptionFunc)(const struct uavcan_equipment_ahrs_SensorGPS*, uint8_t);
+typedef void (*GPSReceptionFunc)(const struct uavcan_equipment_gnss_SensorGPS*, uint8_t);
 
 extern IMUReceptionFunc imu_reception_f_ptr;
 extern GPSReceptionFunc gps_reception_f_ptr;
@@ -53,7 +53,7 @@ void can_pack_GpsData (const GpsData_S *src,
 CanCommsStatus_E can_send_GpsData(struct uavcan_equipment_gnss_SensorGPS gps_data);
 
 /* DroneCAN GPS format converts to pb format */
-void protobuf_pack_GpsData (const struct uavcan_equipment_ahrs_SensorGPS *src, 
+void protobuf_pack_GpsData (const struct uavcan_equipment_gnss_SensorGPS *src, 
                             struct gps_data_t *dst);
 
 /* handling gps data received from other can node */

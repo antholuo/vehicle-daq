@@ -107,7 +107,7 @@ void task_800hz() {
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
-    /* HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin); */
+    HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
     if (gnss_process_incoming_data(huart, Size)) {
         return;
     } else {
@@ -116,7 +116,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    /* HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin); */
+    HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
 }
 // Restarts the DMA reception on UART3 whenever a framing error occurs
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
@@ -124,5 +124,6 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 	if(huart->Instance == USART1)
 	{
         gnss_process_incoming_data(huart, 0);
+        gnss_start_rx(gps_types, NUM_GNSS);
 	}
 }
