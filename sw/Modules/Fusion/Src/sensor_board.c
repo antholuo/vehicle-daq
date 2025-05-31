@@ -67,7 +67,7 @@ void run_sensor_board() {
     while(1) {
         if (poll_peripherals()){
             struct uavcan_equipment_gnss_SensorGPS can_gps_pkt;
-            can_send_GpsData(&gps_data[0], &)can_gps_pkt;
+            can_pack_GpsData(&gps_data[0], &can_gps_pkt);
             (void)can_send_GpsData(can_gps_pkt);
         }
 

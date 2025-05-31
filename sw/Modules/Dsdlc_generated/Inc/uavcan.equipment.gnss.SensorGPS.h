@@ -8,7 +8,7 @@
 
 
 #define UAVCAN_EQUIPMENT_GNSS_SENSORGPS_MAX_SIZE 23
-#define UAVCAN_EQUIPMENT_GNSS_SENSORGPS_SIGNATURE (0x1ACFE90526B2ECULL)
+#define UAVCAN_EQUIPMENT_GNSS_SENSORGPS_SIGNATURE (0x3EA76BAC73D15CB1ULL)
 
 #define UAVCAN_EQUIPMENT_GNSS_SENSORGPS_ID 2101
 
@@ -62,11 +62,11 @@ struct uavcan_equipment_gnss_SensorGPS {
 
 
 
-    int16_t altitude_m;
+    int16_t altitude_mm;
 
 
 
-    uint8_t speed_kts;
+    uint8_t speed_mkts;
 
 
 
@@ -188,7 +188,7 @@ void _uavcan_equipment_gnss_SensorGPS_encode(uint8_t* buffer, uint32_t* bit_ofs,
 
 
 
-    canardEncodeScalar(buffer, *bit_ofs, 16, &msg->altitude_m);
+    canardEncodeScalar(buffer, *bit_ofs, 16, &msg->altitude_mm);
 
     *bit_ofs += 16;
 
@@ -197,7 +197,7 @@ void _uavcan_equipment_gnss_SensorGPS_encode(uint8_t* buffer, uint32_t* bit_ofs,
 
 
 
-    canardEncodeScalar(buffer, *bit_ofs, 8, &msg->speed_kts);
+    canardEncodeScalar(buffer, *bit_ofs, 8, &msg->speed_mkts);
 
     *bit_ofs += 8;
 
@@ -337,7 +337,7 @@ bool _uavcan_equipment_gnss_SensorGPS_decode(const CanardRxTransfer* transfer, u
 
 
 
-    canardDecodeScalar(transfer, *bit_ofs, 16, true, &msg->altitude_m);
+    canardDecodeScalar(transfer, *bit_ofs, 16, true, &msg->altitude_mm);
 
     *bit_ofs += 16;
 
@@ -347,7 +347,7 @@ bool _uavcan_equipment_gnss_SensorGPS_decode(const CanardRxTransfer* transfer, u
 
 
 
-    canardDecodeScalar(transfer, *bit_ofs, 8, false, &msg->speed_kts);
+    canardDecodeScalar(transfer, *bit_ofs, 8, false, &msg->speed_mkts);
 
     *bit_ofs += 8;
 

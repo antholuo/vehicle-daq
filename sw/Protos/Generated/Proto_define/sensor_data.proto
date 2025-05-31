@@ -17,7 +17,6 @@ message ImuData {
     }
 }
 
-
 message GpsData {
     message UtcTime {
         int32 hours = 1;
@@ -31,6 +30,9 @@ message GpsData {
         int32 day = 3;
     }
 
+    UtcTime time = 1;
+    UtcDate date = 2;
+
     int32 lat_microdeg = 3;
     int32 lon_microdeg = 4;
     int32 altitude_mm = 5;
@@ -40,4 +42,5 @@ message GpsData {
     int32 num_sats = 9;
     bool data_valid = 10;
 }
+
 

@@ -131,7 +131,7 @@ struct uavcan_equipment_gnss_SensorGPS sample_uavcan_equipment_gnss_SensorGPS_ms
 
 
 
-    msg.altitude_m = (int16_t)random_bitlen_signed_val(16);
+    msg.altitude_mm = (int16_t)random_bitlen_signed_val(16);
 
 
 
@@ -139,7 +139,7 @@ struct uavcan_equipment_gnss_SensorGPS sample_uavcan_equipment_gnss_SensorGPS_ms
 
 
 
-    msg.speed_kts = (uint8_t)random_bitlen_unsigned_val(8);
+    msg.speed_mkts = (uint8_t)random_bitlen_unsigned_val(8);
 
 
 

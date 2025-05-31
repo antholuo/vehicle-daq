@@ -11,6 +11,7 @@
 #include "dronecan_msgs.h"
 
 #include "imu.h"
+#include "gps.h"
 
 #include "sensor_data.h"
 
@@ -26,8 +27,10 @@ typedef enum {
 
 
 typedef void (*IMUReceptionFunc)(const struct uavcan_equipment_ahrs_SensorIMU*, uint8_t);
+typedef void (*GPSReceptionFunc)(const struct uavcan_equipment_ahrs_SensorGPS*, uint8_t);
 
 extern IMUReceptionFunc imu_reception_f_ptr;
+extern GPSReceptionFunc gps_reception_f_ptr;
 
 void can_pack_ImuData (const ImuData_S *src,
                            struct uavcan_equipment_ahrs_SensorIMU *dst);
@@ -48,4 +51,12 @@ void can_pack_GpsData (const GpsData_S *src,
 
 /* broadcast this node's GPS data on can bus */
 CanCommsStatus_E can_send_GpsData(struct uavcan_equipment_gnss_SensorGPS gps_data);
+
+/* DroneCAN GPS format converts to pb format */
+void protobuf_pack_GpsData (const struct uavcan_equipment_ahrs_SensorGPS *src, 
+                            struct gps_data_t *dst);
+
+/* handling gps data received from other can node */
+void can_receive_GpsData(CanardInstance *ins, CanardRxTransfer *transfer);
+
 #endif /* CAN_SENSORS_H_ */
