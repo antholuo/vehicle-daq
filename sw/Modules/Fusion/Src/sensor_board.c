@@ -34,7 +34,8 @@ static const ImuType_T imu_types[NUM_IMUS] = {IMU_ASM330LHH};
 static ImuData_S imu_data[NUM_IMUS];
 static const GpsType_T gps_types[NUM_GNSS] = {GPS_NEO_M8N};
 static GpsData_S gps_data[NUM_GNSS];
-bool flag_100hz;
+bool flag_100hz = false;
+bool flag_new_gps = false;
 
 static bool setup_peripherals() {
     bool returnVal = true;
@@ -48,11 +49,10 @@ static bool setup_peripherals() {
     return returnVal;
 }
 
-/* poll IMU data, return the availability of the GPS data only */
-static bool poll_peripherals() {
+static void poll_peripherals() {
     (void)poll_imus(imu_types, NUM_IMUS, imu_data);
 
-    return gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
+    (void)gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
 }
 
 void run_sensor_board() {
@@ -65,10 +65,12 @@ void run_sensor_board() {
 
     uint8_t blink_cnt = 0;
     while(1) {
-        if (poll_peripherals()){
+        poll_peripherals();
+        if (flag_new_gps){
             struct uavcan_equipment_gnss_SensorGPS can_gps_pkt;
             can_pack_GpsData(&gps_data[0], &can_gps_pkt);
             (void)can_send_GpsData(can_gps_pkt);
+            flag_new_gps = false;
         }
 
         if (flag_100hz) {
@@ -109,6 +111,7 @@ void task_800hz() {
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
     HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
     if (gnss_process_incoming_data(huart, Size)) {
+        flag_new_gps = true;
         return;
     } else {
         // Empty for now, but check other UART messages here
