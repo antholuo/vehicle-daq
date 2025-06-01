@@ -108,19 +108,25 @@ void can_pack_GpsData (const GpsData_S *src,
 /* DroneCAN GPS format converts to pb format */
 void protobuf_pack_GpsData (const struct uavcan_equipment_gnss_SensorGPS *src, 
                             struct gps_data_t *dst){
-	// dst->hours = src->nmea_time.time_utc.hours;
-	// dst->minutes = src->nmea_time.time_utc.minutes;
-	// dst->seconds = src->nmea_time.time_utc.seconds;
-	// dst->year = src->nmea_time.date_utc.year;
-	// dst->month = src->nmea_time.date_utc.month;
-	// dst->day = src->nmea_time.date_utc.day;
-	dst->lat_microdeg = src->lat_microdeg;
-	dst->lon_microdeg = src->lon_microdeg;
-	dst->altitude_mm = src->altitude_mm;
-	dst->speed_mkts = src->speed_mkts; 
-	dst->course_deg = src->course_deg;
-	dst->num_sats = src->num_sats;
-	dst->quality = src->fix_status;
+	if (src == NULL || dst == NULL){
+		return;
+	}
+	if (dst->time_p == NULL || dst->date_p == NULL){
+		return;
+	}
+	dst->time_p->hours = (uint32_t)src->hours;
+	dst->time_p->minutes = (uint32_t)src->minutes;
+	dst->time_p->seconds = (uint32_t)src->seconds;
+	dst->date_p->year = (uint32_t)src->year;
+	dst->date_p->month = (uint32_t)src->month;
+	dst->date_p->day = (uint32_t)src->day;
+	dst->lat_microdeg = (int32_t)src->lat_microdeg;
+	dst->lon_microdeg = (int32_t)src->lon_microdeg;
+	dst->altitude_mm = (int32_t)src->altitude_mm;
+	dst->speed_mkts = (int32_t)src->speed_mkts; 
+	dst->course_deg = (int32_t)src->course_deg;
+	dst->num_sats = (int32_t)src->num_sats;
+	dst->quality = (int32_t)src->fix_status;
 	dst->data_valid = src->data_valid;
 }
 

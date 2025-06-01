@@ -60,5 +60,5 @@ void gnss_m8n_process_incoming_data(uint16_t size) {
     nmea_raw_idx = size;
     new_data_ready = (new_data_ready == 127 ) ? 1 : (new_data_ready + 1); // to prevent this from overflowing
     /* memcpy(nmea_cp, nmea_raw, size); */
-    // HAL_UARTEx_ReceiveToIdle_DMA(&huart1, nmea_raw, sizeof(nmea_raw)); comment out for circular buffer
+    // HAL_UARTEx_ReceiveToIdle_DMA(&huart1, nmea_raw, sizeof(nmea_raw)); comment out for circular dma model
 }
