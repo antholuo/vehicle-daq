@@ -7,8 +7,8 @@
 
 
 
-#define UAVCAN_EQUIPMENT_GNSS_SENSORGPS_MAX_SIZE 23
-#define UAVCAN_EQUIPMENT_GNSS_SENSORGPS_SIGNATURE (0x3EA76BAC73D15CB1ULL)
+#define UAVCAN_EQUIPMENT_GNSS_SENSORGPS_MAX_SIZE 19
+#define UAVCAN_EQUIPMENT_GNSS_SENSORGPS_SIGNATURE (0x3938EF4F89EEBB36ULL)
 
 #define UAVCAN_EQUIPMENT_GNSS_SENSORGPS_ID 2101
 
@@ -39,18 +39,6 @@ struct uavcan_equipment_gnss_SensorGPS {
 
 
     uint8_t seconds;
-
-
-
-    uint16_t year;
-
-
-
-    uint8_t month;
-
-
-
-    uint8_t day;
 
 
 
@@ -135,33 +123,6 @@ void _uavcan_equipment_gnss_SensorGPS_encode(uint8_t* buffer, uint32_t* bit_ofs,
 
 
     canardEncodeScalar(buffer, *bit_ofs, 8, &msg->seconds);
-
-    *bit_ofs += 8;
-
-
-
-
-
-
-    canardEncodeScalar(buffer, *bit_ofs, 16, &msg->year);
-
-    *bit_ofs += 16;
-
-
-
-
-
-
-    canardEncodeScalar(buffer, *bit_ofs, 8, &msg->month);
-
-    *bit_ofs += 8;
-
-
-
-
-
-
-    canardEncodeScalar(buffer, *bit_ofs, 8, &msg->day);
 
     *bit_ofs += 8;
 
@@ -278,36 +239,6 @@ bool _uavcan_equipment_gnss_SensorGPS_decode(const CanardRxTransfer* transfer, u
 
 
     canardDecodeScalar(transfer, *bit_ofs, 8, false, &msg->seconds);
-
-    *bit_ofs += 8;
-
-
-
-
-
-
-
-    canardDecodeScalar(transfer, *bit_ofs, 16, false, &msg->year);
-
-    *bit_ofs += 16;
-
-
-
-
-
-
-
-    canardDecodeScalar(transfer, *bit_ofs, 8, false, &msg->month);
-
-    *bit_ofs += 8;
-
-
-
-
-
-
-
-    canardDecodeScalar(transfer, *bit_ofs, 8, false, &msg->day);
 
     *bit_ofs += 8;
 

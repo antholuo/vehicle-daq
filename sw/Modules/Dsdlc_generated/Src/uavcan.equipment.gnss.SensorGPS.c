@@ -91,30 +91,6 @@ struct uavcan_equipment_gnss_SensorGPS sample_uavcan_equipment_gnss_SensorGPS_ms
 
 
 
-    msg.year = (uint16_t)random_bitlen_unsigned_val(16);
-
-
-
-
-
-
-
-    msg.month = (uint8_t)random_bitlen_unsigned_val(8);
-
-
-
-
-
-
-
-    msg.day = (uint8_t)random_bitlen_unsigned_val(8);
-
-
-
-
-
-
-
     msg.lat_microdeg = (int32_t)random_bitlen_signed_val(32);
 
 

@@ -11,9 +11,9 @@ uint8 minutes
 uint8 seconds
 
 # NMEA Date
-uint16 year
-uint8 month
-uint8 day
+# uint16 year
+# uint8 month
+# uint8 day
 
 # latitude, microdegrees. Sign indicates direction (+n, -s)
 int32 lat_microdeg
@@ -21,6 +21,9 @@ int32 lat_microdeg
 # longitude, microdegrees. Sign indicates direction (+e, -w)
 int32 lon_microdeg
 
+# I am commenting this out because of I can't debug the CANARD tx :(
+# Everything has to go inside 21 bytes
+# Hopefully no one find this out
 # altitude, millimeters. Sign indicates above/below MSL
 int16 altitude_mm
 
