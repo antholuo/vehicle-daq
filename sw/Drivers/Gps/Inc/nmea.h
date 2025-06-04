@@ -45,17 +45,22 @@ typedef struct {
     uint8_t hours;
     uint8_t minutes;
     uint8_t seconds;
-} NmeaTime_T;
+} UtcTime_T;
 
 typedef struct {
     uint16_t year;
     uint8_t month;
     uint8_t day;
-} NmeaDate_T;
+} UtcDate_T;
+
+typedef struct {
+    UtcTime_T   time_utc;
+    UtcDate_T   date_utc;
+} NmeaTime_T;
 
 // TODO: rest of the structs. We're going to bring this on ONE AT A TIME!!!! slow and steady...
 typedef struct {
-    NmeaTime_T time_utc;			// UTC Time
+    UtcTime_T time_utc;			// UTC Time
     int32_t lat_microdeg;		// latitude in microdegrees
     uint8_t lat_char;			// latitude direction indicator (N/S)
     int32_t lon_microdeg;		// longitude in microdegrees
@@ -74,7 +79,7 @@ typedef struct {
 
 // Struct of recommended minimum data...
 typedef struct {
-    NmeaTime_T time_utc;		// UTC Time of fix
+    NmeaTime_T nmea_time;		// UTC Time of fix
     bool data_valid;			// *Technically a character for data validity, but we only care about t/f
     int32_t lat_microdeg;		// latitude in microdegrees
     uint8_t lat_char;			// latitude direction indicator (N/S)
@@ -82,7 +87,6 @@ typedef struct {
     uint8_t lon_char;			// longitude direction indicator (E/W)
     uint32_t speed_mkts;		// Speed in (micro) knots?
     uint32_t course_deg;		// Track angle relative to north (degrees)
-    NmeaDate_T utc_date;		// UTC Date
     // Ignoring magnetic variation
     uint8_t pos_mode;			// Position mode. A=autonomous, D=differential, E=estimated, R=coarse, S=simulator, N=not valid
 } RmcData_T;

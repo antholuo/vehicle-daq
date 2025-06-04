@@ -76,9 +76,9 @@ struct gps_data_utc_time_repeated_t {
 
 struct gps_data_utc_time_t {
     struct pbtools_message_base_t base;
-    int32_t hours;
-    int32_t minutes;
-    int32_t seconds;
+    uint32_t hours;
+    uint32_t minutes;
+    uint32_t seconds;
 };
 
 /**
@@ -91,9 +91,9 @@ struct gps_data_utc_date_repeated_t {
 
 struct gps_data_utc_date_t {
     struct pbtools_message_base_t base;
-    int32_t year;
-    int32_t month;
-    int32_t day;
+    uint32_t year;
+    uint32_t month;
+    uint32_t day;
 };
 
 /**
@@ -106,6 +106,8 @@ struct gps_data_repeated_t {
 
 struct gps_data_t {
     struct pbtools_message_base_t base;
+    struct gps_data_utc_time_t *time_p;
+    struct gps_data_utc_date_t *date_p;
     int32_t lat_microdeg;
     int32_t lon_microdeg;
     int32_t altitude_mm;
@@ -133,6 +135,12 @@ int imu_data_decode(
     struct imu_data_t *self_p,
     const uint8_t *encoded_p,
     size_t size);
+
+int gps_data_time_alloc(
+    struct gps_data_t *self_p);
+
+int gps_data_date_alloc(
+    struct gps_data_t *self_p);
 
 /**
  * Encoding and decoding of GpsData.

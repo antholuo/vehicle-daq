@@ -270,7 +270,7 @@ void NMEA_FindSentence(NmeaSentence_T *sentence, uint8_t *buf_start,
 //   buf - pointer to the pointer to the data buffer
 //   time - pointer to structure where time will be stored
 // note: the buf pointer will point to the next term
-void NMEA_ParseTime(uint8_t **buf, NmeaTime_T *time) {
+void NMEA_ParseTime(uint8_t **buf, UtcTime_T *time) {
 	if (**buf != ',') {
 		// Hours
 		time->hours = atoi_len(buf, 2);
@@ -366,7 +366,7 @@ void NMEA_ParseLatLon(uint8_t **buf, uint8_t deg_len, int32_t *value,
 //   buf - pointer to the data buffer
 void NMEA_ParseRmc(uint8_t *ptr) {
 	// Time
-	NMEA_ParseTime(&ptr, &data_RMC.time_utc);
+	NMEA_ParseTime(&ptr, &data_RMC.nmea_time.time_utc);
 
 	// validity
 	if (*ptr != ',') {
@@ -401,23 +401,23 @@ void NMEA_ParseRmc(uint8_t *ptr) {
 	// Date of fix
 	if (*ptr != ',') {
 		// Day
-		data_RMC.utc_date.day = atoi_len(&ptr, 2);
+		data_RMC.nmea_time.date_utc.day = atoi_len(&ptr, 2);
 
 		// Month
-		data_RMC.utc_date.month = atoi_len(&ptr, 2);
+		data_RMC.nmea_time.date_utc.month = atoi_len(&ptr, 2);
 
 		// Year (two digits)
-		data_RMC.utc_date.year = atoi_len(&ptr, 2);
+		data_RMC.nmea_time.date_utc.year = atoi_len(&ptr, 2);
 		// Some receivers report date year as 70 or 80 when their internal clock has
 		// not yet synchronized with the satellites
 		// Yep, this trick wouldn't work after 2069 year ^_^
-		if (data_RMC.utc_date.year > 69) {
+		if (data_RMC.nmea_time.date_utc.year > 69) {
 			// Assume what year is less than 2000
-			data_RMC.utc_date.year += 1900;
+			data_RMC.nmea_time.date_utc.year += 1900;
 		} else {
 			// Assume what year is greater than 2000
 			// Copy fix_date to date and fix_time to time in case of the $GPZDA sentence are disabled
-			data_RMC.utc_date.year += 2000;
+			data_RMC.nmea_time.date_utc.year += 2000;
 		}
 	}
 	ptr++;

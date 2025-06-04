@@ -21,3 +21,4 @@
 #include "uavcan.tunnel.Targetted.h"
 #include "uavcan.Timestamp.h"
 #include "uavcan.equipment.ahrs.SensorIMU.h"
+#include "uavcan.equipment.gnss.SensorGPS.h"

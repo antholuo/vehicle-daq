@@ -195,9 +195,9 @@ void gps_data_utc_time_encode_inner(
     struct pbtools_encoder_t *encoder_p,
     struct gps_data_utc_time_t *self_p)
 {
-    pbtools_encoder_write_int32(encoder_p, 3, self_p->seconds);
-    pbtools_encoder_write_int32(encoder_p, 2, self_p->minutes);
-    pbtools_encoder_write_int32(encoder_p, 1, self_p->hours);
+    pbtools_encoder_write_uint32(encoder_p, 3, self_p->seconds);
+    pbtools_encoder_write_uint32(encoder_p, 2, self_p->minutes);
+    pbtools_encoder_write_uint32(encoder_p, 1, self_p->hours);
 }
 
 void gps_data_utc_time_decode_inner(
@@ -210,15 +210,15 @@ void gps_data_utc_time_decode_inner(
         switch (pbtools_decoder_read_tag(decoder_p, &wire_type)) {
 
         case 1:
-            self_p->hours = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->hours = pbtools_decoder_read_uint32(decoder_p, wire_type);
             break;
 
         case 2:
-            self_p->minutes = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->minutes = pbtools_decoder_read_uint32(decoder_p, wire_type);
             break;
 
         case 3:
-            self_p->seconds = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->seconds = pbtools_decoder_read_uint32(decoder_p, wire_type);
             break;
 
         default:
@@ -269,9 +269,9 @@ void gps_data_utc_date_encode_inner(
     struct pbtools_encoder_t *encoder_p,
     struct gps_data_utc_date_t *self_p)
 {
-    pbtools_encoder_write_int32(encoder_p, 3, self_p->day);
-    pbtools_encoder_write_int32(encoder_p, 2, self_p->month);
-    pbtools_encoder_write_int32(encoder_p, 1, self_p->year);
+    pbtools_encoder_write_uint32(encoder_p, 3, self_p->day);
+    pbtools_encoder_write_uint32(encoder_p, 2, self_p->month);
+    pbtools_encoder_write_uint32(encoder_p, 1, self_p->year);
 }
 
 void gps_data_utc_date_decode_inner(
@@ -284,15 +284,15 @@ void gps_data_utc_date_decode_inner(
         switch (pbtools_decoder_read_tag(decoder_p, &wire_type)) {
 
         case 1:
-            self_p->year = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->year = pbtools_decoder_read_uint32(decoder_p, wire_type);
             break;
 
         case 2:
-            self_p->month = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->month = pbtools_decoder_read_uint32(decoder_p, wire_type);
             break;
 
         case 3:
-            self_p->day = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->day = pbtools_decoder_read_uint32(decoder_p, wire_type);
             break;
 
         default:
@@ -334,6 +334,8 @@ void gps_data_init(
     struct pbtools_heap_t *heap_p)
 {
     self_p->base.heap_p = heap_p;
+    self_p->time_p = NULL;
+    self_p->date_p = NULL;
     self_p->lat_microdeg = 0;
     self_p->lon_microdeg = 0;
     self_p->altitude_mm = 0;
@@ -349,13 +351,23 @@ void gps_data_encode_inner(
     struct gps_data_t *self_p)
 {
     pbtools_encoder_write_bool(encoder_p, 10, self_p->data_valid);
-    pbtools_encoder_write_int32(encoder_p, 9, self_p->num_sats);
-    pbtools_encoder_write_int32(encoder_p, 8, self_p->quality);
-    pbtools_encoder_write_int32(encoder_p, 7, self_p->course_deg);
-    pbtools_encoder_write_int32(encoder_p, 6, self_p->speed_mkts);
-    pbtools_encoder_write_int32(encoder_p, 5, self_p->altitude_mm);
-    pbtools_encoder_write_int32(encoder_p, 4, self_p->lon_microdeg);
-    pbtools_encoder_write_int32(encoder_p, 3, self_p->lat_microdeg);
+    pbtools_encoder_write_sint32(encoder_p, 9, self_p->num_sats);
+    pbtools_encoder_write_sint32(encoder_p, 8, self_p->quality);
+    pbtools_encoder_write_sint32(encoder_p, 7, self_p->course_deg);
+    pbtools_encoder_write_sint32(encoder_p, 6, self_p->speed_mkts);
+    pbtools_encoder_write_sint32(encoder_p, 5, self_p->altitude_mm);
+    pbtools_encoder_write_sint32(encoder_p, 4, self_p->lon_microdeg);
+    pbtools_encoder_write_sint32(encoder_p, 3, self_p->lat_microdeg);
+    pbtools_encoder_sub_message_encode(
+        encoder_p,
+        2,
+        (struct pbtools_message_base_t *)self_p->date_p,
+        (pbtools_message_encode_inner_t)gps_data_utc_date_encode_inner);
+    pbtools_encoder_sub_message_encode(
+        encoder_p,
+        1,
+        (struct pbtools_message_base_t *)self_p->time_p,
+        (pbtools_message_encode_inner_t)gps_data_utc_time_encode_inner);
 }
 
 void gps_data_decode_inner(
@@ -367,32 +379,52 @@ void gps_data_decode_inner(
     while (pbtools_decoder_available(decoder_p)) {
         switch (pbtools_decoder_read_tag(decoder_p, &wire_type)) {
 
+        case 1:
+            pbtools_decoder_sub_message_decode(
+                decoder_p,
+                wire_type,
+                (struct pbtools_message_base_t **)&self_p->time_p,
+                sizeof(struct gps_data_utc_time_t),
+                (pbtools_message_init_t)gps_data_utc_time_init,
+                (pbtools_message_decode_inner_t)gps_data_utc_time_decode_inner);
+            break;
+
+        case 2:
+            pbtools_decoder_sub_message_decode(
+                decoder_p,
+                wire_type,
+                (struct pbtools_message_base_t **)&self_p->date_p,
+                sizeof(struct gps_data_utc_date_t),
+                (pbtools_message_init_t)gps_data_utc_date_init,
+                (pbtools_message_decode_inner_t)gps_data_utc_date_decode_inner);
+            break;
+
         case 3:
-            self_p->lat_microdeg = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->lat_microdeg = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 4:
-            self_p->lon_microdeg = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->lon_microdeg = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 5:
-            self_p->altitude_mm = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->altitude_mm = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 6:
-            self_p->speed_mkts = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->speed_mkts = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 7:
-            self_p->course_deg = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->course_deg = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 8:
-            self_p->quality = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->quality = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 9:
-            self_p->num_sats = pbtools_decoder_read_int32(decoder_p, wire_type);
+            self_p->num_sats = pbtools_decoder_read_sint32(decoder_p, wire_type);
             break;
 
         case 10:
@@ -404,6 +436,26 @@ void gps_data_decode_inner(
             break;
         }
     }
+}
+
+int gps_data_time_alloc(
+    struct gps_data_t *self_p)
+{
+    return (pbtools_sub_message_alloc(
+                (struct pbtools_message_base_t **)&self_p->time_p,
+                self_p->base.heap_p,
+                sizeof(struct gps_data_utc_time_t),
+                (pbtools_message_init_t)gps_data_utc_time_init));
+}
+
+int gps_data_date_alloc(
+    struct gps_data_t *self_p)
+{
+    return (pbtools_sub_message_alloc(
+                (struct pbtools_message_base_t **)&self_p->date_p,
+                self_p->base.heap_p,
+                sizeof(struct gps_data_utc_date_t),
+                (pbtools_message_init_t)gps_data_utc_date_init));
 }
 
 void gps_data_encode_repeated_inner(

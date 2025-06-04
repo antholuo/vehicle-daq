@@ -66,7 +66,7 @@ void loop_comms(void){
 		send_NodeStatus();
 
 		/* toggling an led light, could be commented*/
-		HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
+		// HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
 	}
 }
 
@@ -212,6 +212,10 @@ bool shouldAcceptTransfer(const CanardInstance *ins,
 			*out_data_type_signature = UAVCAN_EQUIPMENT_AHRS_SENSORIMU_SIGNATURE;
 			return true;
 		}
+		case UAVCAN_EQUIPMENT_GNSS_SENSORGPS_ID: {
+			*out_data_type_signature = UAVCAN_EQUIPMENT_GNSS_SENSORGPS_SIGNATURE;
+			return true;
+		}
 		case UAVCAN_PROTOCOL_NODESTATUS_ID: {
 			*out_data_type_signature = UAVCAN_PROTOCOL_NODESTATUS_SIGNATURE;
 			return true;
@@ -244,6 +248,10 @@ void onTransferReceived(CanardInstance *ins, CanardRxTransfer *transfer) {
 		switch (transfer->data_type_id) {
 		case UAVCAN_EQUIPMENT_AHRS_SENSORIMU_ID:{
 			can_receive_ImuData(ins, transfer);
+			break;
+		}
+		case UAVCAN_EQUIPMENT_GNSS_SENSORGPS_ID: {
+			can_receive_GpsData(ins, transfer);
 			break;
 		}
 		case UAVCAN_PROTOCOL_NODESTATUS_ID: {

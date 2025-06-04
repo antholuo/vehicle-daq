@@ -34,7 +34,8 @@ static const ImuType_T imu_types[NUM_IMUS] = {IMU_ASM330LHH};
 static ImuData_S imu_data[NUM_IMUS];
 static const GpsType_T gps_types[NUM_GNSS] = {GPS_NEO_M8N};
 static GpsData_S gps_data[NUM_GNSS];
-bool flag_100hz;
+bool flag_100hz = false;
+bool flag_new_gps = false;
 
 static bool setup_peripherals() {
     bool returnVal = true;
@@ -48,12 +49,10 @@ static bool setup_peripherals() {
     return returnVal;
 }
 
-static bool poll_peripherals() {
-    poll_imus(imu_types, NUM_IMUS, imu_data);
+static void poll_peripherals() {
+    (void)poll_imus(imu_types, NUM_IMUS, imu_data);
 
-    /* disabling GPS for now, will add it back later */
-    // (void)gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
-    return true;
+    (void)gnss_parse_data_if_available(gps_types, NUM_GNSS, gps_data);
 }
 
 void run_sensor_board() {
@@ -67,9 +66,13 @@ void run_sensor_board() {
     uint8_t blink_cnt = 0;
     while(1) {
         poll_peripherals();
-        loop_comms();
+        if (flag_new_gps){
+            struct uavcan_equipment_gnss_SensorGPS can_gps_pkt;
+            can_pack_GpsData(&gps_data[0], &can_gps_pkt);
+            (void)can_send_GpsData(can_gps_pkt);
+            flag_new_gps = false;
+        }
 
-        // TODO: check gps data availability, transmit gps data on CAN
         if (flag_100hz) {
             struct uavcan_equipment_ahrs_SensorIMU can_imu_pkt;
             can_pack_ImuData(&imu_data[0], &can_imu_pkt);
@@ -81,6 +84,8 @@ void run_sensor_board() {
             }
             blink_cnt++;
         }
+
+        loop_comms();
     }
 
     //
@@ -104,8 +109,9 @@ void task_800hz() {
 }
 
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
-    /* HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin); */
+    HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin);
     if (gnss_process_incoming_data(huart, Size)) {
+        flag_new_gps = true;
         return;
     } else {
         // Empty for now, but check other UART messages here
@@ -113,7 +119,7 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *huart, uint16_t Size) {
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
-    /* HAL_GPIO_TogglePin(GPIO_LED2_GPIO_Port, GPIO_LED2_Pin); */
+    HAL_GPIO_TogglePin(GPIO_LED1_GPIO_Port, GPIO_LED1_Pin);
 }
 // Restarts the DMA reception on UART3 whenever a framing error occurs
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
@@ -121,5 +127,6 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
 	if(huart->Instance == USART1)
 	{
         gnss_process_incoming_data(huart, 0);
+        gnss_start_rx(gps_types, NUM_GNSS);
 	}
 }

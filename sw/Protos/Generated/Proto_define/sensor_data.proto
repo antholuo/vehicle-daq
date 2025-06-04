@@ -20,24 +20,27 @@ message ImuData {
 
 message GpsData {
     message UtcTime {
-        int32 hours = 1;
-        int32 minutes = 2;
-        int32 seconds = 3;
+        uint32 hours = 1;
+        uint32 minutes = 2;
+        uint32 seconds = 3;
     }
 
     message UtcDate {
-        int32 year = 1;
-        int32 month = 2;
-        int32 day = 3;
+        uint32 year = 1;
+        uint32 month = 2;
+        uint32 day = 3;
     }
 
-    int32 lat_microdeg = 3;
-    int32 lon_microdeg = 4;
-    int32 altitude_mm = 5;
-    int32 speed_mkts = 6;
-    int32 course_deg = 7;
-    int32 quality = 8;
-    int32 num_sats = 9;
+    UtcTime time = 1;
+    UtcDate date = 2;
+
+    sint32 lat_microdeg = 3;
+    sint32 lon_microdeg = 4;
+    sint32 altitude_mm = 5;
+    sint32 speed_mkts = 6;
+    sint32 course_deg = 7;
+    sint32 quality = 8;
+    sint32 num_sats = 9;
     bool data_valid = 10;
 }
 

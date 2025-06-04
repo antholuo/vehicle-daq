@@ -44,7 +44,7 @@ bool gnss_m8n_is_data_available() {
 
 void gnss_m8n_parse_data(GpsData_S *gps_data) {
     NMEA_ParseBuf(nmea_raw, &nmea_raw_idx);
-    gps_data->time_utc = data_RMC.time_utc;
+    gps_data->nmea_time = data_RMC.nmea_time;
     gps_data->lat_microdeg = data_RMC.lat_microdeg;
     gps_data->lon_microdeg = data_RMC.lon_microdeg;
     gps_data->altitude_mm = data_GGA.altitude_mm;
@@ -58,7 +58,7 @@ void gnss_m8n_parse_data(GpsData_S *gps_data) {
 
 void gnss_m8n_process_incoming_data(uint16_t size) {
     nmea_raw_idx = size;
-    new_data_ready += 1;
+    new_data_ready = (new_data_ready == 127 ) ? 1 : (new_data_ready + 1); // to prevent this from overflowing
     /* memcpy(nmea_cp, nmea_raw, size); */
-    HAL_UARTEx_ReceiveToIdle_DMA(&huart1, nmea_raw, sizeof(nmea_raw));
+    // HAL_UARTEx_ReceiveToIdle_DMA(&huart1, nmea_raw, sizeof(nmea_raw)); comment out for circular dma model
 }

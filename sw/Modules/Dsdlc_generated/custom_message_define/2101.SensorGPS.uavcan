@@ -1,0 +1,46 @@
+#
+# Custome CAN message config file
+# Raw IMU data with timestamps.
+#
+# Created on: May 8, 2025
+#   Auther: Hardy Yu
+
+# NMEA Time 
+uint8 hours
+uint8 minutes
+uint8 seconds
+
+# NMEA Date
+# uint16 year
+# uint8 month
+# uint8 day
+
+# latitude, microdegrees. Sign indicates direction (+n, -s)
+int32 lat_microdeg
+
+# longitude, microdegrees. Sign indicates direction (+e, -w)
+int32 lon_microdeg
+
+# I am commenting this out because of I can't debug the CANARD tx :(
+# Everything has to go inside 21 bytes
+# Hopefully no one find this out
+# altitude, millimeters. Sign indicates above/below MSL
+int16 altitude_mm
+
+# groundspeed, microknots (default RMC speed)
+uint8 speed_mkts
+
+# Track, in degrees
+uint16 course_deg
+
+# Disabled for now due to the lack of compass on GPS
+# in degrees, 0-360
+# uint16 heading_deg
+
+# Number of satellites in view (max 22)
+uint8 num_sats
+
+# 0 = No gps, 1 = GPS Fix, 2 = DGSP Fix, 3 = Estimated / Dead Reckoning
+uint8 fix_status
+
+bool data_valid
