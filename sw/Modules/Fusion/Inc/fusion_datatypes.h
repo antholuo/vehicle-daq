@@ -11,12 +11,12 @@
 #ifndef FUSION_DATATYPES_H
 #define FUSION_DATATYPES_H
 
-#include "imu.h"
 #include "gps.h"
+#include "imu.h"
 
 typedef struct __attribute__((packed)) {
-    ImuData_S imu_data;
-    GpsData_S gps_data;
+  ImuData_S imu_data;
+  GpsData_S gps_data;
 } MotionDataRaw_S;
 
-#endif // FUSION_DATATYPES_H
+#endif  // FUSION_DATATYPES_H

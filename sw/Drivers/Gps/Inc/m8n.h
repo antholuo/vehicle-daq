@@ -11,11 +11,11 @@
 #ifndef M8N_H
 #define M8N_H
 
-#include "nmea.h"
-#include "gps.h"
-
 #include <stdbool.h>
 #include <stdint.h>
+
+#include "gps.h"
+#include "nmea.h"
 
 void gnss_m8n_start_rx();
 
@@ -25,4 +25,4 @@ void gnss_m8n_parse_data(GpsData_S *gps_data);
 
 void gnss_m8n_process_incoming_data(uint16_t size);
 
-#endif // M8N_H
+#endif  // M8N_H

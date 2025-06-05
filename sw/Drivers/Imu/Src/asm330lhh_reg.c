@@ -20,39 +20,37 @@
 #include "asm330lhh_reg.h"
 
 /**
-  * @defgroup    ASM330LHH
-  * @brief       This file provides a set of functions needed to drive the
-  *              asm330lhh enhanced inertial module.
-  * @{
-  *
-  */
+ * @defgroup    ASM330LHH
+ * @brief       This file provides a set of functions needed to drive the
+ *              asm330lhh enhanced inertial module.
+ * @{
+ *
+ */
 
 /**
-  * @defgroup    ASM330LHH_Interfaces_Functions
-  * @brief       This section provide a set of functions used to read and
-  *              write a generic register of the device.
-  *              MANDATORY: return 0 -> no Error.
-  * @{
-  *
-  */
+ * @defgroup    ASM330LHH_Interfaces_Functions
+ * @brief       This section provide a set of functions used to read and
+ *              write a generic register of the device.
+ *              MANDATORY: return 0 -> no Error.
+ * @{
+ *
+ */
 
 /**
-  * @brief  Read generic device register
-  *
-  * @param  ctx   read / write interface definitions(ptr)
-  * @param  reg   register to read
-  * @param  data  pointer to buffer that store the data read(ptr)
-  * @param  len   number of consecutive register to read
-  * @retval       interface status (MANDATORY: return 0 -> no Error)
-  *
-  */
-int32_t __weak asm330lhh_read_reg(const stmdev_ctx_t *ctx, uint8_t reg, uint8_t *data,
-                                  uint16_t len)
-{
+ * @brief  Read generic device register
+ *
+ * @param  ctx   read / write interface definitions(ptr)
+ * @param  reg   register to read
+ * @param  data  pointer to buffer that store the data read(ptr)
+ * @param  len   number of consecutive register to read
+ * @retval       interface status (MANDATORY: return 0 -> no Error)
+ *
+ */
+int32_t __weak asm330lhh_read_reg(const stmdev_ctx_t *ctx, uint8_t reg,
+                                  uint8_t *data, uint16_t len) {
   int32_t ret;
 
-  if (ctx == NULL)
-  {
+  if (ctx == NULL) {
     return -1;
   }
 
@@ -62,22 +60,20 @@ int32_t __weak asm330lhh_read_reg(const stmdev_ctx_t *ctx, uint8_t reg, uint8_t 
 }
 
 /**
-  * @brief  Write generic device register
-  *
-  * @param  ctx   read / write interface definitions(ptr)
-  * @param  reg   register to write
-  * @param  data  pointer to data to write in register reg(ptr)
-  * @param  len   number of consecutive register to write
-  * @retval       interface status (MANDATORY: return 0 -> no Error)
-  *
-  */
-int32_t __weak asm330lhh_write_reg(const stmdev_ctx_t *ctx, uint8_t reg, uint8_t *data,
-                                   uint16_t len)
-{
+ * @brief  Write generic device register
+ *
+ * @param  ctx   read / write interface definitions(ptr)
+ * @param  reg   register to write
+ * @param  data  pointer to data to write in register reg(ptr)
+ * @param  len   number of consecutive register to write
+ * @retval       interface status (MANDATORY: return 0 -> no Error)
+ *
+ */
+int32_t __weak asm330lhh_write_reg(const stmdev_ctx_t *ctx, uint8_t reg,
+                                   uint8_t *data, uint16_t len) {
   int32_t ret;
 
-  if (ctx == NULL)
-  {
+  if (ctx == NULL) {
     return -1;
   }
 
@@ -87,131 +83,114 @@ int32_t __weak asm330lhh_write_reg(const stmdev_ctx_t *ctx, uint8_t reg, uint8_t
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup    ASM330LHH_Sensitivity
-  * @brief       These functions convert raw-data into engineering units.
-  * @{
-  *
-  */
+ * @defgroup    ASM330LHH_Sensitivity
+ * @brief       These functions convert raw-data into engineering units.
+ * @{
+ *
+ */
 
-float_t asm330lhh_from_fs2g_to_mg(int16_t lsb)
-{
+float_t asm330lhh_from_fs2g_to_mg(int16_t lsb) {
   return ((float_t)lsb * 0.061f);
 }
 
-float_t asm330lhh_from_fs4g_to_mg(int16_t lsb)
-{
+float_t asm330lhh_from_fs4g_to_mg(int16_t lsb) {
   return ((float_t)lsb * 0.122f);
 }
 
-float_t asm330lhh_from_fs8g_to_mg(int16_t lsb)
-{
+float_t asm330lhh_from_fs8g_to_mg(int16_t lsb) {
   return ((float_t)lsb * 0.244f);
 }
 
-float_t asm330lhh_from_fs16g_to_mg(int16_t lsb)
-{
+float_t asm330lhh_from_fs16g_to_mg(int16_t lsb) {
   return ((float_t)lsb * 0.488f);
 }
 
-float_t asm330lhh_from_fs125dps_to_mdps(int16_t lsb)
-{
+float_t asm330lhh_from_fs125dps_to_mdps(int16_t lsb) {
   return ((float_t)lsb * 4.375f);
 }
 
-float_t asm330lhh_from_fs250dps_to_mdps(int16_t lsb)
-{
+float_t asm330lhh_from_fs250dps_to_mdps(int16_t lsb) {
   return ((float_t)lsb * 8.75f);
 }
 
-float_t asm330lhh_from_fs500dps_to_mdps(int16_t lsb)
-{
+float_t asm330lhh_from_fs500dps_to_mdps(int16_t lsb) {
   return ((float_t)lsb * 17.50f);
 }
 
-float_t asm330lhh_from_fs1000dps_to_mdps(int16_t lsb)
-{
+float_t asm330lhh_from_fs1000dps_to_mdps(int16_t lsb) {
   return ((float_t)lsb * 35.0f);
 }
 
-float_t asm330lhh_from_fs2000dps_to_mdps(int16_t lsb)
-{
+float_t asm330lhh_from_fs2000dps_to_mdps(int16_t lsb) {
   return ((float_t)lsb * 70.0f);
 }
 
-float_t asm330lhh_from_fs4000dps_to_mdps(int16_t lsb)
-{
+float_t asm330lhh_from_fs4000dps_to_mdps(int16_t lsb) {
   return ((float_t)lsb * 140.0f);
 }
 
-float_t asm330lhh_from_lsb_to_celsius(int16_t lsb)
-{
+float_t asm330lhh_from_lsb_to_celsius(int16_t lsb) {
   return (((float_t)lsb / 256.0f) + 25.0f);
 }
 
-float_t asm330lhh_from_lsb_to_nsec(int32_t lsb)
-{
+float_t asm330lhh_from_lsb_to_nsec(int32_t lsb) {
   return ((float_t)lsb * 25000.0f);
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   LSM9DS1_Data_generation
-  * @brief      This section groups all the functions concerning data
-  *             generation
-  * @{
-  *
-  */
+ * @defgroup   LSM9DS1_Data_generation
+ * @brief      This section groups all the functions concerning data
+ *             generation
+ * @{
+ *
+ */
 
 /**
-  * @brief  Accelerometer full-scale selection[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of fs_xl in reg CTRL1_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Accelerometer full-scale selection[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of fs_xl in reg CTRL1_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_full_scale_set(const stmdev_ctx_t *ctx,
-                                    asm330lhh_fs_xl_t val)
-{
+                                    asm330lhh_fs_xl_t val) {
   asm330lhh_ctrl1_xl_t ctrl1_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL1_XL, (uint8_t *)&ctrl1_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl1_xl.fs_xl = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL1_XL,
-                              (uint8_t *)&ctrl1_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL1_XL, (uint8_t *)&ctrl1_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Accelerometer full-scale selection.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of fs_xl in reg CTRL1_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Accelerometer full-scale selection.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of fs_xl in reg CTRL1_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_full_scale_get(const stmdev_ctx_t *ctx,
-                                    asm330lhh_fs_xl_t *val)
-{
+                                    asm330lhh_fs_xl_t *val) {
   asm330lhh_ctrl1_xl_t ctrl1_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL1_XL, (uint8_t *)&ctrl1_xl, 1);
-  switch (ctrl1_xl.fs_xl)
-  {
+  switch (ctrl1_xl.fs_xl) {
     case ASM330LHH_2g:
       *val = ASM330LHH_2g;
       break;
@@ -232,50 +211,44 @@ int32_t asm330lhh_xl_full_scale_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Accelerometer UI data rate selection.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of odr_xl in reg CTRL1_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Accelerometer UI data rate selection.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of odr_xl in reg CTRL1_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_data_rate_set(const stmdev_ctx_t *ctx,
-                                   asm330lhh_odr_xl_t val)
-{
-  asm330lhh_odr_xl_t odr_xl =  val;
+                                   asm330lhh_odr_xl_t val) {
+  asm330lhh_odr_xl_t odr_xl = val;
   asm330lhh_ctrl1_xl_t ctrl1_xl;
   int32_t ret = 0;
 
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL1_XL, (uint8_t *)&ctrl1_xl, 1);
   }
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl1_xl.odr_xl = (uint8_t)odr_xl;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL1_XL,
-                              (uint8_t *)&ctrl1_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL1_XL, (uint8_t *)&ctrl1_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Accelerometer UI data rate selection.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of odr_xl in reg CTRL1_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Accelerometer UI data rate selection.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of odr_xl in reg CTRL1_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_data_rate_get(const stmdev_ctx_t *ctx,
-                                   asm330lhh_odr_xl_t *val)
-{
+                                   asm330lhh_odr_xl_t *val) {
   asm330lhh_ctrl1_xl_t ctrl1_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL1_XL, (uint8_t *)&ctrl1_xl, 1);
-  switch (ctrl1_xl.odr_xl)
-  {
+  switch (ctrl1_xl.odr_xl) {
     case ASM330LHH_XL_ODR_OFF:
       *val = ASM330LHH_XL_ODR_OFF;
       break;
@@ -317,22 +290,20 @@ int32_t asm330lhh_xl_data_rate_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Gyroscope UI chain full-scale selection.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of fs_g in reg CTRL2_G
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Gyroscope UI chain full-scale selection.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of fs_g in reg CTRL2_G
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_full_scale_set(const stmdev_ctx_t *ctx,
-                                    asm330lhh_fs_g_t val)
-{
+                                    asm330lhh_fs_g_t val) {
   asm330lhh_ctrl2_g_t ctrl2_g;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL2_G, (uint8_t *)&ctrl2_g, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl2_g.fs_g = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL2_G, (uint8_t *)&ctrl2_g, 1);
   }
@@ -340,22 +311,20 @@ int32_t asm330lhh_gy_full_scale_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Gyroscope UI chain full-scale selection.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of fs_g in reg CTRL2_G
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Gyroscope UI chain full-scale selection.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of fs_g in reg CTRL2_G
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_full_scale_get(const stmdev_ctx_t *ctx,
-                                    asm330lhh_fs_g_t *val)
-{
+                                    asm330lhh_fs_g_t *val) {
   asm330lhh_ctrl2_g_t ctrl2_g;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL2_G, (uint8_t *)&ctrl2_g, 1);
-  switch (ctrl2_g.fs_g)
-  {
+  switch (ctrl2_g.fs_g) {
     case ASM330LHH_125dps:
       *val = ASM330LHH_125dps;
       break;
@@ -382,26 +351,23 @@ int32_t asm330lhh_gy_full_scale_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Gyroscope data rate.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of odr_g in reg CTRL2_G
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Gyroscope data rate.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of odr_g in reg CTRL2_G
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_data_rate_set(const stmdev_ctx_t *ctx,
-                                   asm330lhh_odr_g_t val)
-{
-  asm330lhh_odr_g_t odr_gy =  val;
+                                   asm330lhh_odr_g_t val) {
+  asm330lhh_odr_g_t odr_gy = val;
   asm330lhh_ctrl2_g_t ctrl2_g;
   int32_t ret = 0;
 
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL2_G, (uint8_t *)&ctrl2_g, 1);
   }
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl2_g.odr_g = (uint8_t)odr_gy;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL2_G, (uint8_t *)&ctrl2_g, 1);
   }
@@ -409,22 +375,20 @@ int32_t asm330lhh_gy_data_rate_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Gyroscope data rate.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of odr_g in reg CTRL2_G
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Gyroscope data rate.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of odr_g in reg CTRL2_G
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_data_rate_get(const stmdev_ctx_t *ctx,
-                                   asm330lhh_odr_g_t *val)
-{
+                                   asm330lhh_odr_g_t *val) {
   asm330lhh_ctrl2_g_t ctrl2_g;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL2_G, (uint8_t *)&ctrl2_g, 1);
-  switch (ctrl2_g.odr_g)
-  {
+  switch (ctrl2_g.odr_g) {
     case ASM330LHH_GY_ODR_OFF:
       *val = ASM330LHH_GY_ODR_OFF;
       break;
@@ -466,21 +430,19 @@ int32_t asm330lhh_gy_data_rate_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Block data update.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of bdu in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_block_data_update_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Block data update.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of bdu in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_block_data_update_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl3_c.bdu = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
   }
@@ -488,15 +450,14 @@ int32_t asm330lhh_block_data_update_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Block data update.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of bdu in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_block_data_update_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Block data update.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of bdu in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_block_data_update_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
@@ -507,23 +468,21 @@ int32_t asm330lhh_block_data_update_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Weight of XL user offset bits of registers X_OFS_USR (73h),
-  *         Y_OFS_USR (74h), Z_OFS_USR (75h).[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of usr_off_w in reg CTRL6_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Weight of XL user offset bits of registers X_OFS_USR (73h),
+ *         Y_OFS_USR (74h), Z_OFS_USR (75h).[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of usr_off_w in reg CTRL6_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_offset_weight_set(const stmdev_ctx_t *ctx,
-                                       asm330lhh_usr_off_w_t val)
-{
+                                       asm330lhh_usr_off_w_t val) {
   asm330lhh_ctrl6_c_t ctrl6_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL6_C, (uint8_t *)&ctrl6_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl6_c.usr_off_w = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL6_C, (uint8_t *)&ctrl6_c, 1);
   }
@@ -531,24 +490,22 @@ int32_t asm330lhh_xl_offset_weight_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Weight of XL user offset bits of registers X_OFS_USR (73h),
-  *         Y_OFS_USR (74h), Z_OFS_USR (75h).[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of usr_off_w in reg CTRL6_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Weight of XL user offset bits of registers X_OFS_USR (73h),
+ *         Y_OFS_USR (74h), Z_OFS_USR (75h).[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of usr_off_w in reg CTRL6_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_offset_weight_get(const stmdev_ctx_t *ctx,
-                                       asm330lhh_usr_off_w_t *val)
-{
+                                       asm330lhh_usr_off_w_t *val) {
   asm330lhh_ctrl6_c_t ctrl6_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL6_C, (uint8_t *)&ctrl6_c, 1);
 
-  switch (ctrl6_c.usr_off_w)
-  {
+  switch (ctrl6_c.usr_off_w) {
     case ASM330LHH_LSb_1mg:
       *val = ASM330LHH_LSb_1mg;
       break;
@@ -563,34 +520,30 @@ int32_t asm330lhh_xl_offset_weight_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Read all the interrupt flag of the device.
-  *[get]
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get registers ALL_INT_SRC; WAKE_UP_SRC;
-  *                              TAP_SRC; D6D_SRC; STATUS_REG;
-  *                              EMB_FUNC_STATUS; FSM_STATUS_A/B
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Read all the interrupt flag of the device.
+ *[get]
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get registers ALL_INT_SRC; WAKE_UP_SRC;
+ *                              TAP_SRC; D6D_SRC; STATUS_REG;
+ *                              EMB_FUNC_STATUS; FSM_STATUS_A/B
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_all_sources_get(const stmdev_ctx_t *ctx,
-                                  asm330lhh_all_sources_t *val)
-{
+                                  asm330lhh_all_sources_t *val) {
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_ALL_INT_SRC,
                            (uint8_t *)&val->all_int_src, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_SRC,
                              (uint8_t *)&val->wake_up_src, 1);
   }
-  if (ret == 0)
-  {
-    ret = asm330lhh_read_reg(ctx, ASM330LHH_D6D_SRC,
-                             (uint8_t *)&val->d6d_src, 1);
+  if (ret == 0) {
+    ret =
+        asm330lhh_read_reg(ctx, ASM330LHH_D6D_SRC, (uint8_t *)&val->d6d_src, 1);
   }
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ret = asm330lhh_read_reg(ctx, ASM330LHH_STATUS_REG,
                              (uint8_t *)&val->status_reg, 1);
   }
@@ -599,199 +552,190 @@ int32_t asm330lhh_all_sources_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  The STATUS_REG register is read by the primary interface.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get register STATUS_REG
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  The STATUS_REG register is read by the primary interface.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get register STATUS_REG
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_status_reg_get(const stmdev_ctx_t *ctx,
-                                 asm330lhh_status_reg_t *val)
-{
+                                 asm330lhh_status_reg_t *val) {
   int32_t ret;
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_STATUS_REG, (uint8_t *) val, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_STATUS_REG, (uint8_t *)val, 1);
   return ret;
 }
 
 /**
-  * @brief  Accelerometer new data available.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of xlda in reg STATUS_REG
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_flag_data_ready_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Accelerometer new data available.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of xlda in reg STATUS_REG
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_flag_data_ready_get(const stmdev_ctx_t *ctx,
+                                         uint8_t *val) {
   asm330lhh_status_reg_t status_reg;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_STATUS_REG,
-                           (uint8_t *)&status_reg, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_STATUS_REG, (uint8_t *)&status_reg, 1);
   *val = status_reg.xlda;
 
   return ret;
 }
 
 /**
-  * @brief  Gyroscope new data available.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of gda in reg STATUS_REG
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_gy_flag_data_ready_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Gyroscope new data available.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of gda in reg STATUS_REG
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_gy_flag_data_ready_get(const stmdev_ctx_t *ctx,
+                                         uint8_t *val) {
   asm330lhh_status_reg_t status_reg;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_STATUS_REG,
-                           (uint8_t *)&status_reg, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_STATUS_REG, (uint8_t *)&status_reg, 1);
   *val = status_reg.gda;
 
   return ret;
 }
 
 /**
-  * @brief  Temperature new data available.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of tda in reg STATUS_REG
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_temp_flag_data_ready_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Temperature new data available.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of tda in reg STATUS_REG
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_temp_flag_data_ready_get(const stmdev_ctx_t *ctx,
+                                           uint8_t *val) {
   asm330lhh_status_reg_t status_reg;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_STATUS_REG,
-                           (uint8_t *)&status_reg, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_STATUS_REG, (uint8_t *)&status_reg, 1);
   *val = status_reg.tda;
 
   return ret;
 }
 
 /**
-  * @brief  Accelerometer X-axis user offset correction expressed in two’s
-  *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
-  *         The value must be in the range [-127 127].[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that contains data to write
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_usr_offset_x_set(const stmdev_ctx_t *ctx, uint8_t *buff)
-{
+ * @brief  Accelerometer X-axis user offset correction expressed in two’s
+ *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
+ *         The value must be in the range [-127 127].[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that contains data to write
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_usr_offset_x_set(const stmdev_ctx_t *ctx, uint8_t *buff) {
   int32_t ret;
   ret = asm330lhh_write_reg(ctx, ASM330LHH_X_OFS_USR, buff, 1);
   return ret;
 }
 
 /**
-  * @brief  Accelerometer X-axis user offset correction expressed in two’s
-  *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
-  *         The value must be in the range [-127 127].[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_usr_offset_x_get(const stmdev_ctx_t *ctx, uint8_t *buff)
-{
+ * @brief  Accelerometer X-axis user offset correction expressed in two’s
+ *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
+ *         The value must be in the range [-127 127].[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that stores data read
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_usr_offset_x_get(const stmdev_ctx_t *ctx, uint8_t *buff) {
   int32_t ret;
   ret = asm330lhh_read_reg(ctx, ASM330LHH_X_OFS_USR, buff, 1);
   return ret;
 }
 
 /**
-  * @brief  Accelerometer Y-axis user offset correction expressed in two’s
-  *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
-  *         The value must be in the range [-127 127].[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that contains data to write
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_usr_offset_y_set(const stmdev_ctx_t *ctx, uint8_t *buff)
-{
+ * @brief  Accelerometer Y-axis user offset correction expressed in two’s
+ *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
+ *         The value must be in the range [-127 127].[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that contains data to write
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_usr_offset_y_set(const stmdev_ctx_t *ctx, uint8_t *buff) {
   int32_t ret;
   ret = asm330lhh_write_reg(ctx, ASM330LHH_Y_OFS_USR, buff, 1);
   return ret;
 }
 
 /**
-  * @brief  Accelerometer Y-axis user offset correction expressed in two’s
-  *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
-  *         The value must be in the range [-127 127].[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_usr_offset_y_get(const stmdev_ctx_t *ctx, uint8_t *buff)
-{
+ * @brief  Accelerometer Y-axis user offset correction expressed in two’s
+ *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
+ *         The value must be in the range [-127 127].[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that stores data read
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_usr_offset_y_get(const stmdev_ctx_t *ctx, uint8_t *buff) {
   int32_t ret;
   ret = asm330lhh_read_reg(ctx, ASM330LHH_Y_OFS_USR, buff, 1);
   return ret;
 }
 
 /**
-  * @brief  Accelerometer Z-axis user offset correction expressed in two’s
-  *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
-  *         The value must be in the range [-127 127].[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that contains data to write
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_usr_offset_z_set(const stmdev_ctx_t *ctx, uint8_t *buff)
-{
+ * @brief  Accelerometer Z-axis user offset correction expressed in two’s
+ *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
+ *         The value must be in the range [-127 127].[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that contains data to write
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_usr_offset_z_set(const stmdev_ctx_t *ctx, uint8_t *buff) {
   int32_t ret;
   ret = asm330lhh_write_reg(ctx, ASM330LHH_Z_OFS_USR, buff, 1);
   return ret;
 }
 
 /**
-  * @brief  Accelerometer X-axis user offset correction expressed in two’s
-  *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
-  *         The value must be in the range [-127 127].[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_usr_offset_z_get(const stmdev_ctx_t *ctx, uint8_t *buff)
-{
+ * @brief  Accelerometer X-axis user offset correction expressed in two’s
+ *         complement, weight depends on USR_OFF_W in CTRL6_C (15h).
+ *         The value must be in the range [-127 127].[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that stores data read
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_usr_offset_z_get(const stmdev_ctx_t *ctx, uint8_t *buff) {
   int32_t ret;
   ret = asm330lhh_read_reg(ctx, ASM330LHH_Z_OFS_USR, buff, 1);
   return ret;
 }
 
 /**
-  * @brief  Enables user offset on out.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of usr_off_on_out in reg CTRL7_G
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_usr_offset_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Enables user offset on out.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of usr_off_on_out in reg CTRL7_G
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_usr_offset_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl7_g_t ctrl7_g;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL7_G, (uint8_t *)&ctrl7_g, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl7_g.usr_off_on_out = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL7_G, (uint8_t *)&ctrl7_g, 1);
   }
@@ -799,15 +743,14 @@ int32_t asm330lhh_xl_usr_offset_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Get user offset on out flag.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get values of usr_off_on_out in reg CTRL7_G
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_usr_offset_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Get user offset on out flag.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get values of usr_off_on_out in reg CTRL7_G
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_usr_offset_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl7_g_t ctrl7_g;
   int32_t ret;
 
@@ -818,65 +761,60 @@ int32_t asm330lhh_xl_usr_offset_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_Timestamp
-  * @brief      This section groups all the functions that manage the
-  *             timestamp generation.
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_Timestamp
+ * @brief      This section groups all the functions that manage the
+ *             timestamp generation.
+ * @{
+ *
+ */
 
 /**
-  * @brief  Reset timestamp counter.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_timestamp_rst(const stmdev_ctx_t *ctx)
-{
+ * @brief  Reset timestamp counter.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_timestamp_rst(const stmdev_ctx_t *ctx) {
   uint8_t rst_val = 0xAA;
 
   return asm330lhh_write_reg(ctx, ASM330LHH_TIMESTAMP2, &rst_val, 1);
 }
 
 /**
-  * @brief  Enables timestamp counter.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of timestamp_en in reg CTRL10_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_timestamp_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Enables timestamp counter.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of timestamp_en in reg CTRL10_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_timestamp_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl10_c_t ctrl10_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL10_C, (uint8_t *)&ctrl10_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl10_c.timestamp_en = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL10_C,
-                              (uint8_t *)&ctrl10_c, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL10_C, (uint8_t *)&ctrl10_c, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Enables timestamp counter.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of timestamp_en in reg CTRL10_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_timestamp_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Enables timestamp counter.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of timestamp_en in reg CTRL10_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_timestamp_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl10_c_t ctrl10_c;
   int32_t ret;
 
@@ -887,58 +825,55 @@ int32_t asm330lhh_timestamp_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Timestamp first data output register (r).
-  *         The value is expressed as a 32-bit word and the bit resolution
-  *         is 25 μs.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_timestamp_raw_get(const stmdev_ctx_t *ctx, uint32_t *val)
-{
+ * @brief  Timestamp first data output register (r).
+ *         The value is expressed as a 32-bit word and the bit resolution
+ *         is 25 μs.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that stores data read
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_timestamp_raw_get(const stmdev_ctx_t *ctx, uint32_t *val) {
   uint8_t buff[4];
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_TIMESTAMP0, buff, 4);
   *val = buff[3];
-  *val = (*val * 256U) +  buff[2];
-  *val = (*val * 256U) +  buff[1];
-  *val = (*val * 256U) +  buff[0];
+  *val = (*val * 256U) + buff[2];
+  *val = (*val * 256U) + buff[1];
+  *val = (*val * 256U) + buff[0];
 
   return ret;
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_Data output
-  * @brief      This section groups all the data output functions.
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_Data output
+ * @brief      This section groups all the data output functions.
+ * @{
+ *
+ */
 
 /**
-  * @brief  Circular burst-mode (rounding) read of the output registers.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of rounding in reg CTRL5_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Circular burst-mode (rounding) read of the output registers.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of rounding in reg CTRL5_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_rounding_mode_set(const stmdev_ctx_t *ctx,
-                                    asm330lhh_rounding_t val)
-{
+                                    asm330lhh_rounding_t val) {
   asm330lhh_ctrl5_c_t ctrl5_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL5_C, (uint8_t *)&ctrl5_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl5_c.rounding = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL5_C, (uint8_t *)&ctrl5_c, 1);
   }
@@ -946,22 +881,20 @@ int32_t asm330lhh_rounding_mode_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Gyroscope UI chain full-scale selection.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of rounding in reg CTRL5_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Gyroscope UI chain full-scale selection.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of rounding in reg CTRL5_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_rounding_mode_get(const stmdev_ctx_t *ctx,
-                                    asm330lhh_rounding_t *val)
-{
+                                    asm330lhh_rounding_t *val) {
   asm330lhh_ctrl5_c_t ctrl5_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL5_C, (uint8_t *)&ctrl5_c, 1);
-  switch (ctrl5_c.rounding)
-  {
+  switch (ctrl5_c.rounding) {
     case ASM330LHH_NO_ROUND:
       *val = ASM330LHH_NO_ROUND;
       break;
@@ -982,17 +915,16 @@ int32_t asm330lhh_rounding_mode_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Temperature data output register (r).
-  *         L and H registers together express a 16-bit word in two’s
-  *         complement.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_temperature_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
-{
+ * @brief  Temperature data output register (r).
+ *         L and H registers together express a 16-bit word in two’s
+ *         complement.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that stores data read
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_temperature_raw_get(const stmdev_ctx_t *ctx, int16_t *val) {
   uint8_t buff[2];
   int32_t ret;
 
@@ -1004,16 +936,15 @@ int32_t asm330lhh_temperature_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
 }
 
 /**
-  * @brief  Angular rate sensor. The value is expressed as a 16-bit
-  *         word in two’s complement.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_angular_rate_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
-{
+ * @brief  Angular rate sensor. The value is expressed as a 16-bit
+ *         word in two’s complement.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that stores data read
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_angular_rate_raw_get(const stmdev_ctx_t *ctx, int16_t *val) {
   uint8_t buff[6];
   int32_t ret;
   ret = asm330lhh_read_reg(ctx, ASM330LHH_OUTX_L_G, buff, 6);
@@ -1029,16 +960,15 @@ int32_t asm330lhh_angular_rate_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
 }
 
 /**
-  * @brief  Linear acceleration output register. The value is expressed as a
-  *         16-bit word in two’s complement.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_acceleration_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
-{
+ * @brief  Linear acceleration output register. The value is expressed as a
+ *         16-bit word in two’s complement.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that stores data read
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_acceleration_raw_get(const stmdev_ctx_t *ctx, int16_t *val) {
   uint8_t buff[6];
   int32_t ret;
   ret = asm330lhh_read_reg(ctx, ASM330LHH_OUTX_L_A, buff, 6);
@@ -1054,97 +984,88 @@ int32_t asm330lhh_acceleration_raw_get(const stmdev_ctx_t *ctx, int16_t *val)
 }
 
 /**
-  * @brief  FIFO data output.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_fifo_out_raw_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  FIFO data output.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that stores data read
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_fifo_out_raw_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   int32_t ret;
   ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_DATA_OUT_X_L, val, 6);
   return ret;
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_common
-  * @brief      This section groups common useful functions.
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_common
+ * @brief      This section groups common useful functions.
+ * @{
+ *
+ */
 
 /**
-  * @brief  DEVICE_CONF bit configuration[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of device_conf in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_device_conf_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  DEVICE_CONF bit configuration[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of device_conf in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_device_conf_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL,
-                           (uint8_t *)&ctrl9_xl, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
 
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl9_xl.device_conf = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL,
-                              (uint8_t *)&ctrl9_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
   }
 
   return ret;
 }
 
 /**
-  * @brief  DEVICE_CONF bit configuration[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of device_conf in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_device_conf_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  DEVICE_CONF bit configuration[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of device_conf in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_device_conf_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL,
-                           (uint8_t *)&ctrl9_xl, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
   *val = ctrl9_xl.device_conf;
 
   return ret;
 }
 
 /**
-  * @brief  Difference in percentage of the effective ODR (and timestamp rate)
-  *         with respect to the typical.[set]
-  *         Step:  0.15%. 8-bit format, 2's complement.
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of freq_fine in reg INTERNAL_FREQ_FINE
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_odr_cal_reg_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Difference in percentage of the effective ODR (and timestamp rate)
+ *         with respect to the typical.[set]
+ *         Step:  0.15%. 8-bit format, 2's complement.
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of freq_fine in reg INTERNAL_FREQ_FINE
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_odr_cal_reg_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_internal_freq_fine_t internal_freq_fine;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_INTERNAL_FREQ_FINE,
                            (uint8_t *)&internal_freq_fine, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     internal_freq_fine.freq_fine = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_INTERNAL_FREQ_FINE,
                               (uint8_t *)&internal_freq_fine, 1);
@@ -1153,17 +1074,16 @@ int32_t asm330lhh_odr_cal_reg_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Difference in percentage of the effective ODR (and timestamp rate)
-  *         with respect to the typical.[get]
-  *         Step:  0.15%. 8-bit format, 2's complement.
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of freq_fine in reg INTERNAL_FREQ_FINE
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_odr_cal_reg_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Difference in percentage of the effective ODR (and timestamp rate)
+ *         with respect to the typical.[get]
+ *         Step:  0.15%. 8-bit format, 2's complement.
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of freq_fine in reg INTERNAL_FREQ_FINE
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_odr_cal_reg_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_internal_freq_fine_t internal_freq_fine;
   int32_t ret;
 
@@ -1175,24 +1095,22 @@ int32_t asm330lhh_odr_cal_reg_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Data-ready pulsed / letched mode.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of dataready_pulsed in
-  *                reg COUNTER_BDR_REG1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Data-ready pulsed / letched mode.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of dataready_pulsed in
+ *                reg COUNTER_BDR_REG1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_data_ready_mode_set(const stmdev_ctx_t *ctx,
-                                      asm330lhh_dataready_pulsed_t val)
-{
+                                      asm330lhh_dataready_pulsed_t val) {
   asm330lhh_counter_bdr_reg1_t counter_bdr_reg1;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                            (uint8_t *)&counter_bdr_reg1, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     counter_bdr_reg1.dataready_pulsed = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                               (uint8_t *)&counter_bdr_reg1, 1);
@@ -1201,24 +1119,22 @@ int32_t asm330lhh_data_ready_mode_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Data-ready pulsed / letched mode.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of dataready_pulsed in
-  *                reg COUNTER_BDR_REG1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Data-ready pulsed / letched mode.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of dataready_pulsed in
+ *                reg COUNTER_BDR_REG1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_data_ready_mode_get(const stmdev_ctx_t *ctx,
-                                      asm330lhh_dataready_pulsed_t *val)
-{
+                                      asm330lhh_dataready_pulsed_t *val) {
   asm330lhh_counter_bdr_reg1_t counter_bdr_reg1;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                            (uint8_t *)&counter_bdr_reg1, 1);
-  switch (counter_bdr_reg1.dataready_pulsed)
-  {
+  switch (counter_bdr_reg1.dataready_pulsed) {
     case ASM330LHH_DRDY_LATCHED:
       *val = ASM330LHH_DRDY_LATCHED;
       break;
@@ -1233,36 +1149,33 @@ int32_t asm330lhh_data_ready_mode_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Device Who am I.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  buff   Buffer that stores data read
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_device_id_get(const stmdev_ctx_t *ctx, uint8_t *buff)
-{
+ * @brief  Device Who am I.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  buff   Buffer that stores data read
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_device_id_get(const stmdev_ctx_t *ctx, uint8_t *buff) {
   int32_t ret;
   ret = asm330lhh_read_reg(ctx, ASM330LHH_WHO_AM_I, buff, 1);
   return ret;
 }
 
 /**
-  * @brief  Software reset. Restore the default values in user registers.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sw_reset in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_reset_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Software reset. Restore the default values in user registers.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sw_reset in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_reset_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl3_c.sw_reset = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
   }
@@ -1270,15 +1183,14 @@ int32_t asm330lhh_reset_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Software reset. Restore the default values in user registers.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sw_reset in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_reset_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Software reset. Restore the default values in user registers.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sw_reset in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_reset_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
@@ -1289,22 +1201,20 @@ int32_t asm330lhh_reset_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Register address automatically incremented during a multiple byte
-  *         access with a serial interface.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of if_inc in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_auto_increment_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Register address automatically incremented during a multiple byte
+ *         access with a serial interface.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of if_inc in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_auto_increment_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl3_c.if_inc = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
   }
@@ -1312,16 +1222,15 @@ int32_t asm330lhh_auto_increment_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Register address automatically incremented during a multiple byte
-  *         access with a serial interface.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of if_inc in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_auto_increment_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Register address automatically incremented during a multiple byte
+ *         access with a serial interface.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of if_inc in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_auto_increment_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
@@ -1332,21 +1241,19 @@ int32_t asm330lhh_auto_increment_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Reboot memory content. Reload the calibration parameters.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of boot in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_boot_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Reboot memory content. Reload the calibration parameters.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of boot in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_boot_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl3_c.boot = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
   }
@@ -1354,15 +1261,14 @@ int32_t asm330lhh_boot_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Reboot memory content. Reload the calibration parameters.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of boot in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_boot_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Reboot memory content. Reload the calibration parameters.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of boot in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_boot_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
@@ -1372,25 +1278,21 @@ int32_t asm330lhh_boot_get(const stmdev_ctx_t *ctx, uint8_t *val)
   return ret;
 }
 
-
-
 /**
-  * @brief  Linear acceleration sensor self-test enable.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of st_xl in reg CTRL5_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Linear acceleration sensor self-test enable.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of st_xl in reg CTRL5_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_self_test_set(const stmdev_ctx_t *ctx,
-                                   asm330lhh_st_xl_t val)
-{
+                                   asm330lhh_st_xl_t val) {
   asm330lhh_ctrl5_c_t ctrl5_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL5_C, (uint8_t *)&ctrl5_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl5_c.st_xl = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL5_C, (uint8_t *)&ctrl5_c, 1);
   }
@@ -1398,23 +1300,21 @@ int32_t asm330lhh_xl_self_test_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Linear acceleration sensor self-test enable.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of st_xl in reg CTRL5_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Linear acceleration sensor self-test enable.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of st_xl in reg CTRL5_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_self_test_get(const stmdev_ctx_t *ctx,
-                                   asm330lhh_st_xl_t *val)
-{
+                                   asm330lhh_st_xl_t *val) {
   asm330lhh_ctrl5_c_t ctrl5_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL5_C, (uint8_t *)&ctrl5_c, 1);
 
-  switch (ctrl5_c.st_xl)
-  {
+  switch (ctrl5_c.st_xl) {
     case ASM330LHH_XL_ST_DISABLE:
       *val = ASM330LHH_XL_ST_DISABLE;
       break;
@@ -1432,22 +1332,20 @@ int32_t asm330lhh_xl_self_test_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Angular rate sensor self-test enable.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of st_g in reg CTRL5_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Angular rate sensor self-test enable.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of st_g in reg CTRL5_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_self_test_set(const stmdev_ctx_t *ctx,
-                                   asm330lhh_st_g_t val)
-{
+                                   asm330lhh_st_g_t val) {
   asm330lhh_ctrl5_c_t ctrl5_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL5_C, (uint8_t *)&ctrl5_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl5_c.st_g = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL5_C, (uint8_t *)&ctrl5_c, 1);
   }
@@ -1455,23 +1353,21 @@ int32_t asm330lhh_gy_self_test_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Angular rate sensor self-test enable.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of st_g in reg CTRL5_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Angular rate sensor self-test enable.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of st_g in reg CTRL5_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_self_test_get(const stmdev_ctx_t *ctx,
-                                   asm330lhh_st_g_t *val)
-{
+                                   asm330lhh_st_g_t *val) {
   asm330lhh_ctrl5_c_t ctrl5_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL5_C, (uint8_t *)&ctrl5_c, 1);
 
-  switch (ctrl5_c.st_g)
-  {
+  switch (ctrl5_c.st_g) {
     case ASM330LHH_GY_ST_DISABLE:
       *val = ASM330LHH_GY_ST_DISABLE;
       break;
@@ -1489,51 +1385,47 @@ int32_t asm330lhh_gy_self_test_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_filters
-  * @brief      This section group all the functions concerning the
-  *             filters configuration
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_filters
+ * @brief      This section group all the functions concerning the
+ *             filters configuration
+ * @{
+ *
+ */
 
 /**
-  * @brief  Accelerometer output from LPF2 filtering stage selection.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of lpf2_xl_en in reg CTRL1_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_filter_lp2_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Accelerometer output from LPF2 filtering stage selection.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of lpf2_xl_en in reg CTRL1_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_filter_lp2_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl1_xl_t ctrl1_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL1_XL, (uint8_t *)&ctrl1_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl1_xl.lpf2_xl_en = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL1_XL,
-                              (uint8_t *)&ctrl1_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL1_XL, (uint8_t *)&ctrl1_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Accelerometer output from LPF2 filtering stage selection.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of lpf2_xl_en in reg CTRL1_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_filter_lp2_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Accelerometer output from LPF2 filtering stage selection.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of lpf2_xl_en in reg CTRL1_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_filter_lp2_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl1_xl_t ctrl1_xl;
   int32_t ret;
 
@@ -1544,22 +1436,20 @@ int32_t asm330lhh_xl_filter_lp2_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Enables gyroscope digital LPF1 if auxiliary SPI is disabled;
-  *         the bandwidth can be selected through FTYPE [2:0] in CTRL6_C.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of lpf1_sel_g in reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_gy_filter_lp1_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Enables gyroscope digital LPF1 if auxiliary SPI is disabled;
+ *         the bandwidth can be selected through FTYPE [2:0] in CTRL6_C.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of lpf1_sel_g in reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_gy_filter_lp1_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl4_c.lpf1_sel_g = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
   }
@@ -1567,16 +1457,15 @@ int32_t asm330lhh_gy_filter_lp1_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Enables gyroscope digital LPF1 if auxiliary SPI is disabled;
-  *         the bandwidth can be selected through FTYPE [2:0] in CTRL6_C.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of lpf1_sel_g in reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_gy_filter_lp1_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Enables gyroscope digital LPF1 if auxiliary SPI is disabled;
+ *         the bandwidth can be selected through FTYPE [2:0] in CTRL6_C.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of lpf1_sel_g in reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_gy_filter_lp1_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
@@ -1587,22 +1476,21 @@ int32_t asm330lhh_gy_filter_lp1_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Mask DRDY on pin (both XL & Gyro) until filter settling ends
-  *         (XL and Gyro independently masked).[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of drdy_mask in reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_filter_settling_mask_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Mask DRDY on pin (both XL & Gyro) until filter settling ends
+ *         (XL and Gyro independently masked).[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of drdy_mask in reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_filter_settling_mask_set(const stmdev_ctx_t *ctx,
+                                           uint8_t val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl4_c.drdy_mask = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
   }
@@ -1610,17 +1498,16 @@ int32_t asm330lhh_filter_settling_mask_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Mask DRDY on pin (both XL & Gyro) until filter settling ends
-  *         (XL and Gyro independently masked).[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of drdy_mask in reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Mask DRDY on pin (both XL & Gyro) until filter settling ends
+ *         (XL and Gyro independently masked).[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of drdy_mask in reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_filter_settling_mask_get(const stmdev_ctx_t *ctx,
-                                           uint8_t *val)
-{
+                                           uint8_t *val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
@@ -1631,22 +1518,20 @@ int32_t asm330lhh_filter_settling_mask_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Gyroscope low pass filter 1 bandwidth.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of ftype in reg CTRL6_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Gyroscope low pass filter 1 bandwidth.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of ftype in reg CTRL6_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_lp1_bandwidth_set(const stmdev_ctx_t *ctx,
-                                       asm330lhh_ftype_t val)
-{
+                                       asm330lhh_ftype_t val) {
   asm330lhh_ctrl6_c_t ctrl6_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL6_C, (uint8_t *)&ctrl6_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl6_c.ftype = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL6_C, (uint8_t *)&ctrl6_c, 1);
   }
@@ -1654,23 +1539,21 @@ int32_t asm330lhh_gy_lp1_bandwidth_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Gyroscope low pass filter 1 bandwidth.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of ftype in reg CTRL6_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Gyroscope low pass filter 1 bandwidth.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of ftype in reg CTRL6_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_lp1_bandwidth_get(const stmdev_ctx_t *ctx,
-                                       asm330lhh_ftype_t *val)
-{
+                                       asm330lhh_ftype_t *val) {
   asm330lhh_ctrl6_c_t ctrl6_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL6_C, (uint8_t *)&ctrl6_c, 1);
 
-  switch (ctrl6_c.ftype)
-  {
+  switch (ctrl6_c.ftype) {
     case ASM330LHH_ULTRA_LIGHT:
       *val = ASM330LHH_ULTRA_LIGHT;
       break;
@@ -1703,38 +1586,34 @@ int32_t asm330lhh_gy_lp1_bandwidth_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Low pass filter 2 on 6D function selection.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of low_pass_on_6d in reg CTRL8_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_lp2_on_6d_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Low pass filter 2 on 6D function selection.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of low_pass_on_6d in reg CTRL8_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_lp2_on_6d_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl8_xl_t ctrl8_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL8_XL, (uint8_t *)&ctrl8_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl8_xl.low_pass_on_6d = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL8_XL,
-                              (uint8_t *)&ctrl8_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL8_XL, (uint8_t *)&ctrl8_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Low pass filter 2 on 6D function selection.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of low_pass_on_6d in reg CTRL8_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_lp2_on_6d_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Low pass filter 2 on 6D function selection.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of low_pass_on_6d in reg CTRL8_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_lp2_on_6d_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl8_xl_t ctrl8_xl;
   int32_t ret;
 
@@ -1745,51 +1624,46 @@ int32_t asm330lhh_xl_lp2_on_6d_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Accelerometer slope filter / high-pass filter selection
-  *         on output.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of hp_slope_xl_en in reg CTRL8_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Accelerometer slope filter / high-pass filter selection
+ *         on output.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of hp_slope_xl_en in reg CTRL8_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_hp_path_on_out_set(const stmdev_ctx_t *ctx,
-                                        asm330lhh_hp_slope_xl_en_t val)
-{
+                                        asm330lhh_hp_slope_xl_en_t val) {
   asm330lhh_ctrl8_xl_t ctrl8_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL8_XL, (uint8_t *)&ctrl8_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl8_xl.hp_slope_xl_en = (((uint8_t)val & 0x10U) >> 4);
     ctrl8_xl.hp_ref_mode_xl = (((uint8_t)val & 0x20U) >> 5);
     ctrl8_xl.hpcf_xl = (uint8_t)val & 0x07U;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL8_XL,
-                              (uint8_t *)&ctrl8_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL8_XL, (uint8_t *)&ctrl8_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Accelerometer slope filter / high-pass filter selection on
-  *         output.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of hp_slope_xl_en in reg CTRL8_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Accelerometer slope filter / high-pass filter selection on
+ *         output.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of hp_slope_xl_en in reg CTRL8_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_hp_path_on_out_get(const stmdev_ctx_t *ctx,
-                                        asm330lhh_hp_slope_xl_en_t *val)
-{
+                                        asm330lhh_hp_slope_xl_en_t *val) {
   asm330lhh_ctrl8_xl_t ctrl8_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL8_XL, (uint8_t *)&ctrl8_xl, 1);
   switch (((ctrl8_xl.hp_ref_mode_xl << 5) + (ctrl8_xl.hp_slope_xl_en << 4) +
-           ctrl8_xl.hpcf_xl))
-  {
+           ctrl8_xl.hpcf_xl)) {
     case ASM330LHH_HP_PATH_DISABLE_ON_OUT:
       *val = ASM330LHH_HP_PATH_DISABLE_ON_OUT;
       break;
@@ -1867,42 +1741,38 @@ int32_t asm330lhh_xl_hp_path_on_out_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Enables accelerometer LPF2 and HPF fast-settling mode.
-  *         The filter sets the second samples after writing this bit.
-  *         Active only during device exit from powerdown mode.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of fastsettl_mode_xl in reg CTRL8_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_fast_settling_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Enables accelerometer LPF2 and HPF fast-settling mode.
+ *         The filter sets the second samples after writing this bit.
+ *         Active only during device exit from powerdown mode.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of fastsettl_mode_xl in reg CTRL8_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_fast_settling_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl8_xl_t ctrl8_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL8_XL, (uint8_t *)&ctrl8_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl8_xl.fastsettl_mode_xl = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL8_XL,
-                              (uint8_t *)&ctrl8_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL8_XL, (uint8_t *)&ctrl8_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Enables accelerometer LPF2 and HPF fast-settling mode.
-  *         The filter sets the second samples after writing
-  *         this bit. Active only during device exit from powerdown mode.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of fastsettl_mode_xl in reg CTRL8_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_fast_settling_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Enables accelerometer LPF2 and HPF fast-settling mode.
+ *         The filter sets the second samples after writing
+ *         this bit. Active only during device exit from powerdown mode.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of fastsettl_mode_xl in reg CTRL8_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_fast_settling_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl8_xl_t ctrl8_xl;
   int32_t ret;
 
@@ -1913,48 +1783,43 @@ int32_t asm330lhh_xl_fast_settling_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  HPF or SLOPE filter selection on wake-up and Activity/Inactivity
-  *         functions.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of slope_fds in reg INT_CFG0
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  HPF or SLOPE filter selection on wake-up and Activity/Inactivity
+ *         functions.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of slope_fds in reg INT_CFG0
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_hp_path_internal_set(const stmdev_ctx_t *ctx,
-                                          asm330lhh_slope_fds_t val)
-{
+                                          asm330lhh_slope_fds_t val) {
   asm330lhh_int_cfg0_t int_cfg0;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG0, (uint8_t *)&int_cfg0, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     int_cfg0.slope_fds = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG0,
-                              (uint8_t *)&int_cfg0, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG0, (uint8_t *)&int_cfg0, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  HPF or SLOPE filter selection on wake-up and Activity/Inactivity
-  *         functions.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of slope_fds in reg INT_CFG0
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  HPF or SLOPE filter selection on wake-up and Activity/Inactivity
+ *         functions.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of slope_fds in reg INT_CFG0
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_hp_path_internal_get(const stmdev_ctx_t *ctx,
-                                          asm330lhh_slope_fds_t *val)
-{
+                                          asm330lhh_slope_fds_t *val) {
   asm330lhh_int_cfg0_t int_cfg0;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG0, (uint8_t *)&int_cfg0, 1);
-  switch (int_cfg0.slope_fds)
-  {
+  switch (int_cfg0.slope_fds) {
     case ASM330LHH_USE_SLOPE:
       *val = ASM330LHH_USE_SLOPE;
       break;
@@ -1969,23 +1834,21 @@ int32_t asm330lhh_xl_hp_path_internal_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Enables gyroscope digital high-pass filter. The filter is enabled
-  *         only if the gyro is in HP mode.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of hp_en_g and hp_en_g in reg CTRL7_G
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Enables gyroscope digital high-pass filter. The filter is enabled
+ *         only if the gyro is in HP mode.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of hp_en_g and hp_en_g in reg CTRL7_G
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_hp_path_internal_set(const stmdev_ctx_t *ctx,
-                                          asm330lhh_hpm_g_t val)
-{
+                                          asm330lhh_hpm_g_t val) {
   asm330lhh_ctrl7_g_t ctrl7_g;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL7_G, (uint8_t *)&ctrl7_g, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl7_g.hp_en_g = (((uint8_t)val & 0x80U) >> 7);
     ctrl7_g.hpm_g = (uint8_t)val & 0x03U;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL7_G, (uint8_t *)&ctrl7_g, 1);
@@ -1994,24 +1857,22 @@ int32_t asm330lhh_gy_hp_path_internal_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief    Enables gyroscope digital high-pass filter. The filter is
-  *           enabled only if the gyro is in HP mode.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of hp_en_g and hp_en_g in reg CTRL7_G
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief    Enables gyroscope digital high-pass filter. The filter is
+ *           enabled only if the gyro is in HP mode.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of hp_en_g and hp_en_g in reg CTRL7_G
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_gy_hp_path_internal_get(const stmdev_ctx_t *ctx,
-                                          asm330lhh_hpm_g_t *val)
-{
+                                          asm330lhh_hpm_g_t *val) {
   asm330lhh_ctrl7_g_t ctrl7_g;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL7_G, (uint8_t *)&ctrl7_g, 1);
 
-  switch ((ctrl7_g.hp_en_g << 7) + ctrl7_g.hpm_g)
-  {
+  switch ((ctrl7_g.hp_en_g << 7) + ctrl7_g.hpm_g) {
     case ASM330LHH_HP_FILTER_NONE:
       *val = ASM330LHH_HP_FILTER_NONE;
       break;
@@ -2035,35 +1896,33 @@ int32_t asm330lhh_gy_hp_path_internal_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_ serial_interface
-  * @brief      This section groups all the functions concerning main
-  *             serial interface management (not auxiliary)
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_ serial_interface
+ * @brief      This section groups all the functions concerning main
+ *             serial interface management (not auxiliary)
+ * @{
+ *
+ */
 
 /**
-  * @brief  Connect/Disconnect SDO/SA0 internal pull-up.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sdo_pu_en in reg PIN_CTRL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Connect/Disconnect SDO/SA0 internal pull-up.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sdo_pu_en in reg PIN_CTRL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_sdo_sa0_mode_set(const stmdev_ctx_t *ctx,
-                                   asm330lhh_sdo_pu_en_t val)
-{
+                                   asm330lhh_sdo_pu_en_t val) {
   asm330lhh_pin_ctrl_t pin_ctrl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     pin_ctrl.sdo_pu_en = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
   }
@@ -2071,23 +1930,21 @@ int32_t asm330lhh_sdo_sa0_mode_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Connect/Disconnect SDO/SA0 internal pull-up.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of sdo_pu_en in reg PIN_CTRL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Connect/Disconnect SDO/SA0 internal pull-up.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of sdo_pu_en in reg PIN_CTRL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_sdo_sa0_mode_get(const stmdev_ctx_t *ctx,
-                                   asm330lhh_sdo_pu_en_t *val)
-{
+                                   asm330lhh_sdo_pu_en_t *val) {
   asm330lhh_pin_ctrl_t pin_ctrl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_PIN_CTRL, (uint8_t *)&pin_ctrl, 1);
 
-  switch (pin_ctrl.sdo_pu_en)
-  {
+  switch (pin_ctrl.sdo_pu_en) {
     case ASM330LHH_PULL_UP_DISC:
       *val = ASM330LHH_PULL_UP_DISC;
       break;
@@ -2102,21 +1959,19 @@ int32_t asm330lhh_sdo_sa0_mode_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  SPI Serial Interface Mode selection.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sim in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_spi_mode_set(const stmdev_ctx_t *ctx, asm330lhh_sim_t val)
-{
+ * @brief  SPI Serial Interface Mode selection.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sim in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_spi_mode_set(const stmdev_ctx_t *ctx, asm330lhh_sim_t val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl3_c.sim = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
   }
@@ -2124,22 +1979,20 @@ int32_t asm330lhh_spi_mode_set(const stmdev_ctx_t *ctx, asm330lhh_sim_t val)
 }
 
 /**
-  * @brief  SPI Serial Interface Mode selection.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of sim in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_spi_mode_get(const stmdev_ctx_t *ctx, asm330lhh_sim_t *val)
-{
+ * @brief  SPI Serial Interface Mode selection.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of sim in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_spi_mode_get(const stmdev_ctx_t *ctx, asm330lhh_sim_t *val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
 
-  switch (ctrl3_c.sim)
-  {
+  switch (ctrl3_c.sim) {
     case ASM330LHH_SPI_4_WIRE:
       *val = ASM330LHH_SPI_4_WIRE;
       break;
@@ -2154,22 +2007,20 @@ int32_t asm330lhh_spi_mode_get(const stmdev_ctx_t *ctx, asm330lhh_sim_t *val)
 }
 
 /**
-  * @brief  Disable / Enable I2C interface.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of i2c_disable in reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Disable / Enable I2C interface.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of i2c_disable in reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_i2c_interface_set(const stmdev_ctx_t *ctx,
-                                    asm330lhh_i2c_disable_t val)
-{
+                                    asm330lhh_i2c_disable_t val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl4_c.i2c_disable = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
   }
@@ -2177,23 +2028,21 @@ int32_t asm330lhh_i2c_interface_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Disable / Enable I2C interface.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of i2c reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Disable / Enable I2C interface.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of i2c reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_i2c_interface_get(const stmdev_ctx_t *ctx,
-                                    asm330lhh_i2c_disable_t *val)
-{
+                                    asm330lhh_i2c_disable_t *val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
 
-  switch (ctrl4_c.i2c_disable)
-  {
+  switch (ctrl4_c.i2c_disable) {
     case ASM330LHH_I2C_ENABLE:
       *val = ASM330LHH_I2C_ENABLE;
       break;
@@ -2208,195 +2057,167 @@ int32_t asm330lhh_i2c_interface_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_interrupt_pins
-  * @brief      This section groups all the functions that manage
-  *             interrupt pins
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_interrupt_pins
+ * @brief      This section groups all the functions that manage
+ *             interrupt pins
+ * @{
+ *
+ */
 
 /**
-  * @brief  Select the signal that need to route on int1 pad.[set]
-  *
-  * @param  ctx      read / write interface definitions
-  * @param  val      struct of registers: INT1_CTRL,
-  *                  MD1_CFG, EMB_FUNC_INT1, FSM_INT1_A,
-  *                  FSM_INT1_B
-  *
-  */
+ * @brief  Select the signal that need to route on int1 pad.[set]
+ *
+ * @param  ctx      read / write interface definitions
+ * @param  val      struct of registers: INT1_CTRL,
+ *                  MD1_CFG, EMB_FUNC_INT1, FSM_INT1_A,
+ *                  FSM_INT1_B
+ *
+ */
 int32_t asm330lhh_pin_int1_route_set(const stmdev_ctx_t *ctx,
-                                     asm330lhh_pin_int1_route_t *val)
-{
+                                     asm330lhh_pin_int1_route_t *val) {
   asm330lhh_int_cfg1_t int_cfg1;
   int32_t ret;
 
-  ret = asm330lhh_write_reg(ctx, ASM330LHH_MD1_CFG, (uint8_t *)&val->md1_cfg, 1);
+  ret =
+      asm330lhh_write_reg(ctx, ASM330LHH_MD1_CFG, (uint8_t *)&val->md1_cfg, 1);
 
-  if (ret == 0)
-  {
-    ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *) &int_cfg1, 1);
+  if (ret == 0) {
+    ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *)&int_cfg1, 1);
   }
 
-  if (ret == 0)
-  {
-    if ((val->int1_ctrl.den_drdy_flag
-         | val->int1_ctrl.int1_boot
-         | val->int1_ctrl.int1_cnt_bdr
-         | val->int1_ctrl.int1_drdy_g
-         | val->int1_ctrl.int1_drdy_xl
-         | val->int1_ctrl.int1_fifo_full
-         | val->int1_ctrl.int1_fifo_ovr
-         | val->int1_ctrl.int1_fifo_th
-         | val->md1_cfg.int1_6d
-         | val->md1_cfg.int1_ff
-         | val->md1_cfg.int1_wu
-         | val->md1_cfg.int1_sleep_change) != PROPERTY_DISABLE)
-    {
+  if (ret == 0) {
+    if ((val->int1_ctrl.den_drdy_flag | val->int1_ctrl.int1_boot |
+         val->int1_ctrl.int1_cnt_bdr | val->int1_ctrl.int1_drdy_g |
+         val->int1_ctrl.int1_drdy_xl | val->int1_ctrl.int1_fifo_full |
+         val->int1_ctrl.int1_fifo_ovr | val->int1_ctrl.int1_fifo_th |
+         val->md1_cfg.int1_6d | val->md1_cfg.int1_ff | val->md1_cfg.int1_wu |
+         val->md1_cfg.int1_sleep_change) != PROPERTY_DISABLE) {
       int_cfg1.interrupts_enable = PROPERTY_ENABLE;
-    }
-    else
-    {
+    } else {
       int_cfg1.interrupts_enable = PROPERTY_DISABLE;
     }
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *) &int_cfg1, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *)&int_cfg1, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Select the signal that need to route on int1 pad.[get]
-  *
-  * @param  ctx      read / write interface definitions
-  * @param  val      struct of registers: INT1_CTRL, MD1_CFG,
-  *                  EMB_FUNC_INT1, FSM_INT1_A, FSM_INT1_B
-  *
-  */
+ * @brief  Select the signal that need to route on int1 pad.[get]
+ *
+ * @param  ctx      read / write interface definitions
+ * @param  val      struct of registers: INT1_CTRL, MD1_CFG,
+ *                  EMB_FUNC_INT1, FSM_INT1_A, FSM_INT1_B
+ *
+ */
 int32_t asm330lhh_pin_int1_route_get(const stmdev_ctx_t *ctx,
-                                     asm330lhh_pin_int1_route_t *val)
-{
+                                     asm330lhh_pin_int1_route_t *val) {
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_INT1_CTRL,
-                           (uint8_t *)&val->int1_ctrl, 1);
-  if (ret == 0)
-  {
-    ret = asm330lhh_read_reg(ctx, ASM330LHH_MD1_CFG, (uint8_t *)&val->md1_cfg, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_INT1_CTRL, (uint8_t *)&val->int1_ctrl,
+                           1);
+  if (ret == 0) {
+    ret =
+        asm330lhh_read_reg(ctx, ASM330LHH_MD1_CFG, (uint8_t *)&val->md1_cfg, 1);
   }
 
   return ret;
 }
 
 /**
-  * @brief  Select the signal that need to route on int2 pad.[set]
-  *
-  * @param  ctx      read / write interface definitions
-  * @param  val      union of registers INT2_CTRL,  MD2_CFG,
-  *                  EMB_FUNC_INT2, FSM_INT2_A, FSM_INT2_B
-  *
-  */
+ * @brief  Select the signal that need to route on int2 pad.[set]
+ *
+ * @param  ctx      read / write interface definitions
+ * @param  val      union of registers INT2_CTRL,  MD2_CFG,
+ *                  EMB_FUNC_INT2, FSM_INT2_A, FSM_INT2_B
+ *
+ */
 int32_t asm330lhh_pin_int2_route_set(const stmdev_ctx_t *ctx,
-                                     asm330lhh_pin_int2_route_t *val)
-{
+                                     asm330lhh_pin_int2_route_t *val) {
   asm330lhh_pin_int1_route_t pin_int1_route;
   asm330lhh_int_cfg1_t int_cfg1;
   int32_t ret;
 
   ret = asm330lhh_write_reg(ctx, ASM330LHH_INT2_CTRL,
                             (uint8_t *)&val->int2_ctrl, 1);
-  if (ret == 0)
-  {
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_MD2_CFG, (uint8_t *)&val->md2_cfg, 1);
+  if (ret == 0) {
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_MD2_CFG, (uint8_t *)&val->md2_cfg,
+                              1);
   }
-  if (ret == 0)
-  {
-    ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *) &int_cfg1, 1);
+  if (ret == 0) {
+    ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *)&int_cfg1, 1);
   }
 
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ret = asm330lhh_pin_int1_route_get(ctx, &pin_int1_route);
   }
 
-  if (ret == 0)
-  {
-    if ((val->int2_ctrl.int2_cnt_bdr
-         | val->int2_ctrl.int2_drdy_g
-         | val->int2_ctrl.int2_drdy_temp
-         | val->int2_ctrl.int2_drdy_xl
-         | val->int2_ctrl.int2_fifo_full
-         | val->int2_ctrl.int2_fifo_ovr
-         | val->int2_ctrl.int2_fifo_th
-         | val->md2_cfg.int2_6d
-         | val->md2_cfg.int2_ff
-         | val->md2_cfg.int2_wu
-         | val->md2_cfg.int2_sleep_change
-         | pin_int1_route.int1_ctrl.den_drdy_flag
-         | pin_int1_route.int1_ctrl.int1_boot
-         | pin_int1_route.int1_ctrl.int1_cnt_bdr
-         | pin_int1_route.int1_ctrl.int1_drdy_g
-         | pin_int1_route.int1_ctrl.int1_drdy_xl
-         | pin_int1_route.int1_ctrl.int1_fifo_full
-         | pin_int1_route.int1_ctrl.int1_fifo_ovr
-         | pin_int1_route.int1_ctrl.int1_fifo_th
-         | pin_int1_route.md1_cfg.int1_6d
-         | pin_int1_route.md1_cfg.int1_ff
-         | pin_int1_route.md1_cfg.int1_wu
-         | pin_int1_route.md1_cfg.int1_sleep_change) != PROPERTY_DISABLE)
-    {
+  if (ret == 0) {
+    if ((val->int2_ctrl.int2_cnt_bdr | val->int2_ctrl.int2_drdy_g |
+         val->int2_ctrl.int2_drdy_temp | val->int2_ctrl.int2_drdy_xl |
+         val->int2_ctrl.int2_fifo_full | val->int2_ctrl.int2_fifo_ovr |
+         val->int2_ctrl.int2_fifo_th | val->md2_cfg.int2_6d |
+         val->md2_cfg.int2_ff | val->md2_cfg.int2_wu |
+         val->md2_cfg.int2_sleep_change |
+         pin_int1_route.int1_ctrl.den_drdy_flag |
+         pin_int1_route.int1_ctrl.int1_boot |
+         pin_int1_route.int1_ctrl.int1_cnt_bdr |
+         pin_int1_route.int1_ctrl.int1_drdy_g |
+         pin_int1_route.int1_ctrl.int1_drdy_xl |
+         pin_int1_route.int1_ctrl.int1_fifo_full |
+         pin_int1_route.int1_ctrl.int1_fifo_ovr |
+         pin_int1_route.int1_ctrl.int1_fifo_th |
+         pin_int1_route.md1_cfg.int1_6d | pin_int1_route.md1_cfg.int1_ff |
+         pin_int1_route.md1_cfg.int1_wu |
+         pin_int1_route.md1_cfg.int1_sleep_change) != PROPERTY_DISABLE) {
       int_cfg1.interrupts_enable = PROPERTY_ENABLE;
-    }
-    else
-    {
+    } else {
       int_cfg1.interrupts_enable = PROPERTY_DISABLE;
     }
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *) &int_cfg1, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *)&int_cfg1, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Select the signal that need to route on int2 pad.[get]
-  *
-  * @param  ctx      read / write interface definitions
-  * @param  val      union of registers INT2_CTRL,  MD2_CFG,
-  *                  EMB_FUNC_INT2, FSM_INT2_A, FSM_INT2_B
-  *
-  */
+ * @brief  Select the signal that need to route on int2 pad.[get]
+ *
+ * @param  ctx      read / write interface definitions
+ * @param  val      union of registers INT2_CTRL,  MD2_CFG,
+ *                  EMB_FUNC_INT2, FSM_INT2_A, FSM_INT2_B
+ *
+ */
 int32_t asm330lhh_pin_int2_route_get(const stmdev_ctx_t *ctx,
-                                     asm330lhh_pin_int2_route_t *val)
-{
+                                     asm330lhh_pin_int2_route_t *val) {
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_INT2_CTRL,
-                           (uint8_t *)&val->int2_ctrl, 1);
-  if (ret == 0)
-  {
-    ret = asm330lhh_read_reg(ctx, ASM330LHH_MD2_CFG, (uint8_t *)&val->md2_cfg, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_INT2_CTRL, (uint8_t *)&val->int2_ctrl,
+                           1);
+  if (ret == 0) {
+    ret =
+        asm330lhh_read_reg(ctx, ASM330LHH_MD2_CFG, (uint8_t *)&val->md2_cfg, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Push-pull/open drain selection on interrupt pads.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of pp_od in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_pin_mode_set(const stmdev_ctx_t *ctx, asm330lhh_pp_od_t val)
-{
+ * @brief  Push-pull/open drain selection on interrupt pads.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of pp_od in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_pin_mode_set(const stmdev_ctx_t *ctx, asm330lhh_pp_od_t val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl3_c.pp_od = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
   }
@@ -2404,22 +2225,21 @@ int32_t asm330lhh_pin_mode_set(const stmdev_ctx_t *ctx, asm330lhh_pp_od_t val)
 }
 
 /**
-  * @brief  Push-pull/open drain selection on interrupt pads.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of pp_od in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_pin_mode_get(const stmdev_ctx_t *ctx, asm330lhh_pp_od_t *val)
-{
+ * @brief  Push-pull/open drain selection on interrupt pads.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of pp_od in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_pin_mode_get(const stmdev_ctx_t *ctx,
+                               asm330lhh_pp_od_t *val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
 
-  switch (ctrl3_c.pp_od)
-  {
+  switch (ctrl3_c.pp_od) {
     case ASM330LHH_PUSH_PULL:
       *val = ASM330LHH_PUSH_PULL;
       break;
@@ -2434,22 +2254,20 @@ int32_t asm330lhh_pin_mode_get(const stmdev_ctx_t *ctx, asm330lhh_pp_od_t *val)
 }
 
 /**
-  * @brief  Interrupt active-high/low.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of h_lactive in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Interrupt active-high/low.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of h_lactive in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_pin_polarity_set(const stmdev_ctx_t *ctx,
-                                   asm330lhh_h_lactive_t val)
-{
+                                   asm330lhh_h_lactive_t val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl3_c.h_lactive = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
   }
@@ -2457,23 +2275,21 @@ int32_t asm330lhh_pin_polarity_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Interrupt active-high/low.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of h_lactive in reg CTRL3_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Interrupt active-high/low.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of h_lactive in reg CTRL3_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_pin_polarity_get(const stmdev_ctx_t *ctx,
-                                   asm330lhh_h_lactive_t *val)
-{
+                                   asm330lhh_h_lactive_t *val) {
   asm330lhh_ctrl3_c_t ctrl3_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL3_C, (uint8_t *)&ctrl3_c, 1);
 
-  switch (ctrl3_c.h_lactive)
-  {
+  switch (ctrl3_c.h_lactive) {
     case ASM330LHH_ACTIVE_HIGH:
       *val = ASM330LHH_ACTIVE_HIGH;
       break;
@@ -2488,21 +2304,19 @@ int32_t asm330lhh_pin_polarity_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  All interrupt signals become available on INT1 pin.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of int2_on_int1 in reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_all_on_int1_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  All interrupt signals become available on INT1 pin.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of int2_on_int1 in reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_all_on_int1_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl4_c.int2_on_int1 = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
   }
@@ -2510,15 +2324,14 @@ int32_t asm330lhh_all_on_int1_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  All interrupt signals become available on INT1 pin.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of int2_on_int1 in reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_all_on_int1_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  All interrupt signals become available on INT1 pin.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of int2_on_int1 in reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_all_on_int1_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
@@ -2529,49 +2342,44 @@ int32_t asm330lhh_all_on_int1_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  All interrupt signals notification mode.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of lir in reg INT_CFG0
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  All interrupt signals notification mode.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of lir in reg INT_CFG0
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_int_notification_set(const stmdev_ctx_t *ctx,
-                                       asm330lhh_lir_t val)
-{
+                                       asm330lhh_lir_t val) {
   asm330lhh_int_cfg0_t int_cfg0;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG0, (uint8_t *)&int_cfg0, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     int_cfg0.lir = (uint8_t)val & 0x01U;
     int_cfg0.int_clr_on_read = (uint8_t)val & 0x01U;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG0,
-                              (uint8_t *)&int_cfg0, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG0, (uint8_t *)&int_cfg0, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  All interrupt signals notification mode.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of lir in reg INT_CFG0
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  All interrupt signals notification mode.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of lir in reg INT_CFG0
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_int_notification_get(const stmdev_ctx_t *ctx,
-                                       asm330lhh_lir_t *val)
-{
+                                       asm330lhh_lir_t *val) {
   asm330lhh_int_cfg0_t int_cfg0;
   int32_t ret;
 
   *val = ASM330LHH_ALL_INT_PULSED;
   ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG0, (uint8_t *)&int_cfg0, 1);
 
-  switch ((int_cfg0.lir << 1) + int_cfg0.int_clr_on_read)
-  {
+  switch ((int_cfg0.lir << 1) + int_cfg0.int_clr_on_read) {
     case ASM330LHH_ALL_INT_PULSED:
       *val = ASM330LHH_ALL_INT_PULSED;
       break;
@@ -2592,38 +2400,36 @@ int32_t asm330lhh_int_notification_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_Wake_Up_event
-  * @brief      This section groups all the functions that manage the
-  *             Wake Up event generation.
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_Wake_Up_event
+ * @brief      This section groups all the functions that manage the
+ *             Wake Up event generation.
+ * @{
+ *
+ */
 
 /**
-  * @brief  Weight of 1 LSB of wakeup threshold.[set]
-  *         0: 1 LSB =FS_XL  /  64
-  *         1: 1 LSB = FS_XL / 256
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of wake_ths_w in reg WAKE_UP_DUR
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Weight of 1 LSB of wakeup threshold.[set]
+ *         0: 1 LSB =FS_XL  /  64
+ *         1: 1 LSB = FS_XL / 256
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of wake_ths_w in reg WAKE_UP_DUR
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_wkup_ths_weight_set(const stmdev_ctx_t *ctx,
-                                      asm330lhh_wake_ths_w_t val)
-{
+                                      asm330lhh_wake_ths_w_t val) {
   asm330lhh_wake_up_dur_t wake_up_dur;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR,
-                           (uint8_t *)&wake_up_dur, 1);
-  if (ret == 0)
-  {
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR, (uint8_t *)&wake_up_dur,
+                           1);
+  if (ret == 0) {
     wake_up_dur.wake_ths_w = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_WAKE_UP_DUR,
                               (uint8_t *)&wake_up_dur, 1);
@@ -2632,26 +2438,24 @@ int32_t asm330lhh_wkup_ths_weight_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Weight of 1 LSB of wakeup threshold.[get]
-  *         0: 1 LSB =FS_XL  /  64
-  *         1: 1 LSB = FS_XL / 256
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of wake_ths_w in reg WAKE_UP_DUR
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Weight of 1 LSB of wakeup threshold.[get]
+ *         0: 1 LSB =FS_XL  /  64
+ *         1: 1 LSB = FS_XL / 256
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of wake_ths_w in reg WAKE_UP_DUR
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_wkup_ths_weight_get(const stmdev_ctx_t *ctx,
-                                      asm330lhh_wake_ths_w_t *val)
-{
+                                      asm330lhh_wake_ths_w_t *val) {
   asm330lhh_wake_up_dur_t wake_up_dur;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR,
-                           (uint8_t *)&wake_up_dur, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR, (uint8_t *)&wake_up_dur,
+                           1);
 
-  switch (wake_up_dur.wake_ths_w)
-  {
+  switch (wake_up_dur.wake_ths_w) {
     case ASM330LHH_LSb_FS_DIV_64:
       *val = ASM330LHH_LSb_FS_DIV_64;
       break;
@@ -2666,23 +2470,21 @@ int32_t asm330lhh_wkup_ths_weight_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Threshold for wakeup: 1 LSB weight depends on WAKE_THS_W in
-  *         WAKE_UP_DUR.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of wk_ths in reg WAKE_UP_THS
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_wkup_threshold_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Threshold for wakeup: 1 LSB weight depends on WAKE_THS_W in
+ *         WAKE_UP_DUR.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of wk_ths in reg WAKE_UP_THS
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_wkup_threshold_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_wake_up_ths_t wake_up_ths;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_THS,
-                           (uint8_t *)&wake_up_ths, 1);
-  if (ret == 0)
-  {
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_THS, (uint8_t *)&wake_up_ths,
+                           1);
+  if (ret == 0) {
     wake_up_ths.wk_ths = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_WAKE_UP_THS,
                               (uint8_t *)&wake_up_ths, 1);
@@ -2691,43 +2493,41 @@ int32_t asm330lhh_wkup_threshold_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Threshold for wakeup: 1 LSB weight depends on WAKE_THS_W in
-  *         WAKE_UP_DUR.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of wk_ths in reg WAKE_UP_THS
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_wkup_threshold_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Threshold for wakeup: 1 LSB weight depends on WAKE_THS_W in
+ *         WAKE_UP_DUR.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of wk_ths in reg WAKE_UP_THS
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_wkup_threshold_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_wake_up_ths_t wake_up_ths;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_THS,
-                           (uint8_t *)&wake_up_ths, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_THS, (uint8_t *)&wake_up_ths,
+                           1);
   *val = wake_up_ths.wk_ths;
 
   return ret;
 }
 
 /**
-  * @brief  Wake up duration event( 1LSb = 1 / ODR ).[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of usr_off_on_wu in reg WAKE_UP_THS
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_xl_usr_offset_on_wkup_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Wake up duration event( 1LSb = 1 / ODR ).[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of usr_off_on_wu in reg WAKE_UP_THS
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_xl_usr_offset_on_wkup_set(const stmdev_ctx_t *ctx,
+                                            uint8_t val) {
   asm330lhh_wake_up_ths_t wake_up_ths;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_THS,
-                           (uint8_t *)&wake_up_ths, 1);
-  if (ret == 0)
-  {
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_THS, (uint8_t *)&wake_up_ths,
+                           1);
+  if (ret == 0) {
     wake_up_ths.usr_off_on_wu = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_WAKE_UP_THS,
                               (uint8_t *)&wake_up_ths, 1);
@@ -2736,43 +2536,40 @@ int32_t asm330lhh_xl_usr_offset_on_wkup_set(const stmdev_ctx_t *ctx, uint8_t val
 }
 
 /**
-  * @brief  Wake up duration event( 1LSb = 1 / ODR ).[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of usr_off_on_wu in reg WAKE_UP_THS
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Wake up duration event( 1LSb = 1 / ODR ).[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of usr_off_on_wu in reg WAKE_UP_THS
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_xl_usr_offset_on_wkup_get(const stmdev_ctx_t *ctx,
-                                            uint8_t *val)
-{
+                                            uint8_t *val) {
   asm330lhh_wake_up_ths_t wake_up_ths;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_THS,
-                           (uint8_t *)&wake_up_ths, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_THS, (uint8_t *)&wake_up_ths,
+                           1);
   *val = wake_up_ths.usr_off_on_wu;
 
   return ret;
 }
 
 /**
-  * @brief  Wake up duration event(1LSb = 1 / ODR).[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of wake_dur in reg WAKE_UP_DUR
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_wkup_dur_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Wake up duration event(1LSb = 1 / ODR).[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of wake_dur in reg WAKE_UP_DUR
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_wkup_dur_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_wake_up_dur_t wake_up_dur;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR,
-                           (uint8_t *)&wake_up_dur, 1);
-  if (ret == 0)
-  {
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR, (uint8_t *)&wake_up_dur,
+                           1);
+  if (ret == 0) {
     wake_up_dur.wake_dur = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_WAKE_UP_DUR,
                               (uint8_t *)&wake_up_dur, 1);
@@ -2781,54 +2578,51 @@ int32_t asm330lhh_wkup_dur_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Wake up duration event(1LSb = 1 / ODR).[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of wake_dur in reg WAKE_UP_DUR
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_wkup_dur_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Wake up duration event(1LSb = 1 / ODR).[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of wake_dur in reg WAKE_UP_DUR
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_wkup_dur_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_wake_up_dur_t wake_up_dur;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR,
-                           (uint8_t *)&wake_up_dur, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR, (uint8_t *)&wake_up_dur,
+                           1);
   *val = wake_up_dur.wake_dur;
 
   return ret;
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_ Activity/Inactivity_detection
-  * @brief      This section groups all the functions concerning
-  *             activity/inactivity detection.
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_ Activity/Inactivity_detection
+ * @brief      This section groups all the functions concerning
+ *             activity/inactivity detection.
+ * @{
+ *
+ */
 
 /**
-  * @brief  Enables gyroscope Sleep mode.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sleep_g in reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_gy_sleep_mode_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Enables gyroscope Sleep mode.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sleep_g in reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_gy_sleep_mode_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl4_c.sleep_g = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL4_C, (uint8_t *)&ctrl4_c, 1);
   }
@@ -2836,15 +2630,14 @@ int32_t asm330lhh_gy_sleep_mode_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Enables gyroscope Sleep mode.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sleep_g in reg CTRL4_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_gy_sleep_mode_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Enables gyroscope Sleep mode.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sleep_g in reg CTRL4_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_gy_sleep_mode_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl4_c_t ctrl4_c;
   int32_t ret;
 
@@ -2855,50 +2648,45 @@ int32_t asm330lhh_gy_sleep_mode_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Drives the sleep status instead of sleep change on INT pins
-  *         (only if INT1_SLEEP_CHANGE or INT2_SLEEP_CHANGE bits
-  *         are enabled).[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sleep_status_on_int in reg INT_CFG0
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_act_pin_notification_set(const stmdev_ctx_t *ctx,
-                                           asm330lhh_sleep_status_on_int_t val)
-{
+ * @brief  Drives the sleep status instead of sleep change on INT pins
+ *         (only if INT1_SLEEP_CHANGE or INT2_SLEEP_CHANGE bits
+ *         are enabled).[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sleep_status_on_int in reg INT_CFG0
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_act_pin_notification_set(
+    const stmdev_ctx_t *ctx, asm330lhh_sleep_status_on_int_t val) {
   asm330lhh_int_cfg0_t int_cfg0;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG0, (uint8_t *)&int_cfg0, 1);
-  if (ret == 0)
-  {
-    int_cfg0. sleep_status_on_int = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG0,
-                              (uint8_t *)&int_cfg0, 1);
+  if (ret == 0) {
+    int_cfg0.sleep_status_on_int = (uint8_t)val;
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG0, (uint8_t *)&int_cfg0, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Drives the sleep status instead of sleep change on INT pins
-  *         (only if INT1_SLEEP_CHANGE or INT2_SLEEP_CHANGE bits
-  *         are enabled).[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of sleep_status_on_int in reg INT_CFG0
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_act_pin_notification_get(const stmdev_ctx_t *ctx,
-                                           asm330lhh_sleep_status_on_int_t *val)
-{
+ * @brief  Drives the sleep status instead of sleep change on INT pins
+ *         (only if INT1_SLEEP_CHANGE or INT2_SLEEP_CHANGE bits
+ *         are enabled).[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of sleep_status_on_int in reg INT_CFG0
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_act_pin_notification_get(
+    const stmdev_ctx_t *ctx, asm330lhh_sleep_status_on_int_t *val) {
   asm330lhh_int_cfg0_t int_cfg0;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG0, (uint8_t *)&int_cfg0, 1);
-  switch (int_cfg0. sleep_status_on_int)
-  {
+  switch (int_cfg0.sleep_status_on_int) {
     case ASM330LHH_DRIVE_SLEEP_CHG_EVENT:
       *val = ASM330LHH_DRIVE_SLEEP_CHG_EVENT;
       break;
@@ -2913,21 +2701,20 @@ int32_t asm330lhh_act_pin_notification_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Enable inactivity function.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of inact_en in reg INT_CFG1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_act_mode_set(const stmdev_ctx_t *ctx, asm330lhh_inact_en_t val)
-{
+ * @brief  Enable inactivity function.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of inact_en in reg INT_CFG1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_act_mode_set(const stmdev_ctx_t *ctx,
+                               asm330lhh_inact_en_t val) {
   asm330lhh_int_cfg1_t int_cfg1;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *)&int_cfg1, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     int_cfg1.inact_en = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *)&int_cfg1, 1);
   }
@@ -2935,23 +2722,21 @@ int32_t asm330lhh_act_mode_set(const stmdev_ctx_t *ctx, asm330lhh_inact_en_t val
 }
 
 /**
-  * @brief  Enable inactivity function.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of inact_en in reg INT_CFG1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Enable inactivity function.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of inact_en in reg INT_CFG1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_act_mode_get(const stmdev_ctx_t *ctx,
-                               asm330lhh_inact_en_t *val)
-{
+                               asm330lhh_inact_en_t *val) {
   asm330lhh_int_cfg1_t int_cfg1;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_INT_CFG1, (uint8_t *)&int_cfg1, 1);
 
-  switch (int_cfg1.inact_en)
-  {
+  switch (int_cfg1.inact_en) {
     case ASM330LHH_XL_AND_GY_NOT_AFFECTED:
       *val = ASM330LHH_XL_AND_GY_NOT_AFFECTED;
       break;
@@ -2972,22 +2757,20 @@ int32_t asm330lhh_act_mode_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Duration to go in sleep mode (1 LSb = 512 / ODR).[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sleep_dur in reg WAKE_UP_DUR
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_act_sleep_dur_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Duration to go in sleep mode (1 LSb = 512 / ODR).[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sleep_dur in reg WAKE_UP_DUR
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_act_sleep_dur_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_wake_up_dur_t wake_up_dur;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR,
-                           (uint8_t *)&wake_up_dur, 1);
-  if (ret == 0)
-  {
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR, (uint8_t *)&wake_up_dur,
+                           1);
+  if (ret == 0) {
     wake_up_dur.sleep_dur = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_WAKE_UP_DUR,
                               (uint8_t *)&wake_up_dur, 1);
@@ -2996,82 +2779,74 @@ int32_t asm330lhh_act_sleep_dur_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Duration to go in sleep mode.(1 LSb = 512 / ODR).[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sleep_dur in reg WAKE_UP_DUR
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_act_sleep_dur_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Duration to go in sleep mode.(1 LSb = 512 / ODR).[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sleep_dur in reg WAKE_UP_DUR
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_act_sleep_dur_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_wake_up_dur_t wake_up_dur;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR,
-                           (uint8_t *)&wake_up_dur, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR, (uint8_t *)&wake_up_dur,
+                           1);
   *val = wake_up_dur.sleep_dur;
 
   return ret;
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_ Six_position_detection(6D/4D)
-  * @brief      This section groups all the functions concerning six
-  *             position detection (6D).
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_ Six_position_detection(6D/4D)
+ * @brief      This section groups all the functions concerning six
+ *             position detection (6D).
+ * @{
+ *
+ */
 
 /**
-  * @brief  Threshold for 4D/6D function.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of sixd_ths in reg TAP_THS_6D
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Threshold for 4D/6D function.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of sixd_ths in reg TAP_THS_6D
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_6d_threshold_set(const stmdev_ctx_t *ctx,
-                                   asm330lhh_sixd_ths_t val)
-{
+                                   asm330lhh_sixd_ths_t val) {
   asm330lhh_ths_6d_t ths_6d;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_THS_6D,
-                           (uint8_t *)&ths_6d, 1);
-  if (ret == 0)
-  {
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_THS_6D, (uint8_t *)&ths_6d, 1);
+  if (ret == 0) {
     ths_6d.sixd_ths = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_THS_6D,
-                              (uint8_t *)&ths_6d, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_THS_6D, (uint8_t *)&ths_6d, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Threshold for 4D/6D function.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of sixd_ths in reg TAP_THS_6D
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Threshold for 4D/6D function.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of sixd_ths in reg TAP_THS_6D
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_6d_threshold_get(const stmdev_ctx_t *ctx,
-                                   asm330lhh_sixd_ths_t *val)
-{
+                                   asm330lhh_sixd_ths_t *val) {
   asm330lhh_ths_6d_t ths_6d;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_THS_6D,
-                           (uint8_t *)&ths_6d, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_THS_6D, (uint8_t *)&ths_6d, 1);
 
-  switch (ths_6d.sixd_ths)
-  {
+  switch (ths_6d.sixd_ths) {
     case ASM330LHH_DEG_80:
       *val = ASM330LHH_DEG_80;
       break;
@@ -3092,104 +2867,94 @@ int32_t asm330lhh_6d_threshold_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  4D orientation detection enable.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of d4d_en in reg TAP_THS_6D
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_4d_mode_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  4D orientation detection enable.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of d4d_en in reg TAP_THS_6D
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_4d_mode_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ths_6d_t ths_6d;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_THS_6D,
-                           (uint8_t *)&ths_6d, 1);
-  if (ret == 0)
-  {
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_THS_6D, (uint8_t *)&ths_6d, 1);
+  if (ret == 0) {
     ths_6d.d4d_en = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_THS_6D,
-                              (uint8_t *)&ths_6d, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_THS_6D, (uint8_t *)&ths_6d, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  4D orientation detection enable.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of d4d_en in reg TAP_THS_6D
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_4d_mode_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  4D orientation detection enable.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of d4d_en in reg TAP_THS_6D
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_4d_mode_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ths_6d_t ths_6d;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_THS_6D,
-                           (uint8_t *)&ths_6d, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_THS_6D, (uint8_t *)&ths_6d, 1);
   *val = ths_6d.d4d_en;
 
   return ret;
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_free_fall
-  * @brief      This section group all the functions concerning the free
-  *             fall detection.
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_free_fall
+ * @brief      This section group all the functions concerning the free
+ *             fall detection.
+ * @{
+ *
+ */
 
 /**
-  * @brief  Free fall threshold setting.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of ff_ths in reg FREE_FALL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Free fall threshold setting.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of ff_ths in reg FREE_FALL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_ff_threshold_set(const stmdev_ctx_t *ctx,
-                                   asm330lhh_ff_ths_t val)
-{
+                                   asm330lhh_ff_ths_t val) {
   asm330lhh_free_fall_t free_fall;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_FREE_FALL, (uint8_t *)&free_fall, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     free_fall.ff_ths = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FREE_FALL,
-                              (uint8_t *)&free_fall, 1);
+    ret =
+        asm330lhh_write_reg(ctx, ASM330LHH_FREE_FALL, (uint8_t *)&free_fall, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Free fall threshold setting.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of ff_ths in reg FREE_FALL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Free fall threshold setting.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of ff_ths in reg FREE_FALL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_ff_threshold_get(const stmdev_ctx_t *ctx,
-                                   asm330lhh_ff_ths_t *val)
-{
+                                   asm330lhh_ff_ths_t *val) {
   asm330lhh_free_fall_t free_fall;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_FREE_FALL, (uint8_t *)&free_fall, 1);
 
-  switch (free_fall.ff_ths)
-  {
+  switch (free_fall.ff_ths) {
     case ASM330LHH_FF_TSH_156mg:
       *val = ASM330LHH_FF_TSH_156mg;
       break;
@@ -3222,62 +2987,56 @@ int32_t asm330lhh_ff_threshold_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Free-fall duration event(1LSb = 1 / ODR).[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of ff_dur in reg FREE_FALL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_ff_dur_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Free-fall duration event(1LSb = 1 / ODR).[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of ff_dur in reg FREE_FALL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_ff_dur_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_wake_up_dur_t wake_up_dur;
   asm330lhh_free_fall_t free_fall;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR,
-                           (uint8_t *)&wake_up_dur, 1);
-  if (ret == 0)
-  {
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR, (uint8_t *)&wake_up_dur,
+                           1);
+  if (ret == 0) {
     wake_up_dur.ff_dur = (val & 0x20U) >> 5;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_WAKE_UP_DUR,
                               (uint8_t *)&wake_up_dur, 1);
   }
-  if (ret == 0)
-  {
-    ret = asm330lhh_read_reg(ctx, ASM330LHH_FREE_FALL,
-                             (uint8_t *)&free_fall, 1);
+  if (ret == 0) {
+    ret =
+        asm330lhh_read_reg(ctx, ASM330LHH_FREE_FALL, (uint8_t *)&free_fall, 1);
   }
-  if (ret == 0)
-  {
+  if (ret == 0) {
     free_fall.ff_dur = val & 0x1FU;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FREE_FALL,
-                              (uint8_t *)&free_fall, 1);
+    ret =
+        asm330lhh_write_reg(ctx, ASM330LHH_FREE_FALL, (uint8_t *)&free_fall, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  Free-fall duration event(1LSb = 1 / ODR).[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of ff_dur in reg FREE_FALL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_ff_dur_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Free-fall duration event(1LSb = 1 / ODR).[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of ff_dur in reg FREE_FALL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_ff_dur_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_wake_up_dur_t wake_up_dur;
   asm330lhh_free_fall_t free_fall;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR,
-                           (uint8_t *)&wake_up_dur, 1);
+  ret = asm330lhh_read_reg(ctx, ASM330LHH_WAKE_UP_DUR, (uint8_t *)&wake_up_dur,
+                           1);
 
-  if (ret == 0)
-  {
-    ret = asm330lhh_read_reg(ctx, ASM330LHH_FREE_FALL,
-                             (uint8_t *)&free_fall, 1);
+  if (ret == 0) {
+    ret =
+        asm330lhh_read_reg(ctx, ASM330LHH_FREE_FALL, (uint8_t *)&free_fall, 1);
   }
   *val = (wake_up_dur.ff_dur << 5) + free_fall.ff_dur;
 
@@ -3285,211 +3044,201 @@ int32_t asm330lhh_ff_dur_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_fifo
-  * @brief      This section group all the functions concerning
-  *             the fifo usage
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_fifo
+ * @brief      This section group all the functions concerning
+ *             the fifo usage
+ * @{
+ *
+ */
 
 /**
-  * @brief  FIFO watermark level selection.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of wtm in reg FIFO_CTRL1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_fifo_watermark_set(const stmdev_ctx_t *ctx, uint16_t val)
-{
+ * @brief  FIFO watermark level selection.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of wtm in reg FIFO_CTRL1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_fifo_watermark_set(const stmdev_ctx_t *ctx, uint16_t val) {
   asm330lhh_fifo_ctrl1_t fifo_ctrl1;
   asm330lhh_fifo_ctrl2_t fifo_ctrl2;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL1, (uint8_t *)&fifo_ctrl1, 1);
-  ret += asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL1, (uint8_t *)&fifo_ctrl1, 1);
+  ret +=
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2, 1);
 
-  if (ret == 0)
-  {
-    fifo_ctrl1.wtm = (uint8_t)(val  & 0xFFU);
+  if (ret == 0) {
+    fifo_ctrl1.wtm = (uint8_t)(val & 0xFFU);
     fifo_ctrl2.wtm = (uint8_t)((val / 256U) & 0x01U);
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL1, (uint8_t *)&fifo_ctrl1, 1);
-    ret += asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL1, (uint8_t *)&fifo_ctrl1,
+                              1);
+    ret += asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL2,
+                               (uint8_t *)&fifo_ctrl2, 1);
   }
 
   return ret;
 }
 
 /**
-  * @brief  FIFO watermark level selection.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of wtm in reg FIFO_CTRL1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_fifo_watermark_get(const stmdev_ctx_t *ctx, uint16_t *val)
-{
+ * @brief  FIFO watermark level selection.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of wtm in reg FIFO_CTRL1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_fifo_watermark_get(const stmdev_ctx_t *ctx, uint16_t *val) {
   asm330lhh_fifo_ctrl1_t fifo_ctrl1;
   asm330lhh_fifo_ctrl2_t fifo_ctrl2;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2,
-                           (uint8_t *)&fifo_ctrl2, 1);
-  if (ret == 0)
-  {
-    ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL1,
-                             (uint8_t *)&fifo_ctrl1, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2, 1);
+  if (ret == 0) {
+    ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL1, (uint8_t *)&fifo_ctrl1,
+                             1);
   }
   *val = fifo_ctrl2.wtm;
-  *val = (*val * 256U) +  fifo_ctrl1.wtm;
+  *val = (*val * 256U) + fifo_ctrl1.wtm;
   return ret;
 }
 
 /**
-  * @brief  Enables ODR CHANGE virtual sensor to be batched in FIFO.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of odrchg_en in reg FIFO_CTRL2
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Enables ODR CHANGE virtual sensor to be batched in FIFO.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of odrchg_en in reg FIFO_CTRL2
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_virtual_sens_odr_chg_set(const stmdev_ctx_t *ctx,
-                                                uint8_t val)
-{
+                                                uint8_t val) {
   asm330lhh_fifo_ctrl2_t fifo_ctrl2;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2,
-                           (uint8_t *)&fifo_ctrl2, 1);
-  if (ret == 0)
-  {
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2, 1);
+  if (ret == 0) {
     fifo_ctrl2.odrchg_en = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL2,
-                              (uint8_t *)&fifo_ctrl2, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2,
+                              1);
   }
 
   return ret;
 }
 
 /**
-  * @brief  Enables ODR CHANGE virtual sensor to be batched in FIFO.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of odrchg_en in reg FIFO_CTRL2
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Enables ODR CHANGE virtual sensor to be batched in FIFO.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of odrchg_en in reg FIFO_CTRL2
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_virtual_sens_odr_chg_get(const stmdev_ctx_t *ctx,
-                                                uint8_t *val)
-{
+                                                uint8_t *val) {
   asm330lhh_fifo_ctrl2_t fifo_ctrl2;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2,
-                           (uint8_t *)&fifo_ctrl2, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2, 1);
   *val = fifo_ctrl2.odrchg_en;
 
   return ret;
 }
 
 /**
-  * @brief  Sensing chain FIFO stop values memorization at threshold
-  *         level.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of stop_on_wtm in reg FIFO_CTRL2
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_fifo_stop_on_wtm_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Sensing chain FIFO stop values memorization at threshold
+ *         level.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of stop_on_wtm in reg FIFO_CTRL2
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_fifo_stop_on_wtm_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_fifo_ctrl2_t fifo_ctrl2;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2,
-                           (uint8_t *)&fifo_ctrl2, 1);
-  if (ret == 0)
-  {
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2, 1);
+  if (ret == 0) {
     fifo_ctrl2.stop_on_wtm = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL2,
-                              (uint8_t *)&fifo_ctrl2, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2,
+                              1);
   }
   return ret;
 }
 
 /**
-  * @brief  Sensing chain FIFO stop values memorization at threshold
-  *         level.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of stop_on_wtm in reg FIFO_CTRL2
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_fifo_stop_on_wtm_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Sensing chain FIFO stop values memorization at threshold
+ *         level.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of stop_on_wtm in reg FIFO_CTRL2
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_fifo_stop_on_wtm_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_fifo_ctrl2_t fifo_ctrl2;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2,
-                           (uint8_t *)&fifo_ctrl2, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL2, (uint8_t *)&fifo_ctrl2, 1);
   *val = fifo_ctrl2.stop_on_wtm;
 
   return ret;
 }
 
 /**
-  * @brief  Selects Batching Data Rate (writing frequency in FIFO)
-  *         for accelerometer data.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of bdr_xl in reg FIFO_CTRL3
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects Batching Data Rate (writing frequency in FIFO)
+ *         for accelerometer data.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of bdr_xl in reg FIFO_CTRL3
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_xl_batch_set(const stmdev_ctx_t *ctx,
-                                    asm330lhh_bdr_xl_t val)
-{
+                                    asm330lhh_bdr_xl_t val) {
   asm330lhh_fifo_ctrl3_t fifo_ctrl3;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL3,
-                           (uint8_t *)&fifo_ctrl3, 1);
-  if (ret == 0)
-  {
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL3, (uint8_t *)&fifo_ctrl3, 1);
+  if (ret == 0) {
     fifo_ctrl3.bdr_xl = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL3,
-                              (uint8_t *)&fifo_ctrl3, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL3, (uint8_t *)&fifo_ctrl3,
+                              1);
   }
   return ret;
 }
 
 /**
-  * @brief  Selects Batching Data Rate (writing frequency in FIFO)
-  *         for accelerometer data.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of bdr_xl in reg FIFO_CTRL3
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects Batching Data Rate (writing frequency in FIFO)
+ *         for accelerometer data.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of bdr_xl in reg FIFO_CTRL3
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_xl_batch_get(const stmdev_ctx_t *ctx,
-                                    asm330lhh_bdr_xl_t *val)
-{
+                                    asm330lhh_bdr_xl_t *val) {
   asm330lhh_fifo_ctrl3_t fifo_ctrl3;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL3,
-                           (uint8_t *)&fifo_ctrl3, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL3, (uint8_t *)&fifo_ctrl3, 1);
 
-  switch (fifo_ctrl3.bdr_xl)
-  {
+  switch (fifo_ctrl3.bdr_xl) {
     case ASM330LHH_XL_NOT_BATCHED:
       *val = ASM330LHH_XL_NOT_BATCHED;
       break;
@@ -3531,51 +3280,47 @@ int32_t asm330lhh_fifo_xl_batch_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Selects Batching Data Rate (writing frequency in FIFO)
-  *         for gyroscope data.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of bdr_gy in reg FIFO_CTRL3
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects Batching Data Rate (writing frequency in FIFO)
+ *         for gyroscope data.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of bdr_gy in reg FIFO_CTRL3
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_gy_batch_set(const stmdev_ctx_t *ctx,
-                                    asm330lhh_bdr_gy_t val)
-{
+                                    asm330lhh_bdr_gy_t val) {
   asm330lhh_fifo_ctrl3_t fifo_ctrl3;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL3,
-                           (uint8_t *)&fifo_ctrl3, 1);
-  if (ret == 0)
-  {
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL3, (uint8_t *)&fifo_ctrl3, 1);
+  if (ret == 0) {
     fifo_ctrl3.bdr_gy = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL3,
-                              (uint8_t *)&fifo_ctrl3, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL3, (uint8_t *)&fifo_ctrl3,
+                              1);
   }
   return ret;
 }
 
 /**
-  * @brief  Selects Batching Data Rate (writing frequency in FIFO)
-  *         for gyroscope data.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of bdr_gy in reg FIFO_CTRL3
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects Batching Data Rate (writing frequency in FIFO)
+ *         for gyroscope data.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of bdr_gy in reg FIFO_CTRL3
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_gy_batch_get(const stmdev_ctx_t *ctx,
-                                    asm330lhh_bdr_gy_t *val)
-{
+                                    asm330lhh_bdr_gy_t *val) {
   asm330lhh_fifo_ctrl3_t fifo_ctrl3;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL3,
-                           (uint8_t *)&fifo_ctrl3, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL3, (uint8_t *)&fifo_ctrl3, 1);
 
-  switch (fifo_ctrl3.bdr_gy)
-  {
+  switch (fifo_ctrl3.bdr_gy) {
     case ASM330LHH_GY_NOT_BATCHED:
       *val = ASM330LHH_GY_NOT_BATCHED;
       break;
@@ -3620,49 +3365,45 @@ int32_t asm330lhh_fifo_gy_batch_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  FIFO mode selection.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of fifo_mode in reg FIFO_CTRL4
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  FIFO mode selection.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of fifo_mode in reg FIFO_CTRL4
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_mode_set(const stmdev_ctx_t *ctx,
-                                asm330lhh_fifo_mode_t val)
-{
+                                asm330lhh_fifo_mode_t val) {
   asm330lhh_fifo_ctrl4_t fifo_ctrl4;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4,
-                           (uint8_t *)&fifo_ctrl4, 1);
-  if (ret == 0)
-  {
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4, (uint8_t *)&fifo_ctrl4, 1);
+  if (ret == 0) {
     fifo_ctrl4.fifo_mode = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL4,
-                              (uint8_t *)&fifo_ctrl4, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL4, (uint8_t *)&fifo_ctrl4,
+                              1);
   }
   return ret;
 }
 
 /**
-  * @brief  FIFO mode selection.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of fifo_mode in reg FIFO_CTRL4
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  FIFO mode selection.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of fifo_mode in reg FIFO_CTRL4
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_mode_get(const stmdev_ctx_t *ctx,
-                                asm330lhh_fifo_mode_t *val)
-{
+                                asm330lhh_fifo_mode_t *val) {
   asm330lhh_fifo_ctrl4_t fifo_ctrl4;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4,
-                           (uint8_t *)&fifo_ctrl4, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4, (uint8_t *)&fifo_ctrl4, 1);
 
-  switch (fifo_ctrl4.fifo_mode)
-  {
+  switch (fifo_ctrl4.fifo_mode) {
     case ASM330LHH_BYPASS_MODE:
       *val = ASM330LHH_BYPASS_MODE;
       break;
@@ -3689,51 +3430,47 @@ int32_t asm330lhh_fifo_mode_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Selects Batching Data Rate (writing frequency in FIFO)
-  *         for temperature data.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of odr_t_batch in reg FIFO_CTRL4
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects Batching Data Rate (writing frequency in FIFO)
+ *         for temperature data.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of odr_t_batch in reg FIFO_CTRL4
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_temp_batch_set(const stmdev_ctx_t *ctx,
-                                      asm330lhh_odr_t_batch_t val)
-{
+                                      asm330lhh_odr_t_batch_t val) {
   asm330lhh_fifo_ctrl4_t fifo_ctrl4;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4,
-                           (uint8_t *)&fifo_ctrl4, 1);
-  if (ret == 0)
-  {
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4, (uint8_t *)&fifo_ctrl4, 1);
+  if (ret == 0) {
     fifo_ctrl4.odr_t_batch = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL4,
-                              (uint8_t *)&fifo_ctrl4, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL4, (uint8_t *)&fifo_ctrl4,
+                              1);
   }
   return ret;
 }
 
 /**
-  * @brief  Selects Batching Data Rate (writing frequency in FIFO)
-  *         for temperature data.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of odr_t_batch in reg FIFO_CTRL4
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects Batching Data Rate (writing frequency in FIFO)
+ *         for temperature data.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of odr_t_batch in reg FIFO_CTRL4
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_temp_batch_get(const stmdev_ctx_t *ctx,
-                                      asm330lhh_odr_t_batch_t *val)
-{
+                                      asm330lhh_odr_t_batch_t *val) {
   asm330lhh_fifo_ctrl4_t fifo_ctrl4;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4,
-                           (uint8_t *)&fifo_ctrl4, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4, (uint8_t *)&fifo_ctrl4, 1);
 
-  switch (fifo_ctrl4.odr_t_batch)
-  {
+  switch (fifo_ctrl4.odr_t_batch) {
     case ASM330LHH_TEMP_NOT_BATCHED:
       *val = ASM330LHH_TEMP_NOT_BATCHED;
       break;
@@ -3754,54 +3491,50 @@ int32_t asm330lhh_fifo_temp_batch_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Selects decimation for timestamp batching in FIFO.
-  *         Writing rate will be the maximum rate between XL and
-  *         GYRO BDR divided by decimation decoder.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of dec_ts_batch in reg FIFO_CTRL4
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects decimation for timestamp batching in FIFO.
+ *         Writing rate will be the maximum rate between XL and
+ *         GYRO BDR divided by decimation decoder.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of dec_ts_batch in reg FIFO_CTRL4
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_timestamp_decimation_set(const stmdev_ctx_t *ctx,
-                                                asm330lhh_dec_ts_batch_t val)
-{
+                                                asm330lhh_dec_ts_batch_t val) {
   asm330lhh_fifo_ctrl4_t fifo_ctrl4;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4,
-                           (uint8_t *)&fifo_ctrl4, 1);
-  if (ret == 0)
-  {
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4, (uint8_t *)&fifo_ctrl4, 1);
+  if (ret == 0) {
     fifo_ctrl4.dec_ts_batch = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL4,
-                              (uint8_t *)&fifo_ctrl4, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_FIFO_CTRL4, (uint8_t *)&fifo_ctrl4,
+                              1);
   }
   return ret;
 }
 
 /**
-  * @brief  Selects decimation for timestamp batching in FIFO.
-  *         Writing rate will be the maximum rate between XL and
-  *         GYRO BDR divided by decimation decoder.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of dec_ts_batch in reg
-  *                                 FIFO_CTRL4
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects decimation for timestamp batching in FIFO.
+ *         Writing rate will be the maximum rate between XL and
+ *         GYRO BDR divided by decimation decoder.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of dec_ts_batch in reg
+ *                                 FIFO_CTRL4
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_timestamp_decimation_get(const stmdev_ctx_t *ctx,
-                                                asm330lhh_dec_ts_batch_t *val)
-{
+                                                asm330lhh_dec_ts_batch_t *val) {
   asm330lhh_fifo_ctrl4_t fifo_ctrl4;
   int32_t ret;
 
-  ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4,
-                           (uint8_t *)&fifo_ctrl4, 1);
+  ret =
+      asm330lhh_read_reg(ctx, ASM330LHH_FIFO_CTRL4, (uint8_t *)&fifo_ctrl4, 1);
 
-  switch (fifo_ctrl4.dec_ts_batch)
-  {
+  switch (fifo_ctrl4.dec_ts_batch) {
     case ASM330LHH_NO_DECIMATION:
       *val = ASM330LHH_NO_DECIMATION;
       break;
@@ -3822,25 +3555,23 @@ int32_t asm330lhh_fifo_timestamp_decimation_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Selects the trigger for the internal counter of batching events
-  *         between XL and gyro.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of trig_counter_bdr in
-  *                reg COUNTER_BDR_REG1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects the trigger for the internal counter of batching events
+ *         between XL and gyro.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of trig_counter_bdr in
+ *                reg COUNTER_BDR_REG1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_cnt_event_batch_set(const stmdev_ctx_t *ctx,
-                                           asm330lhh_trig_counter_bdr_t val)
-{
+                                           asm330lhh_trig_counter_bdr_t val) {
   asm330lhh_counter_bdr_reg1_t counter_bdr_reg1;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                            (uint8_t *)&counter_bdr_reg1, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     counter_bdr_reg1.trig_counter_bdr = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                               (uint8_t *)&counter_bdr_reg1, 1);
@@ -3849,26 +3580,24 @@ int32_t asm330lhh_fifo_cnt_event_batch_set(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Selects the trigger for the internal counter of batching events
-  *          between XL and gyro.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of trig_counter_bdr
-  *                in reg COUNTER_BDR_REG1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Selects the trigger for the internal counter of batching events
+ *          between XL and gyro.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of trig_counter_bdr
+ *                in reg COUNTER_BDR_REG1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_cnt_event_batch_get(const stmdev_ctx_t *ctx,
-                                           asm330lhh_trig_counter_bdr_t *val)
-{
+                                           asm330lhh_trig_counter_bdr_t *val) {
   asm330lhh_counter_bdr_reg1_t counter_bdr_reg1;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                            (uint8_t *)&counter_bdr_reg1, 1);
 
-  switch (counter_bdr_reg1.trig_counter_bdr)
-  {
+  switch (counter_bdr_reg1.trig_counter_bdr) {
     case ASM330LHH_XL_BATCH_EVENT:
       *val = ASM330LHH_XL_BATCH_EVENT;
       break;
@@ -3883,23 +3612,21 @@ int32_t asm330lhh_fifo_cnt_event_batch_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Resets the internal counter of batching events for a single sensor.
-  *         This bit is automatically reset to zero if it was set to ‘1’.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of rst_counter_bdr in reg COUNTER_BDR_REG1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_rst_batch_counter_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  Resets the internal counter of batching events for a single sensor.
+ *         This bit is automatically reset to zero if it was set to ‘1’.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of rst_counter_bdr in reg COUNTER_BDR_REG1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_rst_batch_counter_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_counter_bdr_reg1_t counter_bdr_reg1;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                            (uint8_t *)&counter_bdr_reg1, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     counter_bdr_reg1.rst_counter_bdr = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                               (uint8_t *)&counter_bdr_reg1, 1);
@@ -3908,16 +3635,15 @@ int32_t asm330lhh_rst_batch_counter_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  Resets the internal counter of batching events for a single sensor.
-  *         This bit is automatically reset to zero if it was set to ‘1’.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of rst_counter_bdr in reg COUNTER_BDR_REG1
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_rst_batch_counter_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Resets the internal counter of batching events for a single sensor.
+ *         This bit is automatically reset to zero if it was set to ‘1’.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of rst_counter_bdr in reg COUNTER_BDR_REG1
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_rst_batch_counter_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_counter_bdr_reg1_t counter_bdr_reg1;
   int32_t ret;
 
@@ -3929,31 +3655,30 @@ int32_t asm330lhh_rst_batch_counter_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Batch data rate counter.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of cnt_bdr_th in reg COUNTER_BDR_REG2
-  *                and COUNTER_BDR_REG1.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_batch_counter_threshold_set(const stmdev_ctx_t *ctx, uint16_t val)
-{
+ * @brief  Batch data rate counter.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of cnt_bdr_th in reg COUNTER_BDR_REG2
+ *                and COUNTER_BDR_REG1.
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_batch_counter_threshold_set(const stmdev_ctx_t *ctx,
+                                              uint16_t val) {
   asm330lhh_counter_bdr_reg2_t counter_bdr_reg1;
   asm330lhh_counter_bdr_reg2_t counter_bdr_reg2;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                            (uint8_t *)&counter_bdr_reg1, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     counter_bdr_reg1.cnt_bdr_th = (uint8_t)((val / 256U) & 0x07U);
     ret = asm330lhh_write_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                               (uint8_t *)&counter_bdr_reg1, 1);
   }
-  if (ret == 0)
-  {
-    counter_bdr_reg2.cnt_bdr_th = (uint8_t)(val - (counter_bdr_reg1.cnt_bdr_th * 256U));
+  if (ret == 0) {
+    counter_bdr_reg2.cnt_bdr_th =
+        (uint8_t)(val - (counter_bdr_reg1.cnt_bdr_th * 256U));
     ret = asm330lhh_write_reg(ctx, ASM330LHH_COUNTER_BDR_REG2,
                               (uint8_t *)&counter_bdr_reg2, 1);
   }
@@ -3961,44 +3686,42 @@ int32_t asm330lhh_batch_counter_threshold_set(const stmdev_ctx_t *ctx, uint16_t 
 }
 
 /**
-  * @brief  Batch data rate counter.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of cnt_bdr_th in reg COUNTER_BDR_REG2
-  *                and COUNTER_BDR_REG1.
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Batch data rate counter.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of cnt_bdr_th in reg COUNTER_BDR_REG2
+ *                and COUNTER_BDR_REG1.
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_batch_counter_threshold_get(const stmdev_ctx_t *ctx,
-                                              uint16_t *val)
-{
+                                              uint16_t *val) {
   asm330lhh_counter_bdr_reg1_t counter_bdr_reg1;
   asm330lhh_counter_bdr_reg2_t counter_bdr_reg2;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_COUNTER_BDR_REG1,
                            (uint8_t *)&counter_bdr_reg1, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ret = asm330lhh_read_reg(ctx, ASM330LHH_COUNTER_BDR_REG2,
                              (uint8_t *)&counter_bdr_reg2, 1);
   }
 
   *val = counter_bdr_reg1.cnt_bdr_th;
-  *val = (*val * 256U) +  counter_bdr_reg2.cnt_bdr_th;
+  *val = (*val * 256U) + counter_bdr_reg2.cnt_bdr_th;
   return ret;
 }
 
 /**
-  * @brief  Number of unread sensor data (TAG + 6 bytes) stored in FIFO.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Read the value of diff_fifo in reg FIFO_STATUS1 and FIFO_STATUS2
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_fifo_data_level_get(const stmdev_ctx_t *ctx, uint16_t *val)
-{
+ * @brief  Number of unread sensor data (TAG + 6 bytes) stored in FIFO.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Read the value of diff_fifo in reg FIFO_STATUS1 and
+ * FIFO_STATUS2
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_fifo_data_level_get(const stmdev_ctx_t *ctx, uint16_t *val) {
   uint8_t reg[2];
   asm330lhh_fifo_status1_t *fifo_status1 = (asm330lhh_fifo_status1_t *)&reg[0];
   asm330lhh_fifo_status2_t *fifo_status2 = (asm330lhh_fifo_status2_t *)&reg[1];
@@ -4006,8 +3729,7 @@ int32_t asm330lhh_fifo_data_level_get(const stmdev_ctx_t *ctx, uint16_t *val)
 
   /* read both FIFO_STATUS1 + FIFO_STATUS2 regs */
   ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_STATUS1, (uint8_t *)reg, 2);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     *val = fifo_status2->diff_fifo;
     *val = (*val * 256U) + fifo_status1->diff_fifo;
   }
@@ -4016,24 +3738,22 @@ int32_t asm330lhh_fifo_data_level_get(const stmdev_ctx_t *ctx, uint16_t *val)
 }
 
 /**
-  * @brief  Smart FIFO status.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Read registers FIFO_STATUS2
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Smart FIFO status.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Read registers FIFO_STATUS2
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_status_get(const stmdev_ctx_t *ctx,
-                                  asm330lhh_fifo_status2_t *val)
-{
+                                  asm330lhh_fifo_status2_t *val) {
   uint8_t reg[2];
   asm330lhh_fifo_status2_t *fifo_status2 = (asm330lhh_fifo_status2_t *)&reg[1];
   int32_t ret;
 
   /* read both FIFO_STATUS1 + FIFO_STATUS2 regs */
   ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_STATUS1, (uint8_t *)reg, 2);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     *val = *fifo_status2;
   }
 
@@ -4041,23 +3761,21 @@ int32_t asm330lhh_fifo_status_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  Smart FIFO full status.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Read the values of fifo_full_ia in reg FIFO_STATUS2
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_fifo_full_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  Smart FIFO full status.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Read the values of fifo_full_ia in reg FIFO_STATUS2
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_fifo_full_flag_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   uint8_t reg[2];
   asm330lhh_fifo_status2_t *fifo_status2 = (asm330lhh_fifo_status2_t *)&reg[1];
   int32_t ret;
 
   /* read both FIFO_STATUS1 + FIFO_STATUS2 regs */
   ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_STATUS1, (uint8_t *)reg, 2);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     *val = fifo_status2->fifo_full_ia;
   }
 
@@ -4065,24 +3783,22 @@ int32_t asm330lhh_fifo_full_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  FIFO overrun status.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Read the values of  fifo_over_run_latched in
-  *                reg FIFO_STATUS2
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_fifo_ovr_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  FIFO overrun status.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Read the values of  fifo_over_run_latched in
+ *                reg FIFO_STATUS2
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_fifo_ovr_flag_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   uint8_t reg[2];
   asm330lhh_fifo_status2_t *fifo_status2 = (asm330lhh_fifo_status2_t *)&reg[1];
   int32_t ret;
 
   /* read both FIFO_STATUS1 + FIFO_STATUS2 regs */
   ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_STATUS1, (uint8_t *)reg, 2);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     *val = fifo_status2->fifo_ovr_ia;
   }
 
@@ -4090,23 +3806,21 @@ int32_t asm330lhh_fifo_ovr_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  FIFO watermark status.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Read the values of fifo_wtm_ia in reg FIFO_STATUS2
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_fifo_wtm_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  FIFO watermark status.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Read the values of fifo_wtm_ia in reg FIFO_STATUS2
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_fifo_wtm_flag_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   uint8_t reg[2];
   asm330lhh_fifo_status2_t *fifo_status2 = (asm330lhh_fifo_status2_t *)&reg[1];
   int32_t ret;
 
   /* read both FIFO_STATUS1 + FIFO_STATUS2 regs */
   ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_STATUS1, (uint8_t *)reg, 2);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     *val = fifo_status2->fifo_wtm_ia;
   }
 
@@ -4114,24 +3828,22 @@ int32_t asm330lhh_fifo_wtm_flag_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  Identifies the sensor in FIFO_DATA_OUT.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of tag_sensor in reg FIFO_DATA_OUT_TAG
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  Identifies the sensor in FIFO_DATA_OUT.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of tag_sensor in reg FIFO_DATA_OUT_TAG
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_fifo_sensor_tag_get(const stmdev_ctx_t *ctx,
-                                      asm330lhh_fifo_tag_t *val)
-{
+                                      asm330lhh_fifo_tag_t *val) {
   asm330lhh_fifo_data_out_tag_t fifo_data_out_tag;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_FIFO_DATA_OUT_TAG,
                            (uint8_t *)&fifo_data_out_tag, 1);
 
-  switch (fifo_data_out_tag.tag_sensor)
-  {
+  switch (fifo_data_out_tag.tag_sensor) {
     case ASM330LHH_GYRO_NC_TAG:
       *val = ASM330LHH_GYRO_NC_TAG;
       break;
@@ -4155,34 +3867,33 @@ int32_t asm330lhh_fifo_sensor_tag_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @defgroup   ASM330LHH_DEN_functionality
-  * @brief      This section groups all the functions concerning
-  *             DEN functionality.
-  * @{
-  *
-  */
+ * @defgroup   ASM330LHH_DEN_functionality
+ * @brief      This section groups all the functions concerning
+ *             DEN functionality.
+ * @{
+ *
+ */
 
 /**
-  * @brief  DEN functionality marking mode.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of den_mode in reg CTRL6_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_den_mode_set(const stmdev_ctx_t *ctx, asm330lhh_den_mode_t val)
-{
+ * @brief  DEN functionality marking mode.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of den_mode in reg CTRL6_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_den_mode_set(const stmdev_ctx_t *ctx,
+                               asm330lhh_den_mode_t val) {
   asm330lhh_ctrl6_c_t ctrl6_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL6_C, (uint8_t *)&ctrl6_c, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl6_c.den_mode = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL6_C, (uint8_t *)&ctrl6_c, 1);
   }
@@ -4190,23 +3901,21 @@ int32_t asm330lhh_den_mode_set(const stmdev_ctx_t *ctx, asm330lhh_den_mode_t val
 }
 
 /**
-  * @brief  DEN functionality marking mode.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of den_mode in reg CTRL6_C
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  DEN functionality marking mode.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of den_mode in reg CTRL6_C
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_den_mode_get(const stmdev_ctx_t *ctx,
-                               asm330lhh_den_mode_t *val)
-{
+                               asm330lhh_den_mode_t *val) {
   asm330lhh_ctrl6_c_t ctrl6_c;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL6_C, (uint8_t *)&ctrl6_c, 1);
 
-  switch (ctrl6_c.den_mode)
-  {
+  switch (ctrl6_c.den_mode) {
     case ASM330LHH_DEN_DISABLE:
       *val = ASM330LHH_DEN_DISABLE;
       break;
@@ -4230,47 +3939,42 @@ int32_t asm330lhh_den_mode_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  DEN active level configuration.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of den_lh in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  DEN active level configuration.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of den_lh in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_den_polarity_set(const stmdev_ctx_t *ctx,
-                                   asm330lhh_den_lh_t val)
-{
+                                   asm330lhh_den_lh_t val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl9_xl.den_lh = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL,
-                              (uint8_t *)&ctrl9_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  DEN active level configuration.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of den_lh in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  DEN active level configuration.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of den_lh in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_den_polarity_get(const stmdev_ctx_t *ctx,
-                                   asm330lhh_den_lh_t *val)
-{
+                                   asm330lhh_den_lh_t *val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
 
-  switch (ctrl9_xl.den_lh)
-  {
+  switch (ctrl9_xl.den_lh) {
     case ASM330LHH_DEN_ACT_LOW:
       *val = ASM330LHH_DEN_ACT_LOW;
       break;
@@ -4285,47 +3989,42 @@ int32_t asm330lhh_den_polarity_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  DEN configuration.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of den_xl_g in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  DEN configuration.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of den_xl_g in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_den_enable_set(const stmdev_ctx_t *ctx,
-                                 asm330lhh_den_xl_g_t val)
-{
+                                 asm330lhh_den_xl_g_t val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl9_xl.den_xl_g = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL,
-                              (uint8_t *)&ctrl9_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  DEN configuration.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Get the values of den_xl_g in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
+ * @brief  DEN configuration.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Get the values of den_xl_g in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
 int32_t asm330lhh_den_enable_get(const stmdev_ctx_t *ctx,
-                                 asm330lhh_den_xl_g_t *val)
-{
+                                 asm330lhh_den_xl_g_t *val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
 
-  switch (ctrl9_xl.den_xl_g)
-  {
+  switch (ctrl9_xl.den_xl_g) {
     case ASM330LHH_STAMP_IN_GY_DATA:
       *val = ASM330LHH_STAMP_IN_GY_DATA;
       break;
@@ -4343,38 +4042,34 @@ int32_t asm330lhh_den_enable_get(const stmdev_ctx_t *ctx,
 }
 
 /**
-  * @brief  DEN value stored in LSB of X-axis.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of den_z in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_den_mark_axis_x_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  DEN value stored in LSB of X-axis.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of den_z in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_den_mark_axis_x_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl9_xl.den_z = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL,
-                              (uint8_t *)&ctrl9_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  DEN value stored in LSB of X-axis.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of den_z in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_den_mark_axis_x_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  DEN value stored in LSB of X-axis.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of den_z in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_den_mark_axis_x_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
@@ -4385,38 +4080,34 @@ int32_t asm330lhh_den_mark_axis_x_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  DEN value stored in LSB of Y-axis.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of den_y in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_den_mark_axis_y_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  DEN value stored in LSB of Y-axis.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of den_y in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_den_mark_axis_y_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl9_xl.den_y = (uint8_t)val;
-    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL,
-                              (uint8_t *)&ctrl9_xl, 1);
+    ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
   }
   return ret;
 }
 
 /**
-  * @brief  DEN value stored in LSB of Y-axis.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of den_y in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_den_mark_axis_y_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  DEN value stored in LSB of Y-axis.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of den_y in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_den_mark_axis_y_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
@@ -4427,21 +4118,19 @@ int32_t asm330lhh_den_mark_axis_y_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @brief  DEN value stored in LSB of Z-axis.[set]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of den_x in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_den_mark_axis_z_set(const stmdev_ctx_t *ctx, uint8_t val)
-{
+ * @brief  DEN value stored in LSB of Z-axis.[set]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of den_x in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_den_mark_axis_z_set(const stmdev_ctx_t *ctx, uint8_t val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
   ret = asm330lhh_read_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
-  if (ret == 0)
-  {
+  if (ret == 0) {
     ctrl9_xl.den_x = (uint8_t)val;
     ret = asm330lhh_write_reg(ctx, ASM330LHH_CTRL9_XL, (uint8_t *)&ctrl9_xl, 1);
   }
@@ -4449,15 +4138,14 @@ int32_t asm330lhh_den_mark_axis_z_set(const stmdev_ctx_t *ctx, uint8_t val)
 }
 
 /**
-  * @brief  DEN value stored in LSB of Z-axis.[get]
-  *
-  * @param  ctx    Read / write interface definitions.(ptr)
-  * @param  val    Change the values of den_x in reg CTRL9_XL
-  * @retval        Interface status (MANDATORY: return 0 -> no Error).
-  *
-  */
-int32_t asm330lhh_den_mark_axis_z_get(const stmdev_ctx_t *ctx, uint8_t *val)
-{
+ * @brief  DEN value stored in LSB of Z-axis.[get]
+ *
+ * @param  ctx    Read / write interface definitions.(ptr)
+ * @param  val    Change the values of den_x in reg CTRL9_XL
+ * @retval        Interface status (MANDATORY: return 0 -> no Error).
+ *
+ */
+int32_t asm330lhh_den_mark_axis_z_get(const stmdev_ctx_t *ctx, uint8_t *val) {
   asm330lhh_ctrl9_xl_t ctrl9_xl;
   int32_t ret;
 
@@ -4468,14 +4156,13 @@ int32_t asm330lhh_den_mark_axis_z_get(const stmdev_ctx_t *ctx, uint8_t *val)
 }
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /**
-  * @}
-  *
-  */
+ * @}
+ *
+ */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
-
