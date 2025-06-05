@@ -1,6 +1,8 @@
 #pragma once
 
+#include "uavcan.Timestamp.h"
 #include "uavcan.equipment.ahrs.RawIMU.h"
+#include "uavcan.equipment.ahrs.SensorIMU.h"
 #include "uavcan.equipment.ahrs.Solution.h"
 #include "uavcan.equipment.device.Temperature.h"
 #include "uavcan.equipment.gnss.Auxiliary.h"
@@ -8,9 +10,10 @@
 #include "uavcan.equipment.gnss.Fix.h"
 #include "uavcan.equipment.gnss.Fix2.h"
 #include "uavcan.equipment.gnss.RTCMStream.h"
+#include "uavcan.equipment.gnss.SensorGPS.h"
+#include "uavcan.protocol.GetNodeInfo.h"
 #include "uavcan.protocol.GetNodeInfo_req.h"
 #include "uavcan.protocol.GetNodeInfo_res.h"
-#include "uavcan.protocol.GetNodeInfo.h"
 #include "uavcan.protocol.GlobalTimeSync.h"
 #include "uavcan.protocol.HardwareVersion.h"
 #include "uavcan.protocol.NodeStatus.h"
@@ -19,6 +22,3 @@
 #include "uavcan.tunnel.Protocol.h"
 #include "uavcan.tunnel.SerialConfig.h"
 #include "uavcan.tunnel.Targetted.h"
-#include "uavcan.Timestamp.h"
-#include "uavcan.equipment.ahrs.SensorIMU.h"
-#include "uavcan.equipment.gnss.SensorGPS.h"
