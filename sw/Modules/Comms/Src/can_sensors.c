@@ -76,7 +76,7 @@ void can_receive_ImuData(CanardInstance *ins, CanardRxTransfer *transfer) {
   /* If the imu reception handler is defined elsewhere, then run the handler
    * function */
   if (imu_reception_f_ptr != NULL) {
-    uint8_t can_id = 10;  // fake data
+	uint8_t can_id = transfer->source_node_id;
     imu_reception_f_ptr(&rawIMU, can_id);
   }
 
@@ -159,7 +159,7 @@ void can_receive_GpsData(CanardInstance *ins, CanardRxTransfer *transfer) {
   /* If the imu reception handler is defined elsewhere, then run the handler
    * function */
   if (gps_reception_f_ptr != NULL) {
-    uint8_t can_id = 10;  // fake data
+    uint8_t can_id = transfer->source_node_id;
     gps_reception_f_ptr(&gps_data, can_id);
   }
 

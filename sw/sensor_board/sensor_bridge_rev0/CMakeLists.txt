@@ -11,6 +11,12 @@ set(PROJECT_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
 # Set project source dir to "sensor_bridge_rev0"
 set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
+# Provide default value for macros
+option(NODE_ID "Board's CAN Node ID" "20")
+
+# Pass it as a compile definition
+add_compile_definitions(NODE_ID=0x${NODE_ID})
+
 ### Includes ###
 include_directories(
   # Default STM32 HAL Libraries

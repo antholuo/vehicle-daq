@@ -14,6 +14,14 @@ set(PROJECT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 # Disabling the can reception handle for now... for the sake of binary size
 add_definitions(-DSENSOR_BOARD_CAN_RECEPTION_DISABLE)
 
+# Provide default value
+option(NODE_ID "Board's CAN Node ID" "20")
+option(BOARD_INIT_DELAY_MS "Board initialization delay in ms" "0")
+
+# Pass it as a compile definition
+add_compile_definitions(NODE_ID=0x${NODE_ID})
+add_compile_definitions(BOARD_INIT_DELAY_MS=${BOARD_INIT_DELAY_MS})
+
 ### Includes ###
 include_directories(
   # Default STM32 HAL Libraries
