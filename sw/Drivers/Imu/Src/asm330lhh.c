@@ -15,7 +15,6 @@
 
 #include "asm330lhh_reg.h"
 #include "gpio.h"
-#include "imu.h"
 #include "spi.h"
 
 ////////

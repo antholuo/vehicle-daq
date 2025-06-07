@@ -24,9 +24,11 @@
 
 #define NUM_IMUS 1
 #define NUM_GNSS 1
-//  TODO: intruduce this macro in build system instead, plus making this
-//  configurable in build
-// #define IMU_ID   10
+
+/* this delay serves for staggering the CAN bus TX timing, default 0 */
+#ifndef BOARD_INIT_DELAY_MS
+#define BOARD_INIT_DELAY_MS 0
+#endif
 
 extern UART_HandleTypeDef huart1;
 
@@ -59,6 +61,8 @@ static void poll_peripherals() {
 }
 
 void run_sensor_board() {
+  HAL_Delay(BOARD_INIT_DELAY_MS);
+
   (void)setup_peripherals();
   setup_comms();
 

@@ -9,34 +9,62 @@ TEST=false
 FLASH=false
 BUILD_TYPE="Debug"
 GENERATOR="Unix Makefiles"
+NODE_ID="20"
+BOARD_INIT_DELAY_MS="0"
 
-while getopts "c,t,h,f,r" opt; do
-    case $opt in
-        c)
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -c)
             CLEAN=true
-        ;;
-        t)
+            shift
+            ;;
+        -t)
             TEST=true
-        ;;
-        f)
+            shift
+            ;;
+        -f)
             FLASH=true
-        ;;
-        r)
+            shift
+            ;;
+        -r)
             BUILD_TYPE="Release"
-        ;;
-        h|\?)
+            shift
+            ;;
+        -id)
+            if [[ -n "$2" && "$2" =~ ^[0-9]+$ ]]; then
+                NODE_ID="$2"
+                shift 2
+            else
+                echo "Error: -id must be followed by a numeric value"
+                exit 1
+            fi
+            ;;
+        -delay)
+            if [[ -n "$2" && "$2" =~ ^[0-9]+$ ]]; then
+                BOARD_INIT_DELAY_MS="$2"
+                shift 2
+            else
+                echo "Error: -delay must be followed by a numeric value"
+                exit 1
+            fi
+            ;;
+        -h|--help|*)
             printf "%s\n" "Usage: $0 [OPTIONS]"\
                 "Script to build the sensor_board_rev0 project"\
                 "    -f                 - flashes the Safety after building"\
                 "    -c                 - removes previous build files before building"\
                 "    -h                 - outputs this message"\
                 "    -t                 - runs tests after building if build is successful"\
-                "    -r                 - Sets the build type to release"
+                "    -r                 - sets the build type to Release"\
+                "    -id <value>        - sets NODE_ID (e.g., -id 20)"\
+                "    -delay <value>     - sets BOARD_INIT_DELAY_MS (e.g., -delay 100)"
             exit 1
-        ;;
+            ;;
     esac
 done
 
+# Determine generator
 if command -v ninja >/dev/null 2>&1; then
     GENERATOR="Ninja"
 elif command -v make >/dev/null 2>&1; then
@@ -52,7 +80,6 @@ die() {
     exit $1
 }
 
-# Set up exit condition
 trap 'die $? $LINENO' ERR
 
 BUILD_DIR="build"
@@ -62,34 +89,45 @@ if [[ $CLEAN == true ]]; then
     cmake -E remove_directory $BUILD_DIR
 fi
 
-# Prebuild info display
-echo "Building ..."
-# if [[ $# > 0 ]]; then
-#     echo "with cmake parameters: $@"
-# fi
+echo "Building..."
 
-# Build commands
-cmake -E make_directory $BUILD_DIR
-cmake -E chdir $BUILD_DIR \
-  cmake \
-    -G "${GENERATOR}" \
-    -DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
-    -DCMAKE_TOOLCHAIN_FILE="sensor_board_rev0.cmake" \
-    -Wdev\
-    -Wdeprecated\
-    ../
+# Construct cmake command
+CMAKE_CMD=(
+    cmake -E chdir "$BUILD_DIR"
+    cmake
+    -G "$GENERATOR"
+    -DCMAKE_BUILD_TYPE="$BUILD_TYPE"
+    -DCMAKE_TOOLCHAIN_FILE="sensor_board_rev0.cmake"
+    -Wdev
+    -Wdeprecated
+)
 
-cmake --build $BUILD_DIR
-
-if [[ $TEST == true ]] ; then
-    cmake --build $BUILD_DIR --target test
+# Include NODE_ID if specified
+if [[ -n "$NODE_ID" ]]; then
+    echo "Using NODE_ID=$NODE_ID"
+    CMAKE_CMD+=("-DNODE_ID=$NODE_ID")
 fi
 
-if [[ $FLASH == true ]] ; then
-    cmake --build $BUILD_DIR --target install
+if [[ -n "$BOARD_INIT_DELAY_MS" ]]; then
+    echo "Using BOARD_INIT_DELAY_MS=$BOARD_INIT_DELAY_MS"
+    CMAKE_CMD+=("-DBOARD_INIT_DELAY_MS=$BOARD_INIT_DELAY_MS")
 fi
 
-# Final status display
+CMAKE_CMD+=("../")
+
+# Build steps
+cmake -E make_directory "$BUILD_DIR"
+"${CMAKE_CMD[@]}"
+cmake --build "$BUILD_DIR"
+
+if [[ $TEST == true ]]; then
+    cmake --build "$BUILD_DIR" --target test
+fi
+
+if [[ $FLASH == true ]]; then
+    cmake --build "$BUILD_DIR" --target install
+fi
+
 echo ""
 echo "Build SUCCESS!"
 exit 0

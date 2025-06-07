@@ -9,9 +9,10 @@
 
 #include "string.h"
 
-/* ATTENTION: NODE ID needs to be hard-coded differently between boards! */
-/* TODO: Configurable NODE ID through build system */
-#define NODE_ID 0x20
+/* Configurable NODE_ID through build system, default 20 */
+#ifndef NODE_ID
+#define NODE_ID 20
+#endif
 
 /* the master hal can handler*/
 extern CAN_HandleTypeDef hcan;
@@ -46,7 +47,7 @@ void setup_comms(void) {
 #endif
 
   /* Hardcodinig a node id for this can node */
-  canard.node_id = NODE_ID;
+  canardSetLocalNodeID(&canard, NODE_ID);
 
   /* set a static variable to the current tick */
   next_1hz_service_at = HAL_GetTick();
