@@ -1,0 +1,21 @@
+# this file should be placed at /etc/systemd/system
+
+# run this file in daemon by:
+# sudo systemctl daemon-reexec
+# sudo systemctl daemon-reload
+# sudo systemctl enable sensor-logger.service
+# sudo systemctl start sensor-logger.service
+# sudo systemctl status sensor-logger.service
+
+[Unit]
+Description=Sensor Logger Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/python3 /home/hardy/develop/fydp/sensor_bridge_reader.py
+Restart=always
+User=hardy
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target
