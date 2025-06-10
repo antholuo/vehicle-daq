@@ -134,6 +134,12 @@ class SensorNode:
             file.write(outline)
 
 
+def moving_average(data, window_size):
+    """Calculates the moving average of a 1D array.
+    """
+    window = np.ones(window_size) / window_size
+    return np.convolve(data, window, mode='same')
+
 def parse_datafile_to_blocks(datafile):
     blocks = []
     current_block = []
@@ -195,18 +201,43 @@ def plot_accel_xy(plotdata):
     id33_data = plotdata["33"]
     print(id33_data)
 
+    lat = []
+    lon = []
+
     x_pts = []
     y_pts_xl_x = []
     y_pts_xl_y = []
+    reference = id33_data.sensor_data[0].timestamp;
     for data in id33_data.sensor_data:
-        x_pts.append(data.timestamp)
+        x_pts.append(data.timestamp - reference)
         y_pts_xl_x.append(data.accel_x_g)
         y_pts_xl_y.append(data.accel_y_g)
+        if data.gps_update:
+            lat.append(data.latitude)
+            lon.append(data.longitude)
 
-    plt.plot(x_pts, y_pts_xl_x, label="xl_x")
-    plt.plot(x_pts, y_pts_xl_y, label="xl_y")
+    x_pts = np.array(x_pts)
+    y_pts_xl_x = np.array(y_pts_xl_x)
+    y_pts_xl_y = np.array(y_pts_xl_y)
 
+    y_x_filt = moving_average(y_pts_xl_x, 100);
+    y_y_filt = moving_average(y_pts_xl_y, 100);
+
+    # plt.plot(x_pts, y_pts_xl_x, label="xl_x")
+    # plt.plot(x_pts, y_pts_xl_y, label="xl_y")
+
+    plt.plot(y_x_filt, label="xl_x_filt")
+    plt.plot(y_y_filt, label="xl_y_filt")
+    
     plt.legend(loc='upper left')
+
+    plt.figure()
+
+    # create second plot (gps data)
+    plt.scatter(x=lon, y=lat)
+    plt.xlabel("longitude")
+    plt.ylabel("latitude")
+    plt.title("GPS Data")
     plt.show()
 
 if __name__ == "__main__":
