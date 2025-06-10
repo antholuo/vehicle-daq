@@ -19,6 +19,8 @@ class SensorData:
     accel_x_g = 0
     accel_y_g = 0
     accel_z_g = 0
+    accel_valid = False
+    gyro_valid = False
 
     def __init__(self, dump):
         self.dump = dump
@@ -167,7 +169,8 @@ def parse_data(datafile, outpath):
             sensor_data = SensorData(block[1])
             sensor_data.add_imu_data(block[3], block[4], block[5], block[6])
 
-            sensor_node.append_data(sensor_data)
+            if sensor_data.accel_valid and sensor_data.gyro_valid:
+                sensor_node.append_data(sensor_data)
         elif block[2] == "GPS Message:":
             # append GPS data to BOTH prev IMU data's
             sensor_data = SensorData(block[1])
