@@ -2,6 +2,9 @@ import os
 import re
 import shutil
 
+import matplotlib.pyplot as plt
+import numpy as np
+
 DATAFILE = "/Users/anthony/Downloads/first_car_data.txt"
 OUTPATH = "./out/"
 
@@ -151,7 +154,6 @@ def parse_datafile_to_blocks(datafile):
 
 def parse_data(datafile, outpath):
     blocks = parse_datafile_to_blocks(datafile)
-    print(blocks[0])
     sensor_nodes = {}  # create one dataset per unique IMU
 
     for block in blocks:
@@ -162,7 +164,6 @@ def parse_data(datafile, outpath):
         else:
             sensor_node = SensorNode(int(id))
             sensor_nodes[id] = sensor_node
-        print(id, sensor_node)
 
         if block[2] == "IMU Message:":
             # create new IMU data
@@ -188,7 +189,29 @@ def parse_data(datafile, outpath):
         with open(path, "x") as file:
             sensor_nodes[ids].write_to_csv(file)
 
+    return sensor_nodes
+
+def plot_accel_xy(plotdata):
+    id33_data = plotdata["33"]
+    print(id33_data)
+
+    x_pts = []
+    y_pts_xl_x = []
+    y_pts_xl_y = []
+    for data in id33_data.sensor_data:
+        x_pts.append(data.timestamp)
+        y_pts_xl_x.append(data.accel_x_g)
+        y_pts_xl_y.append(data.accel_y_g)
+
+    plt.plot(x_pts, y_pts_xl_x, label="xl_x")
+    plt.plot(x_pts, y_pts_xl_y, label="xl_y")
+
+    plt.legend(loc='upper left')
+    plt.show()
 
 if __name__ == "__main__":
+    plotdata = None
     with open(DATAFILE, "r") as datafile:
-        parse_data(datafile, OUTPATH)
+        plotdata = parse_data(datafile, OUTPATH)
+
+    plot_accel_xy(plotdata)
