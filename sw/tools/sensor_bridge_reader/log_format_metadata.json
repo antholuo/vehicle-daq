@@ -1,0 +1,35 @@
+{
+  "description": "Sensor data log format for each received sensor message (IMU or GPS). Unused fields are left blank.",
+  "fields": [
+    "node_id",
+    "sensor_type",
+    "imu_ts",
+    "gps_ts",
+    "rtc_ts",
+    "gps_update",
+    "imu_update",
+    "lat",
+    "lon",
+    "altitude_m",
+    "speed_kmph",
+    "heading",
+    "accuracy",
+    "accel_x",
+    "accel_y",
+    "accel_z",
+    "gyro_x",
+    "gyro_y",
+    "gyro_z"
+  ],
+  "notes": {
+    "imu_ts": "Timestamp from the IMU itself.",
+    "gps_ts": "Last GPS time received in hh:mm:ss format.",
+    "rtc_ts": "Raspberry Pi monotonic timestamp (RTC substitute).",
+    "gps_update": "1 only when new and valid GPS data is received.",
+    "imu_update": "1 only when new and valid IMU data is received.",
+    "lat/lon": "Set in degrees, from microdegree values.",
+    "altitude_m": "Altitude in meters (from mm).",
+    "speed_kmph": "Converted from knots if available, else -1.",
+    "heading/accuracy": "-1 if not provided by GPS."
+  }
+}
