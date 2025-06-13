@@ -14,15 +14,24 @@ MAX_MESSAGE_SIZE = 256
 UART_DEVICE = '/dev/ttyAMA4'
 UART_BAUDRATE = 230400
 LOG_ROTATE_INTERVAL = 600  # seconds
-LOG_DIR = "/home/hardy/sensor_logs"
-
-CSV_HEADER = [
-    "node_id", "sensor_type", "imu_ts", "gps_ts", "rtc_ts",
-    "gps_update", "imu_update", "lat", "lon", "altitude_m", "speed_kmph",
-    "heading", "accuracy", "accel_x", "accel_y", "accel_z", "gyro_x", "gyro_y", "gyro_z"
-]
+LOG_DIR = "/home/fydp/sensor_logs"
+METADATA_PATH = "/home/fydp/sensor_bridge_reader/log_format_metadata.json"
 
 os.makedirs(LOG_DIR, exist_ok=True)
+
+def get_log_columns():
+    with open(METADATA_PATH, "r") as f:
+        metadata = json.load(f)
+    return metadata["fields"]
+
+CSV_HEADER = get_log_columns()
+###  CSV Header  ###
+# [
+#     "node_id", "sensor_type", "imu_ts", "gps_ts", "rtc_ts",
+#     "gps_update", "imu_update", "lat", "lon", "altitude_m", "speed_kmph",
+#     "heading", "accuracy", "accel_x", "accel_y", "accel_z", "gyro_x", "gyro_y", "gyro_z"
+# ]
+
 
 def get_timestamp_string():
     try:
