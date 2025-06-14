@@ -9,13 +9,13 @@ use log::info;
 
 use embassy_sync::{blocking_mutex::raw::NoopRawMutex, signal::Signal};
 use esp_hal::{
-    gpio::lp_io::LowPowerOutput,
+    gpio::lp_io::{LowPowerInput, LowPowerOutput},
     load_lp_code,
     lp_core::{LpCore, LpCoreWakeupSource},
     main,
     rmt::Rmt,
     time::Rate,
-    uart::{AtCmdConfig, Config, RxConfig, Uart, UartRx, UartTx},
+    uart::{lp_uart::LpUart, AtCmdConfig, Config, RxConfig, Uart, UartRx, UartTx},
     Async,
 };
 use esp_hal_smartled::{buffer_size_async, SmartLedsAdapterAsync};
@@ -133,18 +133,27 @@ async fn main(spawner: Spawner) {
     //
     let lp_pin = LowPowerOutput::new(peripherals.GPIO1);
 
+    // let (lp_uart_rx_pin, lp_uart_tx_pin) = (peripherals.GPIO4, peripherals.GPIO5);
+    let lp_uart_config = Config::default()
+        .with_rx(RxConfig::default().with_fifo_full_threshold(READ_BUF_SIZE as u16));
+
+    let mut lp_uart = LpUart::new(
+        peripherals.LP_UART,
+        lp_uart_config,
+        LowPowerOutput::new(peripherals.GPIO5),
+        LowPowerInput::new(peripherals.GPIO4),
+    );
+
     let mut lp_core = LpCore::new(peripherals.LP_CORE);
     lp_core.stop();
     info!("lp_core stopped");
 
-    let lp_core_code = load_lp_code!("target/riscv32imac-unknown-none-elf/blinky");
+    let lp_core_code = load_lp_code!(
+        "../esp-hal/esp-lp-hal/target/riscv32imac-unknown-none-elf/debug/examples/blinky"
+    );
 
-    lp_core_code.run(&mut lp_core, LpCoreWakeupSource::HpCpu, lp_pin);
+    lp_core_code.run(&mut lp_core, LpCoreWakeupSource::HpCpu, lp_pin, lp_uart);
     info!("lp_core run");
-
-    let (lp_uart_rx_pin, lp_uart_tx_pin) = (peripherals.GPIO4, peripherals.GPIO5);
-    let lp_uart_config = Config::default()
-        .with_rx(RxConfig::default().with_fifo_full_threshold(READ_BUF_SIZE as u16));
 
     // let mut lp_uart = Uart::new(peripherals.LP_UART, lp_uart_config)
     //     .unwrap()
