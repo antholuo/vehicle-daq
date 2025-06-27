@@ -1,0 +1,20 @@
+[package]
+name = "esp32c6_test1_no_std_lpcore"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+cfg-if = "1.0.1"
+embedded-hal      = { version = "1.0.0" }
+esp-build = "0.3.0"
+# esp-hal = { version = "1.0.0-beta.1", features = ["esp32c6", "unstable"] }
+esp-lp-hal = {version="0.2.0", default-features=true, features=["esp32c6"]}
+panic-halt = "1.0.0"
+
+[build]
+target = "riscv32imac-unknown-elf"
+
+[target.'cfg(target_arch = "riscv32")']
+rustflags = [
+    "-C", "link-arg=-Tlink.x"
+]
