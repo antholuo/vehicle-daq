@@ -149,7 +149,8 @@ async fn main(spawner: Spawner) {
     info!("lp_core stopped");
 
     let lp_core_code = load_lp_code!(
-        "../esp-hal/esp-lp-hal/target/riscv32imac-unknown-none-elf/debug/examples/blinky"
+        // "../esp-hal/esp-lp-hal/target/riscv32imac-unknown-none-elf/debug/examples/blinky"
+        "../esp32c6_test1_no_std_lpcore/target/riscv32imac-unknown-none-elf/debug/esp32c6_test1_no_std_lpcore"
     );
 
     lp_core_code.run(&mut lp_core, LpCoreWakeupSource::HpCpu, lp_pin, lp_uart);
