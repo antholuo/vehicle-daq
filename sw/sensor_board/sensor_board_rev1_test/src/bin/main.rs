@@ -36,18 +36,22 @@ fn main() -> ! {
     let _peripherals = esp_hal::init(config);
 
     let mut user_led = Output::new(_peripherals.GPIO19, Level::High, OutputConfig::default());
-    let mut imu_spi = match Spi::new(
+
+    let imu_spi = match Spi::new(
         _peripherals.SPI2,
         Config::default()
             .with_frequency(Rate::from_khz(100))
             .with_mode(Mode::_0),
-    )
-    .with_sck(_peripherals.GPIO0)
-    .with_mosi(_peripherals.GPIO1)
-    .with_miso(_peripherals.GPIO2)
-    {
-        Ok(s) => Some(s),
-        Err(e) => None,
+    ) {
+        Ok(base) => Some(
+            base.with_sck(_peripherals.GPIO0)
+                .with_mosi(_peripherals.GPIO1)
+                .with_miso(_peripherals.GPIO2),
+        ),
+        Err(e) => {
+            esp_println::println!("SPI init failed: {:?}", e);
+            None
+        }
     };
 
     loop {
