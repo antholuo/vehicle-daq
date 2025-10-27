@@ -44,9 +44,9 @@ fn main() -> ! {
             .with_mode(Mode::_0),
     ) {
         Ok(base) => Some(
-            base.with_sck(_peripherals.GPIO0)
-                .with_mosi(_peripherals.GPIO1)
-                .with_miso(_peripherals.GPIO2),
+            base.with_sck(_peripherals.GPIO6)
+                .with_mosi(_peripherals.GPIO7)
+                .with_miso(_peripherals.GPIO0),
         ),
         Err(e) => {
             esp_println::println!("SPI init failed: {:?}", e);
