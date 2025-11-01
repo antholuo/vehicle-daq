@@ -1,5 +1,7 @@
+#![allow(dead_code)]
+
 use embedded_hal::spi::SpiBus;
-use log::info;
+use log::{debug, info, trace};
 
 const REG_WHOAMI: u8 = 0x0F;
 
@@ -21,6 +23,27 @@ const REG_OUTZ_H_A: u8 = 0x2D;
 
 const ACCEL_FSR_MASK: u8 = 0b0000_1100; // bits [3:2] in CTRL1_XL
 const ACCEL_ODR_MASK: u8 = 0b1111_0000; // bits [7:4] in CTRL1_XL
+
+#[derive(Debug, Clone, Copy)]
+pub struct XlRawData {
+    pub x: i16,
+    pub y: i16,
+    pub z: i16,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct GyRawData {
+    pub x: i16,
+    pub y: i16,
+    pub z: i16,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ImuRawData {
+    pub xl: XlRawData,
+    pub gy: GyRawData,
+    pub ts: u64,
+}
 
 #[derive(Debug)]
 pub enum AccelFs {
@@ -151,20 +174,74 @@ where
     Ok(())
 }
 
+pub fn read_xl_xyz<S>(spi: &mut S) -> Result<XlRawData, S::Error>
+where
+    S: SpiBus<u8>,
+    S::Error: core::fmt::Debug,
+{
+    debug!("Attempting to read raw XL XYZ registers");
+    const READ_CMD: u8 = 0x80 | REG_OUTX_L_A; // in place read all 6 bytes
+    let mut buf: [u8; 6] = [READ_CMD, 0, 0, 0, 0, 0];
+    spi.transfer_in_place(&mut buf)?;
+    let x = i16::from_le_bytes([buf[0], buf[1]]);
+    let y = i16::from_le_bytes([buf[2], buf[3]]);
+    let z = i16::from_le_bytes([buf[4], buf[5]]);
+
+    debug!("Got X, Y, Z raw as {} {} {}", x, y, z);
+
+    Ok(XlRawData { x: x, y: y, z: z })
+}
+
+pub fn read_xl_x<S>(spi: &mut S) -> Result<i16, S::Error>
+where
+    S: SpiBus<u8>,
+    S::Error: core::fmt::Debug,
+{
+    const READ_CMD: u8 = 0x80 | REG_OUTX_L_A;
+    let mut buf: [u8; 3] = [READ_CMD, 0x00, 0x00];
+
+    spi.transfer_in_place(&mut buf)?;
+
+    let x_lo = buf[1];
+    let x_hi = buf[2];
+
+    let x_raw = i16::from_le_bytes([x_lo, x_hi]);
+
+    Ok(x_raw)
+}
+
+pub fn read_xl_y<S>(spi: &mut S) -> Result<i16, S::Error>
+where
+    S: SpiBus<u8>,
+    S::Error: core::fmt::Debug,
+{
+    const READ_CMD: u8 = 0x80 | REG_OUTY_L_A;
+    let mut buf: [u8; 3] = [READ_CMD, 0x00, 0x00];
+
+    spi.transfer_in_place(&mut buf)?;
+
+    let y_lo = buf[1];
+    let y_hi = buf[2];
+
+    let y_raw = i16::from_le_bytes([y_lo, y_hi]);
+
+    Ok(y_raw)
+}
+
 pub fn read_xl_z<S>(spi: &mut S) -> Result<i16, S::Error>
 where
     S: SpiBus<u8>,
     S::Error: core::fmt::Debug,
 {
     const READ_CMD: u8 = 0x80 | REG_OUTZ_L_A;
-    let mut buffer: [u8; 3] = [READ_CMD, 0x00, 0x00]; // TODO: shorten to buf
+    let mut buf: [u8; 3] = [READ_CMD, 0x00, 0x00];
 
-    spi.transfer_in_place(&mut buffer)?;
+    spi.transfer_in_place(&mut buf)?;
 
-    let z_low = buffer[1];
-    let z_high = buffer[2];
+    let z_lo = buf[1];
+    let z_hi = buf[2];
 
-    let z_raw = i16::from_le_bytes([z_low, z_high]);
+    let z_raw = i16::from_le_bytes([z_lo, z_hi]);
 
     Ok(z_raw)
 }
