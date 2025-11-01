@@ -5,6 +5,9 @@
     reason = "mem::forget is generally not safe to do with esp_hal types, especially those \
     holding buffers for the duration of a data transfer."
 )]
+
+use crate::asm330::{AccelFs, AccelOdr};
+
 use esp_hal::clock::CpuClock;
 use esp_hal::gpio::{Level, Output, OutputConfig};
 use esp_hal::main;
@@ -32,6 +35,9 @@ fn main() -> ! {
 
     esp_println::logger::init_logger_from_env();
 
+    ///////////////////////////
+    // Peripheral Configuration
+
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let _peripherals = esp_hal::init(config);
 
@@ -57,6 +63,11 @@ fn main() -> ! {
 
     let mut imu_spi = imu_spi_maybe.expect("Spi must be initialized to continue!");
 
+    let fsr_a = AccelFs::G2;
+    let odr_a = AccelOdr::Hz104;
+    asm330::set_xl_fsr(&mut imu_spi, &fsr_a);
+    asm330::set_xl_odr(&mut imu_spi, &odr_a);
+
     loop {
         info!("Hello world!");
         user_led.toggle();
@@ -68,6 +79,15 @@ fn main() -> ! {
                 info!("SPI Error: {:?}", e);
             }
         }
+
+        let g_z = match asm330::read_xl_z(&mut imu_spi) {
+            Ok(raw) => {
+                let g_val = asm330::fs_a_to_g(raw, &fsr_a);
+                info!("Got G_Z as {}g's", g_val);
+                Some(g_val)
+            }
+            Err(e) => None,
+        };
 
         // let mut buffer: [u8; 2] = [0x8F, 0x00];
         // match imu_spi.transfer(&mut buffer) {
@@ -82,7 +102,7 @@ fn main() -> ! {
         // }
 
         let delay_start = Instant::now();
-        while delay_start.elapsed() < Duration::from_secs(2) {}
+        while delay_start.elapsed() < Duration::from_secs(1) {}
     }
 
     // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/esp-hal-v1.0.0-rc.1/examples/src/bin
