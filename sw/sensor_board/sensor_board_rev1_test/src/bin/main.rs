@@ -6,7 +6,7 @@
     holding buffers for the duration of a data transfer."
 )]
 
-use crate::asm330::{AccelFs, AccelOdr};
+use crate::asm330::{AccelFs, Odr};
 
 use esp_hal::clock::CpuClock;
 use esp_hal::gpio::{Level, Output, OutputConfig};
@@ -64,9 +64,9 @@ fn main() -> ! {
     let mut imu_spi = imu_spi_maybe.expect("Spi must be initialized to continue!");
 
     let fsr_a = AccelFs::G2;
-    let odr_a = AccelOdr::Hz104;
+    let odr_a = Odr::Hz104;
     let _ = asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
-    let _ = asm330::set_xl_odr(&mut imu_spi, &odr_a);
+    let _ = asm330::set_xl_odr(&mut imu_spi, odr_a);
     info!("Hello world!");
     user_led.toggle();
     match asm330::check_who_am_i(&mut imu_spi) {
