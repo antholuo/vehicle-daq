@@ -16,7 +16,7 @@ use esp_hal::spi::{
     master::{Config, Spi},
 };
 use esp_hal::time::{Duration, Instant, Rate};
-use log::info;
+use log::{info, warn};
 
 use sensor_board_rev1_test::asm330;
 
@@ -80,6 +80,18 @@ fn main() -> ! {
             }
         }
 
+        match asm330::read_xl_xyz(&mut imu_spi) {
+            Ok(xl_raw_data) => {
+                info!(
+                    "Got XL X: {}, Y: {}, Z: {}",
+                    xl_raw_data.x, xl_raw_data.y, xl_raw_data.z
+                );
+            }
+            Err(e) => {
+                warn!("Failed to read XL XYZ: {:?}", e);
+            }
+        }
+
         let g_z = match asm330::read_xl_z(&mut imu_spi) {
             Ok(raw) => {
                 let g_val = asm330::fs_a_to_g(raw, &fsr_a);
@@ -88,6 +100,11 @@ fn main() -> ! {
             }
             Err(e) => None,
         };
+        if let Some(val) = g_z {
+            info!("Unpacked g_z as {}g", val);
+        } else {
+            warn!("No g_z value available");
+        }
 
         // let mut buffer: [u8; 2] = [0x8F, 0x00];
         // match imu_spi.transfer(&mut buffer) {
