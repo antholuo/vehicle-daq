@@ -53,12 +53,12 @@ const REG_OUTY_H_A: u8 = 0x2B;
 const REG_OUTZ_L_A: u8 = 0x2C;
 const REG_OUTZ_H_A: u8 = 0x2D;
 
-const REG_FIFO_DATA_OUT_X_L = 0x79;
-const REG_FIFO_DATA_OUT_X_H = 0x7A;
-const REG_FIFO_DATA_OUT_Y_L = 0x7B;
-const REG_FIFO_DATA_OUT_Y_H = 0x7C;
-const REG_FIFO_DATA_OUT_Z_L = 0x7D;
-const REG_FIFO_DATA_OUT_Z_H = 0x7E
+// const REG_FIFO_DATA_OUT_X_L = 0x79;
+// const REG_FIFO_DATA_OUT_X_H = 0x7A;
+// const REG_FIFO_DATA_OUT_Y_L = 0x7B;
+// const REG_FIFO_DATA_OUT_Y_H = 0x7C;
+// const REG_FIFO_DATA_OUT_Z_L = 0x7D;
+// const REG_FIFO_DATA_OUT_Z_H = 0x7E
 
 // ----- Bitmasks -----
 const GYRO_FSR_MASK: u8 = 0b0000_1110; // bits [3:1] in CTRL2_G
@@ -250,42 +250,42 @@ where
     Ok(())
 }
 
-pub fn read_fifo_batch<S>(
-    spi: &mut S,
-    raw_samples: &mut [RawImuData],
-    fifo_depth: usize,
-) -> Result<usize, S::Error>
-where
-    S: SpiBus<u8>,
-    S::Error: core::fmt::Debug,
-{
-    // Limit how many we read to the buffer size
-    let max_buf_size = fifo_depth.min(raw_samples.len());
-
-    for i in 0..max_buf_size {
-        raw_samples[i] = get_from_fifo(spi)?;
-    }
-
-    Ok(max_buf_size)
-}
-
-fn get_from_fifo<S>(spi: &mut S) -> Result<RawImuData, S::Error>
-where
-    S: SpiBus<u8>,
-    S::Error: core::fmt::Debug,
-{
-    const READ_CMD: u8 = 0x80 | REG_FIFO_DATA_OUT_X_L; // start at the FIRST fifo reg
-    let mut buffer: [u8; 16] = [READ_CMD, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    spi.transfer_in_place(&mut buffer)?;
-    let ts_low = buffer[13];
-    let ts_mid = buffer[14];
-    let ts_high = buffer[15];
-    Ok(RawImuData {
-        gy.x: i16::from_le_bytes(buffer[1], buffer[2]),
-        gyro_y: i16::from_le_bytes(buffer[3], buffer[4]),
-        gyro_z: i16::from_le_bytes(buffer[5], buffer[6]),
-    })
-}
+// pub fn read_fifo_batch<S>(
+//     spi: &mut S,
+//     raw_samples: &mut [RawImuData],
+//     fifo_depth: usize,
+// ) -> Result<usize, S::Error>
+// where
+//     S: SpiBus<u8>,
+//     S::Error: core::fmt::Debug,
+// {
+//     // Limit how many we read to the buffer size
+//     let max_buf_size = fifo_depth.min(raw_samples.len());
+//
+//     for i in 0..max_buf_size {
+//         raw_samples[i] = get_from_fifo(spi)?;
+//     }
+//
+//     Ok(max_buf_size)
+// }
+//
+// fn get_from_fifo<S>(spi: &mut S) -> Result<RawImuData, S::Error>
+// where
+//     S: SpiBus<u8>,
+//     S::Error: core::fmt::Debug,
+// {
+//     const READ_CMD: u8 = 0x80 | REG_FIFO_DATA_OUT_X_L; // start at the FIRST fifo reg
+//     let mut buffer: [u8; 16] = [READ_CMD, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+//     spi.transfer_in_place(&mut buffer)?;
+//     let ts_low = buffer[13];
+//     let ts_mid = buffer[14];
+//     let ts_high = buffer[15];
+//     Ok(RawImuData {
+//         gy.x: i16::from_le_bytes(buffer[1], buffer[2]),
+//         gyro_y: i16::from_le_bytes(buffer[3], buffer[4]),
+//         gyro_z: i16::from_le_bytes(buffer[5], buffer[6]),
+//     })
+// }
 
 ////////////////////////
 /// Gyro

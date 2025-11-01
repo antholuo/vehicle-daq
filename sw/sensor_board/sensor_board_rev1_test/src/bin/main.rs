@@ -6,7 +6,8 @@
     holding buffers for the duration of a data transfer."
 )]
 
-use crate::asm330::{AccelFs, Odr};
+use crate::old_asm330::{AccelFs, Odr};
+use sensor_board_rev1_test::asm330;
 
 use esp_hal::clock::CpuClock;
 use esp_hal::gpio::{Level, Output, OutputConfig};
@@ -18,7 +19,7 @@ use esp_hal::spi::{
 use esp_hal::time::{Duration, Instant, Rate};
 use log::{debug, info, warn};
 
-use sensor_board_rev1_test::asm330;
+use sensor_board_rev1_test::old_asm330;
 
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! {
@@ -65,11 +66,11 @@ fn main() -> ! {
 
     let fsr_a = AccelFs::G2;
     let odr_a = Odr::Hz104;
-    let _ = asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
-    let _ = asm330::set_xl_odr(&mut imu_spi, odr_a);
+    let _ = old_asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
+    let _ = old_asm330::set_xl_odr(&mut imu_spi, odr_a);
     info!("Hello world!");
     user_led.toggle();
-    match asm330::check_who_am_i(&mut imu_spi) {
+    match old_asm330::check_who_am_i(&mut imu_spi) {
         Ok(val) => {
             info!("WhoAmI value is 0x{:02X}", val);
         }
@@ -79,15 +80,15 @@ fn main() -> ! {
     }
 
     loop {
-        match asm330::read_xl_xyz(&mut imu_spi) {
+        match old_asm330::read_xl_xyz(&mut imu_spi) {
             Ok(xl_raw_data) => {
                 debug!(
                     "Got XL X: {}, Y: {}, Z: {}",
                     xl_raw_data.x, xl_raw_data.y, xl_raw_data.z
                 );
-                let accel_x_g = asm330::fs_a_to_g(xl_raw_data.x, &fsr_a);
-                let accel_y_g = asm330::fs_a_to_g(xl_raw_data.y, &fsr_a);
-                let accel_z_g = asm330::fs_a_to_g(xl_raw_data.z, &fsr_a);
+                let accel_x_g = old_asm330::fs_a_to_g(xl_raw_data.x, &fsr_a);
+                let accel_y_g = old_asm330::fs_a_to_g(xl_raw_data.y, &fsr_a);
+                let accel_z_g = old_asm330::fs_a_to_g(xl_raw_data.z, &fsr_a);
 
                 info!(
                     "Accel: X={:.3}g Y={:.3}g Z={:.3}g",
