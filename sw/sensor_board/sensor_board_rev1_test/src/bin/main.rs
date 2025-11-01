@@ -67,19 +67,18 @@ fn main() -> ! {
     let odr_a = AccelOdr::Hz104;
     let _ = asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
     let _ = asm330::set_xl_odr(&mut imu_spi, &odr_a);
+    info!("Hello world!");
+    user_led.toggle();
+    match asm330::check_who_am_i(&mut imu_spi) {
+        Ok(val) => {
+            info!("WhoAmI value is 0x{:02X}", val);
+        }
+        Err(e) => {
+            info!("SPI Error: {:?}", e);
+        }
+    }
 
     loop {
-        info!("Hello world!");
-        user_led.toggle();
-        match asm330::check_who_am_i(&mut imu_spi) {
-            Ok(val) => {
-                info!("WhoAmI value is 0x{:02X}", val);
-            }
-            Err(e) => {
-                info!("SPI Error: {:?}", e);
-            }
-        }
-
         match asm330::read_xl_xyz(&mut imu_spi) {
             Ok(xl_raw_data) => {
                 debug!(
@@ -100,19 +99,19 @@ fn main() -> ! {
             }
         }
 
-        let g_z = match asm330::read_xl_z(&mut imu_spi) {
-            Ok(raw) => {
-                let g_val = asm330::fs_a_to_g(raw, &fsr_a);
-                info!("Got G_Z as {}g's", g_val);
-                Some(g_val)
-            }
-            Err(e) => None,
-        };
-        if let Some(val) = g_z {
-            info!("Unpacked g_z as {}g", val);
-        } else {
-            warn!("No g_z value available");
-        }
+        // let g_z = match asm330::read_xl_z(&mut imu_spi) {
+        //     Ok(raw) => {
+        //         let g_val = asm330::fs_a_to_g(raw, &fsr_a);
+        //         info!("Got G_Z as {}g's", g_val);
+        //         Some(g_val)
+        //     }
+        //     Err(e) => None,
+        // };
+        // if let Some(val) = g_z {
+        //     info!("Unpacked g_z as {}g", val);
+        // } else {
+        //     warn!("No g_z value available");
+        // }
 
         // let mut buffer: [u8; 2] = [0x8F, 0x00];
         // match imu_spi.transfer(&mut buffer) {
@@ -127,7 +126,7 @@ fn main() -> ! {
         // }
 
         let delay_start = Instant::now();
-        while delay_start.elapsed() < Duration::from_secs(1) {}
+        while delay_start.elapsed() < Duration::from_millis(10) {}
     }
 
     // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/esp-hal-v1.0.0-rc.1/examples/src/bin
