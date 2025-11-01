@@ -60,19 +60,26 @@ fn main() -> ! {
     loop {
         info!("Hello world!");
         user_led.toggle();
-        asm330::check_who_am_i();
-
-        let mut buffer: [u8; 2] = [0x8F, 0x00];
-        match imu_spi.transfer(&mut buffer) {
-            Ok(_) => {
-                let whoami_value = buffer[1];
-
-                info!("whoami value is {}", whoami_value);
+        match asm330::check_who_am_i(&mut imu_spi) {
+            Ok(val) => {
+                info!("WhoAmI value is 0x{:02X}", val);
             }
             Err(e) => {
                 info!("SPI Error: {:?}", e);
             }
         }
+
+        // let mut buffer: [u8; 2] = [0x8F, 0x00];
+        // match imu_spi.transfer(&mut buffer) {
+        //     Ok(_) => {
+        //         let whoami_value = buffer[1];
+        //
+        //         info!("whoami value is {}", whoami_value);
+        //     }
+        //     Err(e) => {
+        //         info!("SPI Error: {:?}", e);
+        //     }
+        // }
 
         let delay_start = Instant::now();
         while delay_start.elapsed() < Duration::from_secs(2) {}
