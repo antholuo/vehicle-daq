@@ -37,7 +37,7 @@ fn main() -> ! {
 
     let mut user_led = Output::new(_peripherals.GPIO19, Level::High, OutputConfig::default());
 
-    let imu_spi = match Spi::new(
+    let imu_spi_maybe = match Spi::new(
         _peripherals.SPI2,
         Config::default()
             .with_frequency(Rate::from_khz(100))
@@ -46,7 +46,8 @@ fn main() -> ! {
         Ok(base) => Some(
             base.with_sck(_peripherals.GPIO6)
                 .with_mosi(_peripherals.GPIO7)
-                .with_miso(_peripherals.GPIO0),
+                .with_miso(_peripherals.GPIO0)
+                .with_cs(_peripherals.GPIO1),
         ),
         Err(e) => {
             esp_println::println!("SPI init failed: {:?}", e);
@@ -54,10 +55,25 @@ fn main() -> ! {
         }
     };
 
+    let mut imu_spi = imu_spi_maybe.expect("Spi must be initialized to continue!");
+
     loop {
         info!("Hello world!");
         user_led.toggle();
         asm330::check_who_am_i();
+
+        let mut buffer: [u8; 2] = [0x8F, 0x00];
+        match imu_spi.transfer(&mut buffer) {
+            Ok(_) => {
+                let whoami_value = buffer[1];
+
+                info!("whoami value is {}", whoami_value);
+            }
+            Err(e) => {
+                info!("SPI Error: {:?}", e);
+            }
+        }
+
         let delay_start = Instant::now();
         while delay_start.elapsed() < Duration::from_secs(2) {}
     }

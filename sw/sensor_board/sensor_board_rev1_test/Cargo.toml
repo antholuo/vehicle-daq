@@ -9,7 +9,7 @@ name = "sensor_board_rev1_test"
 path = "./src/bin/main.rs"
 
 [dependencies]
-esp-hal = { version = "=1.0.0-rc.1", features = ["esp32c6", "log-04"] }
+esp-hal = { version = "1.0.0", features = ["esp32c6", "log-04", "unstable"] }
 
 
 esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"] }
