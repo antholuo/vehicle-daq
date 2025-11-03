@@ -1,6 +1,8 @@
 #![allow(dead_code)] // allow dead code
 #![cfg_attr(rustfmt, rustfmt_skip)] // skip formatting (alignment)
 
+// NOTE: SAMT == ShiftAmount
+
 pub(super) const PIN_CTRL: u8 = 0x02;
 
 pub(super) const FIFO_CTRL1: u8 = 0x07;
@@ -16,16 +18,28 @@ pub(super) const INT2_CTRL: u8 = 0x0E;
 
 pub(super) const WHO_AM_I: u8 = 0x0F;
 
+// ----- XL/GY/C ctrl regs -----
 pub(super) const CTRL1_XL: u8 = 0x10;
+pub(super) const CTRL1_XL_ODR_SAMT:     u8 = 4;
+pub(super) const CTRL1_XL_FS_SAMT:      u8 = 2;
+pub(super) const CTRL1_XL_LPF2_EN_SAMT: u8 = 1;
 pub(super) const CTRL2_G:  u8 = 0x11;
+pub(super) const CTRL2_G_ODR_SAMT:    u8 = 4;
+pub(super) const CTRL2_G_FS_SAMT:     u8 = 2;
+pub(super) const CTRL2_G_FS125_SAMT:  u8 = 1;
+pub(super) const CTRL2_G_FS4000_SAMT: u8 = 0;
 pub(super) const CTRL3_C:  u8 = 0x12;
+pub(super) const CTRL3_C_BDU_SAMT: u8 = 6;
 pub(super) const CTRL4_C:  u8 = 0x13;
 pub(super) const CTRL5_C:  u8 = 0x14;
 pub(super) const CTRL6_C:  u8 = 0x15;
+pub(super) const CTRL6_C_GY_LPF1_MASK: u8 = 0b0000_0111;
 pub(super) const CTRL7_G:  u8 = 0x16;
 pub(super) const CTRL8_XL: u8 = 0x17;
 pub(super) const CTRL9_XL: u8 = 0x18;
 pub(super) const CTRL10_C: u8 = 0x19;
+pub(super) const CTRL10_C_TIMER_EN_MASK: u8 = 0b0010_0000;
+// ----- -----
 
 pub(super) const ALL_INT_SRC: u8 = 0x1A;
 pub(super) const WAKE_UP_SRC: u8 = 0x1B;
