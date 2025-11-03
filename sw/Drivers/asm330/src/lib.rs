@@ -91,7 +91,7 @@ where
             z: gy_z,
             valid: gy_data_ready,
         },
-        ts: Some(timestamp),
+        ts: Some(timestamp), // TODO: handle case where timestamping isn't enabled
         temp: if temp_data_ready {
             Some(temp_raw)
         } else {
