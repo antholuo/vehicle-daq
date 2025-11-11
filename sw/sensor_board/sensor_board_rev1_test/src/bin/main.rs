@@ -7,7 +7,8 @@
 )]
 
 use asm330::{
-    AccelFs, GyroFs, Odr, enable_xl_gy_outputs, fs_a_to_g, poll_data, read_who_am_i, reset_asm330,
+    AccelFs, GyroFs, Odr, enable_xl_gy_outputs, fs_a_to_g, poll_data, read_who_am_i, read_xl_xyz,
+    reset_asm330, set_xl_fsr, set_xl_odr,
 };
 
 use esp_hal::clock::CpuClock;
@@ -67,48 +68,64 @@ fn main() -> ! {
 
     let mut imu_spi = imu_spi_maybe.expect("Spi must be initialized to continue!");
 
-    let ocfg = asm330::OutputConfig {
-        xl_odr: Odr::Hz417,
-        xl_fsr: AccelFs::G4,
-        xl_lpf2_en: true,
-        gy_odr: Odr::Hz417,
-        gy_fsr: GyroFs::DPS500,
-        gy_lpf1_en: true,
-        block_data_en: false,
-        timestamp_en: false,
-    };
+    // let ocfg = asm330::OutputConfig {
+    //     xl_odr: Odr::Hz12_5,
+    //     xl_fsr: AccelFs::G4,
+    //     xl_lpf2_en: false,
+    //     gy_odr: Odr::Hz12_5,
+    //     gy_fsr: GyroFs::DPS500,
+    //     gy_lpf1_en: false,
+    //     block_data_en: false,
+    //     timestamp_en: false,
+    // };
 
     read_who_am_i(&mut imu_spi);
 
-    reset_asm330(&mut imu_spi);
+    // reset_asm330(&mut imu_spi);
 
     read_who_am_i(&mut imu_spi);
 
-    enable_xl_gy_outputs(&mut imu_spi, &ocfg);
+    // enable_xl_gy_outputs(&mut imu_spi, &ocfg);
+
+    set_xl_fsr(&mut imu_spi, &AccelFs::G2);
+    set_xl_odr(&mut imu_spi, Odr::Hz12_5);
 
     loop {
-        match poll_data(&mut imu_spi) {
-            Ok(data) => {
-                let ts = data.ts.unwrap_or(0);
-
-                // Print header every N loops if you want (optional)
-                info!("--------------------------------------------------------------");
+        // match poll_data(&mut imu_spi) {
+        //     Ok(data) => {
+        //         let ts = data.ts.unwrap_or(0);
+        //
+        //         // Print header every N loops if you want (optional)
+        //         // info!("--------------------------------------------------------------");
+        //         // info!(
+        //         //     "TS: {:>10} | ACC [mg]: x={:>6}, y={:>6}, z={:>6} | GYRO [dps]: x={:>6}, y={:>6}, z={:>6}",
+        //         //     ts,
+        //         //     fs_a_to_g(data.xl.x, &ocfg.xl_fsr),
+        //         //     fs_a_to_g(data.xl.y, &ocfg.xl_fsr),
+        //         //     fs_a_to_g(data.xl.z, &ocfg.xl_fsr),
+        //         //     data.gy.x,
+        //         //     data.gy.y,
+        //         //     data.gy.z
+        //         // );
+        //     }
+        //     Err(e) => {
+        //         log::warn!("IMU read failed: {:?}", e);
+        //     }
+        // }
+        match read_xl_xyz(&mut imu_spi) {
+            Ok(dat) => {
                 info!(
-                    "TS: {:>10} | ACC [mg]: x={:>6}, y={:>6}, z={:>6} | GYRO [dps]: x={:>6}, y={:>6}, z={:>6}",
-                    ts,
-                    fs_a_to_g(data.xl.x, &ocfg.xl_fsr),
-                    fs_a_to_g(data.xl.y, &ocfg.xl_fsr),
-                    fs_a_to_g(data.xl.z, &ocfg.xl_fsr),
-                    data.gy.x,
-                    data.gy.y,
-                    data.gy.z
+                    "x={}, y={}, z={}",
+                    fs_a_to_g(dat.x, &AccelFs::G2),
+                    fs_a_to_g(dat.y, &AccelFs::G2),
+                    fs_a_to_g(dat.z, &AccelFs::G2),
                 );
             }
             Err(e) => {
-                log::warn!("IMU read failed: {:?}", e);
+                info!("eontauhsaoeh")
             }
         }
         let delay_start = Instant::now();
-        while delay_start.elapsed() < Duration::from_millis(100) {}
+        while delay_start.elapsed() < Duration::from_millis(1000) {}
     }
 }

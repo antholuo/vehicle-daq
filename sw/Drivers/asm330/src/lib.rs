@@ -41,7 +41,17 @@ where
     // let current_ctrl6_c = read_register(spi, CTRL6_C)?;
     // let new_ctrl6_c = (current_ctrl6_c & !CTRL6_C_GY_LPF1_MASK) | 0b010; // pick LPF1 setting
     // write_register(spi, CTRL6_C, new_ctrl6_c)?;
+    //
+    const TSTAMP_EN_BIT: u8 = CTRL10_C_TIMER_EN_MASK; // 0b0010_0000
+    let current = read_register(spi, CTRL10_C)?;
+    let new_val = current | TSTAMP_EN_BIT;
+    write_register(spi, CTRL10_C, new_val)?;
 
+    let xl_ctrl = read_register(spi, CTRL1_XL)?;
+    let gy_ctrl = read_register(spi, CTRL2_G)?;
+    info!("CTRL1_XL = 0x{:02X}, CTRL2_G = 0x{:02X}", xl_ctrl, gy_ctrl);
+    let verify = read_register(spi, CTRL10_C)?;
+    log::info!("CTRL10_C (timestamp cfg): 0x{:02X}", verify);
     Ok(())
 }
 
@@ -55,27 +65,32 @@ where
     let xl_data_ready: bool = (status & 0b0000_0001) != 0; // XLDA
     let gy_data_ready: bool = (status & 0b0000_0010) != 0; // GDA
     let temp_data_ready: bool = (status & 0b0000_0100) != 0; // TDA
-    debug!(
+    info!(
         "XLDA: {}, GDA: {}, TDA: {}",
         xl_data_ready, gy_data_ready, temp_data_ready
     );
 
     // Get timestamp
-    const TIMESTAMP_READ_CMD: u8 = 0x80 | TIMESTAMP0;
-    let mut ts_buf: [u8; 4] = [TIMESTAMP_READ_CMD, 0, 0, 0];
+    const TS_READ_CMD: u8 = 0x80 | TIMESTAMP0;
+    let mut ts_buf = [TS_READ_CMD, 0, 0, 0]; // send command + 3 dummy bytes
     spi.transfer_in_place(&mut ts_buf)?;
-    let timestamp = u32::from_le_bytes([ts_buf[0], ts_buf[1], ts_buf[2], ts_buf[3]]);
+
+    // Note: skip byte 0 (command byte)
+    let timestamp = ((ts_buf[3] as u32) << 16) | ((ts_buf[2] as u32) << 8) | (ts_buf[1] as u32);
 
     // Read TEMP/XL/GY in oneshot (all 14 regs)
-    const SENS_READ_CMD: u8 = 0x80 | OUT_TEMP_L;
-    let mut sens_buf: [u8; 14] = [0; 14];
+    const SENS_READ_CMD: u8 = 0x80 | 0x40 | OUT_TEMP_L;
+    let mut sens_buf: [u8; 15] = [0; 15];
     sens_buf[0] = SENS_READ_CMD;
+    // spi.write(&[SENS_READ_CMD])?;
+    // spi.read(&mut sens_buf)?;
     spi.transfer_in_place(&mut sens_buf)?;
+    info!("sens buf is {:?}", sens_buf);
 
     let temp_raw = u16::from_le_bytes([sens_buf[0], sens_buf[1]]);
     let gy_x = i16::from_le_bytes([sens_buf[2], sens_buf[3]]);
     let gy_y = i16::from_le_bytes([sens_buf[4], sens_buf[5]]);
-    let gy_z = i16::from_le_bytes([sens_buf[6], sens_buf[7]]);
+    let gy_z = i16::from_le_bytes([sens_buf[7], sens_buf[8]]);
     let xl_x = i16::from_le_bytes([sens_buf[8], sens_buf[9]]);
     let xl_y = i16::from_le_bytes([sens_buf[10], sens_buf[11]]);
     let xl_z = i16::from_le_bytes([sens_buf[12], sens_buf[13]]);
@@ -142,20 +157,63 @@ where
 
     info!("Reset complete after {} checks.", attempts);
 
-    // Step 3 (optional): Reload calibration data
-    const BOOT_BIT: u8 = 0b1000_0000;
-    write_register(spi, CTRL3_C, BOOT_BIT)?;
-    info!("Reloading trimming data from NVM...");
+    Ok(())
+}
 
-    // Step 4: Wait for boot to clear
-    loop {
-        let reg = read_register(spi, CTRL3_C)?;
-        if reg & BOOT_BIT == 0 {
-            break;
-        }
-    }
+pub fn read_xl_xyz<S>(spi: &mut S) -> Result<RawSensorData, S::Error>
+where
+    S: SpiBus<u8>,
+    S::Error: core::fmt::Debug,
+{
+    debug!("Attempting to read raw XL XYZ registers");
+    const READ_CMD: u8 = 0x80 | OUTX_L_A; // in place read all 6 bytes
+    let mut buf: [u8; 6] = [READ_CMD, 0, 0, 0, 0, 0];
+    spi.transfer_in_place(&mut buf)?;
+    let x = i16::from_le_bytes([buf[0], buf[1]]);
+    let y = i16::from_le_bytes([buf[2], buf[3]]);
+    let z = i16::from_le_bytes([buf[4], buf[5]]);
 
-    info!("Boot sequence complete.");
+    info!("Got X, Y, Z raw as {} {} {}", x, y, z);
+
+    Ok(RawSensorData {
+        x: x,
+        y: y,
+        z: z,
+        valid: true,
+    })
+}
+
+const ACCEL_FSR_MASK: u8 = 0b0000_1100; // bits [3:2] in CTRL1_XL
+const ACCEL_ODR_MASK: u8 = 0b1111_0000; // bits [7:4] in CTRL1_XL
+pub fn set_xl_fsr<S>(spi: &mut S, fsr: &AccelFs) -> Result<(), S::Error>
+where
+    S: SpiBus<u8>,
+    S::Error: core::fmt::Debug,
+{
+    let fsr_bits = match fsr {
+        AccelFs::G2 => 0b0000_0000,
+        AccelFs::G4 => 0b0000_1000,
+        AccelFs::G8 => 0b0000_1100,
+        AccelFs::G16 => 0b0000_0100,
+    };
+    let current_ctrl1_xl = read_register(spi, CTRL1_XL)?;
+    let new_val = (current_ctrl1_xl & !ACCEL_FSR_MASK) | fsr_bits;
+    write_register(spi, CTRL1_XL, new_val)?;
+
+    Ok(())
+}
+
+pub fn set_xl_odr<S>(spi: &mut S, odr: Odr) -> Result<(), S::Error>
+where
+    S: SpiBus<u8>,
+    S::Error: core::fmt::Debug,
+{
+    let odr_bits = odr as u8;
+
+    let current_ctrl1_xl = read_register(spi, CTRL1_XL)?;
+    let new_val = (current_ctrl1_xl & !ACCEL_ODR_MASK) | odr_bits;
+
+    write_register(spi, CTRL1_XL, new_val)?;
 
     Ok(())
 }
