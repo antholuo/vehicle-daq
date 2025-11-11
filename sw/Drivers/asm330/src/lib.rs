@@ -11,7 +11,7 @@ pub use types::*;
 use reg_ctrl::*;
 use registers::*;
 
-pub fn read_who_am_i<S>(spi: &mut S, cfg: &OutputConfig) -> Result<u8, S::Error>
+pub fn read_who_am_i<S>(spi: &mut S) -> Result<u8, S::Error>
 where
     S: SpiBus<u8>,
     S::Error: core::fmt::Debug,

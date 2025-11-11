@@ -7,7 +7,7 @@
 )]
 
 use crate::old_asm330::{AccelFs, Odr};
-use sensor_board_rev1_test::asm330;
+use asm330::read_who_am_i;
 
 use esp_hal::clock::CpuClock;
 use esp_hal::gpio::{Level, Output, OutputConfig};
@@ -78,6 +78,8 @@ fn main() -> ! {
             info!("SPI Error: {:?}", e);
         }
     }
+
+    read_who_am_i(&mut imu_spi);
 
     loop {
         match old_asm330::read_xl_xyz(&mut imu_spi) {
