@@ -1,5 +1,7 @@
 #![no_std]
-use embedded_hal::spi::SpiBus;
+use core::time::Duration;
+
+use embedded_hal::{delay, spi::SpiBus};
 use log::{debug, info, trace, warn};
 
 mod reg_ctrl;
@@ -36,9 +38,9 @@ where
 
     write_register(spi, CTRL2_G, make_ctrl2_g_reg(cfg.gy_odr, cfg.gy_fsr))?;
 
-    let current_ctrl6_c = read_register(spi, CTRL6_C)?;
-    let new_ctrl6_c = (current_ctrl6_c & !CTRL6_C_GY_LPF1_MASK) | 0b010; // pick LPF1 setting 
-    write_register(spi, CTRL6_C, new_ctrl6_c)?;
+    // let current_ctrl6_c = read_register(spi, CTRL6_C)?;
+    // let new_ctrl6_c = (current_ctrl6_c & !CTRL6_C_GY_LPF1_MASK) | 0b010; // pick LPF1 setting
+    // write_register(spi, CTRL6_C, new_ctrl6_c)?;
 
     Ok(())
 }
@@ -98,4 +100,62 @@ where
             None
         },
     })
+}
+
+pub fn fs_a_to_g(raw: i16, fsr: &AccelFs) -> f32 {
+    let sensitivity_mg = match fsr {
+        AccelFs::G2 => 0.061,
+        AccelFs::G4 => 0.122,
+        AccelFs::G8 => 0.244,
+        AccelFs::G16 => 0.488,
+    };
+
+    ((raw as f32) * sensitivity_mg) / 1000.0
+}
+
+pub fn reset_asm330<S>(spi: &mut S) -> Result<(), S::Error>
+where
+    S: SpiBus<u8>,
+    S::Error: core::fmt::Debug,
+{
+    use log::{debug, info, warn};
+
+    // Step 1: Issue software reset
+    const SW_RESET_BIT: u8 = 0b0000_0001;
+    write_register(spi, CTRL3_C, SW_RESET_BIT)?;
+    info!("Issued software reset to ASM330...");
+
+    // Step 2: Wait for reset to complete
+    // The SW_RESET bit self-clears when done.
+    let mut attempts = 0u8;
+    loop {
+        let reg = read_register(spi, CTRL3_C)?;
+        if reg & SW_RESET_BIT == 0 {
+            break;
+        }
+        attempts += 1;
+        if attempts > 100 {
+            warn!("ASM330 reset timed out!");
+            break;
+        }
+    }
+
+    info!("Reset complete after {} checks.", attempts);
+
+    // Step 3 (optional): Reload calibration data
+    const BOOT_BIT: u8 = 0b1000_0000;
+    write_register(spi, CTRL3_C, BOOT_BIT)?;
+    info!("Reloading trimming data from NVM...");
+
+    // Step 4: Wait for boot to clear
+    loop {
+        let reg = read_register(spi, CTRL3_C)?;
+        if reg & BOOT_BIT == 0 {
+            break;
+        }
+    }
+
+    info!("Boot sequence complete.");
+
+    Ok(())
 }
