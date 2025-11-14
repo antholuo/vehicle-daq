@@ -20,6 +20,7 @@ use esp_hal::time::{Duration, Instant, Rate};
 use log::{debug, info, warn};
 
 use sensor_board_rev1_test::old_asm330;
+use sensor_board_rev1_test::neopixel::{NeoPixel, Color};
 
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! {
@@ -43,6 +44,11 @@ fn main() -> ! {
     let _peripherals = esp_hal::init(config);
 
     let mut user_led = Output::new(_peripherals.GPIO19, Level::High, OutputConfig::default());
+
+    // Initialize RMT for NeoPixel control
+    let rmt = esp_hal::rmt::Rmt::new(_peripherals.RMT, Rate::from_mhz(80)).unwrap();
+    let mut neopixel = NeoPixel::new(rmt.channel0, _peripherals.GPIO18);
+    info!("NeoPixel initialized on GPIO18");
 
     let imu_spi_maybe = match Spi::new(
         _peripherals.SPI2,
@@ -79,6 +85,11 @@ fn main() -> ! {
         }
     }
 
+    let colors = Color::all_colors();
+    let mut color_idx: usize = 0;
+    let mut brightness: u8 = 0;
+    let mut brightness_increasing = true;
+
     loop {
         match old_asm330::read_xl_xyz(&mut imu_spi) {
             Ok(xl_raw_data) => {
@@ -97,6 +108,7 @@ fn main() -> ! {
             }
             Err(e) => {
                 warn!("Failed to read XL XYZ: {:?}", e);
+                neopixel.set_color(Color::Red);
             }
         }
 
@@ -125,6 +137,24 @@ fn main() -> ! {
         //         info!("SPI Error: {:?}", e);
         //     }
         // }
+
+        // Cycle through colors and brightness
+        // Update brightness with breathing effect
+        if brightness_increasing {
+            brightness = brightness.saturating_add(5);
+            if brightness >= 255 {
+                brightness_increasing = false;
+            }
+        } else {
+            brightness = brightness.saturating_sub(5);
+            if brightness == 0 {
+                brightness_increasing = true;
+                // Move to next color when brightness cycle completes
+                color_idx = (color_idx + 1) % colors.len();
+            }
+        }
+        
+        neopixel.set_color_with_brightness(colors[color_idx], brightness);
 
         let delay_start = Instant::now();
         while delay_start.elapsed() < Duration::from_millis(10) {}
