@@ -9,12 +9,11 @@ name = "sensor_board_rev1_test"
 path = "./src/bin/main.rs"
 
 [dependencies]
+asm330 = { path = "../../Drivers/asm330"}
+
 esp-hal = { version = "1.0.0", features = ["esp32c6", "log-04", "unstable"] }
-
-
 esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"] }
 log                    = "0.4.27"
-
 critical-section = "1.2.0"
 esp-println      = { version = "0.16.0", features = ["esp32c6", "log-04"] }
 embedded-hal = "1.0.0"

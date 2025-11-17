@@ -8,6 +8,7 @@ name = "esp32c6_test1_no_std"
 path = "./src/bin/async_main.rs"
 
 [dependencies]
+asm330 = { path = "../../Drivers/asm330"}
 embassy-net = { version = "0.6.0", features = [
   "dhcpv4",
   "medium-ethernet",

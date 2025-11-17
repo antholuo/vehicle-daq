@@ -6,6 +6,7 @@ use log::{debug, info, trace};
 // ----- Register Addresses -----
 // --- FIFO ---
 const REG_FIFO_CTRL1: u8 = 0x07;
+const CTRL1_XL_LPF2EN: u8 = 0b0000_0010;
 
 const REG_FIFO_CTRL2: u8 = 0x08;
 const WTM8_MASK: u8 = 0b0000_00001;
@@ -356,7 +357,7 @@ where
         AccelFs::G16 => 0b0000_0100,
     };
     let current_ctrl1_xl = read_register(spi, REG_CTRL1_XL)?;
-    let new_val = (current_ctrl1_xl & !ACCEL_FSR_MASK) | fsr_bits;
+    let new_val = (current_ctrl1_xl & !ACCEL_FSR_MASK) | fsr_bits | CTRL1_XL_LPF2EN;
     write_register(spi, REG_CTRL1_XL, new_val)?;
 
     Ok(())

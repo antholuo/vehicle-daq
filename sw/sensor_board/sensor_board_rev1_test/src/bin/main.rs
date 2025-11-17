@@ -6,9 +6,6 @@
     holding buffers for the duration of a data transfer."
 )]
 
-use crate::old_asm330::{AccelFs, Odr};
-use sensor_board_rev1_test::asm330;
-
 use esp_hal::clock::CpuClock;
 use esp_hal::gpio::{Level, Output, OutputConfig};
 use esp_hal::main;
@@ -19,8 +16,11 @@ use esp_hal::spi::{
 use esp_hal::time::{Duration, Instant, Rate};
 use log::{debug, info, warn};
 
+use sensor_board_rev1_test::neopixel::{Color, NeoPixel};
 use sensor_board_rev1_test::old_asm330;
-use sensor_board_rev1_test::neopixel::{NeoPixel, Color};
+
+use asm330;
+use sensor_board_rev1_test::old_asm330::{AccelFs, Odr};
 
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! {
@@ -72,8 +72,8 @@ fn main() -> ! {
 
     let fsr_a = AccelFs::G2;
     let odr_a = Odr::Hz104;
-    let _ = old_asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
-    let _ = old_asm330::set_xl_odr(&mut imu_spi, odr_a);
+    // let _ = old_asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
+    // let _ = old_asm330::set_xl_odr(&mut imu_spi, odr_a);
     info!("Hello world!");
     user_led.toggle();
     match old_asm330::check_who_am_i(&mut imu_spi) {
@@ -85,58 +85,46 @@ fn main() -> ! {
         }
     }
 
+    let lpf2_en: bool = true;
+    asm330::enable_xl(
+        &mut imu_spi,
+        asm330::Odr::Hz104,
+        asm330::AccelFs::G2,
+        lpf2_en,
+    );
+
     let colors = Color::all_colors();
     let mut color_idx: usize = 0;
     let mut brightness: u8 = 0;
     let mut brightness_increasing = true;
 
+    let mut imu_read_1hz = Instant::now();
+
     loop {
-        match old_asm330::read_xl_xyz(&mut imu_spi) {
-            Ok(xl_raw_data) => {
-                debug!(
-                    "Got XL X: {}, Y: {}, Z: {}",
-                    xl_raw_data.x, xl_raw_data.y, xl_raw_data.z
-                );
-                let accel_x_g = old_asm330::fs_a_to_g(xl_raw_data.x, &fsr_a);
-                let accel_y_g = old_asm330::fs_a_to_g(xl_raw_data.y, &fsr_a);
-                let accel_z_g = old_asm330::fs_a_to_g(xl_raw_data.z, &fsr_a);
+        if imu_read_1hz.elapsed() > Duration::from_secs(1) {
+            match old_asm330::read_xl_xyz(&mut imu_spi) {
+                Ok(xl_raw_data) => {
+                    debug!(
+                        "Got XL X: {}, Y: {}, Z: {}",
+                        xl_raw_data.x, xl_raw_data.y, xl_raw_data.z
+                    );
+                    let accel_x_g = old_asm330::fs_a_to_g(xl_raw_data.x, &fsr_a);
+                    let accel_y_g = old_asm330::fs_a_to_g(xl_raw_data.y, &fsr_a);
+                    let accel_z_g = old_asm330::fs_a_to_g(xl_raw_data.z, &fsr_a);
 
-                info!(
-                    "Accel: X={:.3}g Y={:.3}g Z={:.3}g",
-                    accel_x_g, accel_y_g, accel_z_g
-                );
+                    info!(
+                        "Old data has Accel: X={:.3}g Y={:.3}g Z={:.3}g",
+                        accel_x_g, accel_y_g, accel_z_g
+                    );
+                }
+                Err(e) => {
+                    warn!("Failed to read XL XYZ: {:?}", e);
+                    neopixel.set_color(Color::Red);
+                }
             }
-            Err(e) => {
-                warn!("Failed to read XL XYZ: {:?}", e);
-                neopixel.set_color(Color::Red);
-            }
+
+            imu_read_1hz = Instant::now();
         }
-
-        // let g_z = match asm330::read_xl_z(&mut imu_spi) {
-        //     Ok(raw) => {
-        //         let g_val = asm330::fs_a_to_g(raw, &fsr_a);
-        //         info!("Got G_Z as {}g's", g_val);
-        //         Some(g_val)
-        //     }
-        //     Err(e) => None,
-        // };
-        // if let Some(val) = g_z {
-        //     info!("Unpacked g_z as {}g", val);
-        // } else {
-        //     warn!("No g_z value available");
-        // }
-
-        // let mut buffer: [u8; 2] = [0x8F, 0x00];
-        // match imu_spi.transfer(&mut buffer) {
-        //     Ok(_) => {
-        //         let whoami_value = buffer[1];
-        //
-        //         info!("whoami value is {}", whoami_value);
-        //     }
-        //     Err(e) => {
-        //         info!("SPI Error: {:?}", e);
-        //     }
-        // }
 
         // Cycle through colors and brightness
         // Update brightness with breathing effect
@@ -153,7 +141,7 @@ fn main() -> ! {
                 color_idx = (color_idx + 1) % colors.len();
             }
         }
-        
+
         neopixel.set_color_with_brightness(colors[color_idx], brightness);
 
         let delay_start = Instant::now();
