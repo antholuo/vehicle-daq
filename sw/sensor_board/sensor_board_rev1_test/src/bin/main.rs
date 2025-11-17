@@ -6,11 +6,13 @@
     holding buffers for the duration of a data transfer."
 )]
 
-use crate::old_asm330::{AccelFs, Odr};
-use sensor_board_rev1_test::asm330;
+use asm330::{
+    AccelFs, GyroFs, Odr, enable_xl_gy_outputs, fs_a_to_g, poll_data, read_who_am_i, read_xl_xyz,
+    reset_asm330, set_xl_fsr, set_xl_odr,
+};
 
 use esp_hal::clock::CpuClock;
-use esp_hal::gpio::{Level, Output, OutputConfig};
+use esp_hal::gpio::{Level, Output};
 use esp_hal::main;
 use esp_hal::spi::{
     Mode,
@@ -18,8 +20,6 @@ use esp_hal::spi::{
 };
 use esp_hal::time::{Duration, Instant, Rate};
 use log::{debug, info, warn};
-
-use sensor_board_rev1_test::old_asm330;
 
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! {
@@ -42,7 +42,11 @@ fn main() -> ! {
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let _peripherals = esp_hal::init(config);
 
-    let mut user_led = Output::new(_peripherals.GPIO19, Level::High, OutputConfig::default());
+    let mut user_led = Output::new(
+        _peripherals.GPIO19,
+        Level::High,
+        esp_hal::gpio::OutputConfig::default(),
+    );
 
     let imu_spi_maybe = match Spi::new(
         _peripherals.SPI2,
@@ -64,71 +68,64 @@ fn main() -> ! {
 
     let mut imu_spi = imu_spi_maybe.expect("Spi must be initialized to continue!");
 
-    let fsr_a = AccelFs::G2;
-    let odr_a = Odr::Hz104;
-    let _ = old_asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
-    let _ = old_asm330::set_xl_odr(&mut imu_spi, odr_a);
-    info!("Hello world!");
-    user_led.toggle();
-    match old_asm330::check_who_am_i(&mut imu_spi) {
-        Ok(val) => {
-            info!("WhoAmI value is 0x{:02X}", val);
-        }
-        Err(e) => {
-            info!("SPI Error: {:?}", e);
-        }
-    }
+    // let ocfg = asm330::OutputConfig {
+    //     xl_odr: Odr::Hz12_5,
+    //     xl_fsr: AccelFs::G4,
+    //     xl_lpf2_en: false,
+    //     gy_odr: Odr::Hz12_5,
+    //     gy_fsr: GyroFs::DPS500,
+    //     gy_lpf1_en: false,
+    //     block_data_en: false,
+    //     timestamp_en: false,
+    // };
+
+    read_who_am_i(&mut imu_spi);
+
+    // reset_asm330(&mut imu_spi);
+
+    read_who_am_i(&mut imu_spi);
+
+    // enable_xl_gy_outputs(&mut imu_spi, &ocfg);
+
+    set_xl_fsr(&mut imu_spi, &AccelFs::G2);
+    set_xl_odr(&mut imu_spi, Odr::Hz12_5);
 
     loop {
-        match old_asm330::read_xl_xyz(&mut imu_spi) {
-            Ok(xl_raw_data) => {
-                debug!(
-                    "Got XL X: {}, Y: {}, Z: {}",
-                    xl_raw_data.x, xl_raw_data.y, xl_raw_data.z
-                );
-                let accel_x_g = old_asm330::fs_a_to_g(xl_raw_data.x, &fsr_a);
-                let accel_y_g = old_asm330::fs_a_to_g(xl_raw_data.y, &fsr_a);
-                let accel_z_g = old_asm330::fs_a_to_g(xl_raw_data.z, &fsr_a);
-
+        // match poll_data(&mut imu_spi) {
+        //     Ok(data) => {
+        //         let ts = data.ts.unwrap_or(0);
+        //
+        //         // Print header every N loops if you want (optional)
+        //         // info!("--------------------------------------------------------------");
+        //         // info!(
+        //         //     "TS: {:>10} | ACC [mg]: x={:>6}, y={:>6}, z={:>6} | GYRO [dps]: x={:>6}, y={:>6}, z={:>6}",
+        //         //     ts,
+        //         //     fs_a_to_g(data.xl.x, &ocfg.xl_fsr),
+        //         //     fs_a_to_g(data.xl.y, &ocfg.xl_fsr),
+        //         //     fs_a_to_g(data.xl.z, &ocfg.xl_fsr),
+        //         //     data.gy.x,
+        //         //     data.gy.y,
+        //         //     data.gy.z
+        //         // );
+        //     }
+        //     Err(e) => {
+        //         log::warn!("IMU read failed: {:?}", e);
+        //     }
+        // }
+        match read_xl_xyz(&mut imu_spi) {
+            Ok(dat) => {
                 info!(
-                    "Accel: X={:.3}g Y={:.3}g Z={:.3}g",
-                    accel_x_g, accel_y_g, accel_z_g
+                    "x={}, y={}, z={}",
+                    fs_a_to_g(dat.x, &AccelFs::G2),
+                    fs_a_to_g(dat.y, &AccelFs::G2),
+                    fs_a_to_g(dat.z, &AccelFs::G2),
                 );
             }
             Err(e) => {
-                warn!("Failed to read XL XYZ: {:?}", e);
+                info!("eontauhsaoeh")
             }
         }
-
-        // let g_z = match asm330::read_xl_z(&mut imu_spi) {
-        //     Ok(raw) => {
-        //         let g_val = asm330::fs_a_to_g(raw, &fsr_a);
-        //         info!("Got G_Z as {}g's", g_val);
-        //         Some(g_val)
-        //     }
-        //     Err(e) => None,
-        // };
-        // if let Some(val) = g_z {
-        //     info!("Unpacked g_z as {}g", val);
-        // } else {
-        //     warn!("No g_z value available");
-        // }
-
-        // let mut buffer: [u8; 2] = [0x8F, 0x00];
-        // match imu_spi.transfer(&mut buffer) {
-        //     Ok(_) => {
-        //         let whoami_value = buffer[1];
-        //
-        //         info!("whoami value is {}", whoami_value);
-        //     }
-        //     Err(e) => {
-        //         info!("SPI Error: {:?}", e);
-        //     }
-        // }
-
         let delay_start = Instant::now();
-        while delay_start.elapsed() < Duration::from_millis(10) {}
+        while delay_start.elapsed() < Duration::from_millis(1000) {}
     }
-
-    // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/esp-hal-v1.0.0-rc.1/examples/src/bin
 }
