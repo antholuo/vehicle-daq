@@ -72,6 +72,10 @@ fn main() -> ! {
 
     let fsr_a = AccelFs::G2;
     let odr_a = Odr::Hz104;
+    
+    // Enable Block Data Update (prevents tearing during multi-byte reads)
+    let _ = old_asm330::enable_block_data_update(&mut imu_spi);
+    
     let _ = old_asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
     let _ = old_asm330::set_xl_odr(&mut imu_spi, odr_a);
     info!("Hello world!");

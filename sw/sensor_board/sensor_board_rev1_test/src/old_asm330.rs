@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use embedded_hal::spi::SpiBus;
-use log::{debug, info, trace};
+use log::{debug, info};
 
 // ----- Register Addresses -----
 // --- FIFO ---
@@ -67,6 +67,7 @@ const ACCEL_FSR_MASK: u8 = 0b0000_1100; // bits [3:2] in CTRL1_XL
 const ACCEL_ODR_MASK: u8 = 0b1111_0000; // bits [7:4] in CTRL1_XL
 
 const TIMER_EN_MASK: u8 = 0b0010_000; // Bit 5 in CTRL10_C
+const BDU_MASK: u8 = 0b0100_0000; // Bit 6 in CTRL3_C - Block Data Update
 // TODO: Fix the way that our program communicates with the IMU lmao
 
 const H_LACTIVE_MASK: u8 = 0b0010_0000; // Polarity: 0 = active high, 1 = active low
@@ -219,6 +220,16 @@ where
     let current_ctrl10_c = read_register(spi, REG_CTRL10_C)?;
     let new_ctrl10_c = current_ctrl10_c | TIMER_EN_MASK;
     write_register(spi, REG_CTRL10_C, new_ctrl10_c)
+}
+
+pub fn enable_block_data_update<S>(spi: &mut S) -> Result<(), S::Error>
+where
+    S: SpiBus<u8>,
+    S::Error: core::fmt::Debug,
+{
+    let current_ctrl3_c = read_register(spi, REG_CTRL3_C)?;
+    let new_ctrl3_c = current_ctrl3_c | BDU_MASK;
+    write_register(spi, REG_CTRL3_C, new_ctrl3_c)
 }
 
 ////////////////////////
@@ -384,11 +395,12 @@ where
 {
     debug!("Attempting to read raw XL XYZ registers");
     const READ_CMD: u8 = 0x80 | REG_OUTX_L_A; // in place read all 6 bytes
-    let mut buf: [u8; 6] = [READ_CMD, 0, 0, 0, 0, 0];
+    let mut buf: [u8; 7] = [READ_CMD, 0, 0, 0, 0, 0, 0]; // 1 cmd + 6 data bytes
     spi.transfer_in_place(&mut buf)?;
-    let x = i16::from_le_bytes([buf[0], buf[1]]);
-    let y = i16::from_le_bytes([buf[2], buf[3]]);
-    let z = i16::from_le_bytes([buf[4], buf[5]]);
+    // buf[0] contains the cmd echo, actual data starts at buf[1]
+    let x = i16::from_le_bytes([buf[1], buf[2]]);
+    let y = i16::from_le_bytes([buf[3], buf[4]]);
+    let z = i16::from_le_bytes([buf[5], buf[6]]);
 
     debug!("Got X, Y, Z raw as {} {} {}", x, y, z);
 
