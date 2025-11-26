@@ -45,9 +45,13 @@ pub struct DevkitC {
     pub user_led: Option<esp_hal::gpio::Output<'static>>,
     pub neopixel: Option<neopixel::NeoPixel<'static>>,
     pub disp_spi: Option<SharedSpiDevice>,
-
     pub imu_spi: Option<SharedSpiDevice>,
     pub gps2_uart: Option<esp_hal::uart::Uart<'static, esp_hal::Async>>,
+    // ESP-NOW / AirComm
+    pub esp_now: Option<esp_radio::esp_now::EspNow<'static>>,
+    #[allow(dead_code)]
+    pub wifi_controller: Option<esp_radio::wifi::WifiController<'static>>,
+    pub wifi_peripheral: Option<esp_hal::peripherals::WIFI<'static>>,
 }
 
 impl DevkitC {
@@ -99,12 +103,49 @@ impl DevkitC {
         );
         let imu_spi_device = SpiDevice::new(spi_bus, imu_spi2_cs);
         let disp_spi_device = SpiDevice::new(spi_bus, disp_spi2_cs);
+
+        // DO NOT initialize ESP-NOW here! It will deadlock.
+        // WiFi initialization will be done later in async context (main)
+
         Self {
             user_led: Some(user_led),
             neopixel: Some(neopixel),
             disp_spi: Some(disp_spi_device),
             imu_spi: Some(imu_spi_device),
             gps2_uart: Some(gps2_uart),
+            esp_now: None,
+            wifi_controller: None,
+            wifi_peripheral: Some(peripherals.WIFI),
+        }
+    }
+
+    /// Initialize ESP-NOW in an async context (must be called after RTOS tasks are running)
+    pub async fn init_esp_now(&mut self) {
+        if let Some(wifi_peripheral) = self.wifi_peripheral.take() {
+            info!("Initializing ESP-NOW in async context...");
+
+            // Small delay to ensure RTOS tasks are running
+            embassy_time::Timer::after_millis(200).await;
+
+            match esp_radio::wifi::new(wifi_peripheral, esp_radio::wifi::Config::default()) {
+                Ok((mut wifi_controller, interfaces)) => {
+                    info!("ESP-NOW initialized successfully");
+                    if let Err(e) = wifi_controller.set_mode(esp_radio::wifi::WifiMode::Station) {
+                        warn!("Failed to set WiFi mode: {:?}", e);
+                        return;
+                    }
+                    if let Err(e) = wifi_controller.start() {
+                        warn!("Failed to start WiFi controller: {:?}", e);
+                        return;
+                    }
+
+                    self.wifi_controller = Some(wifi_controller);
+                    self.esp_now = Some(interfaces.esp_now);
+                }
+                Err(e) => {
+                    warn!("WiFi initialization failed: {:?}", e);
+                }
+            }
         }
     }
 }
@@ -136,6 +177,11 @@ impl BoardPeripherals for DevkitC {
         trace!("gps2_uart take called");
         self.gps2_uart.take().expect("gps2_uart already taken")
     }
+
+    fn take_esp_now(&mut self) -> Option<esp_radio::esp_now::EspNow<'static>> {
+        trace!("esp_now take called");
+        self.esp_now.take()
+    }
 }
 
 #[esp_rtos::main]
@@ -147,7 +193,12 @@ async fn main(spawner: embassy_executor::Spawner) {
     let config = esp_hal::Config::default().with_cpu_clock(esp_hal::clock::CpuClock::max());
     let peripherals = esp_hal::init(config);
 
-    app_run(spawner, DevkitC::from_peripherals(peripherals)).await;
+    let mut board = DevkitC::from_peripherals(peripherals);
+
+    // Initialize ESP-NOW in async context (after RTOS scheduler is running)
+    board.init_esp_now().await;
+
+    app_run(spawner, board).await;
     loop {
         embassy_time::Timer::after_secs(1).await
     }

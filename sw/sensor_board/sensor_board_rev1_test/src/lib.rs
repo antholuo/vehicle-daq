@@ -9,6 +9,7 @@ use esp_hal::gpio::Output;
 use esp_hal::spi::master::Spi;
 use esp_hal::uart::Uart;
 
+pub mod aircomm;
 pub mod app;
 pub mod asm330;
 pub mod gps;
@@ -30,4 +31,7 @@ pub trait BoardPeripherals {
     // SENSORS
     fn take_imu_spi_device(&mut self) -> SharedSpiDevice;
     fn take_gps2_uart(&mut self) -> Uart<'static, Async>;
+
+    // WIRELESS
+    fn take_esp_now(&mut self) -> Option<esp_radio::esp_now::EspNow<'static>>;
 }

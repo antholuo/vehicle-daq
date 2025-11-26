@@ -1,10 +1,13 @@
-use esp_hal::gpio::Output;
 /// app.rs
 /// responsible for starting the "app" and setting any necessary configs
+
+use embassy_time::{Duration, Instant};
+use esp_hal::gpio::Output;
 
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
+use crate::aircomm::{AirCommTransceiver, HeartbeatData, SensorMessage, SensorPayload, BROADCAST};
 use crate::gps::{init_gps, start_gps};
 use crate::hmi::{neopixel, start_hmi};
 use crate::imu::start_imu;
@@ -37,6 +40,23 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
         .spawn(start_gps_task(gps2_uart))
         .expect("GPS task did not spawn");
 
+    // ESP-NOW / AirComm task
+    if let Some(esp_now) = board.take_esp_now() {
+        match AirCommTransceiver::new(esp_now) {
+            Ok(transceiver) => {
+                info!("AirComm transceiver initialized");
+                spawner
+                    .spawn(espnow_task(transceiver))
+                    .expect("ESP-NOW task did not spawn");
+            }
+            Err(e) => {
+                warn!("Failed to create AirComm transceiver: {:?}", e);
+            }
+        }
+    } else {
+        warn!("ESP-NOW not available - skipping wireless communication");
+    }
+
     loop {
         embassy_time::Timer::after_secs(1).await
     }
@@ -52,7 +72,7 @@ async fn start_hmi_task(user_led: Output<'static>, neopixel: neopixel::NeoPixel<
 }
 
 #[embassy_executor::task]
-async fn start_imu_task(mut imu_spi_device: SharedSpiDevice) {
+async fn start_imu_task(imu_spi_device: SharedSpiDevice) {
     info!("IMU TASK BEING SPAWNED");
     start_imu(imu_spi_device).await;
 }
@@ -61,4 +81,93 @@ async fn start_imu_task(mut imu_spi_device: SharedSpiDevice) {
 async fn start_gps_task(mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Async>) {
     gps2_uart = init_gps(gps2_uart).await;
     start_gps(gps2_uart).await;
+}
+
+/// ESP-NOW transceiver task
+///
+/// Handles both sending heartbeats at regular intervals and receiving messages.
+/// Uses timeout-based receive to avoid blocking heartbeat transmission.
+#[embassy_executor::task]
+async fn espnow_task(mut transceiver: AirCommTransceiver<'static>) {
+    info!("[ESP-NOW] Task started");
+
+    const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(1);
+
+    // Send first heartbeat immediately
+    send_heartbeat(&mut transceiver).await;
+    let mut last_heartbeat = Instant::now();
+
+    loop {
+        // Calculate how long until next heartbeat is due
+        let elapsed = last_heartbeat.elapsed();
+        let timeout = if elapsed >= HEARTBEAT_INTERVAL {
+            Duration::from_millis(0)
+        } else {
+            HEARTBEAT_INTERVAL - elapsed
+        };
+
+        // Try to receive with timeout (doesn't cancel the receive, just times out)
+        match embassy_time::with_timeout(timeout, transceiver.receive()).await {
+            Ok(Ok(msg)) => {
+                // Successfully received a message
+                handle_received_message(&msg);
+            }
+            Ok(Err(e)) => {
+                // Receive error
+                warn!("[ESP-NOW RX] Error: {:?}", e);
+            }
+            Err(_) => {
+                // Timeout - no message received, that's fine
+            }
+        }
+
+        // Check if it's time to send heartbeat
+        if last_heartbeat.elapsed() >= HEARTBEAT_INTERVAL {
+            send_heartbeat(&mut transceiver).await;
+            last_heartbeat = Instant::now();
+        }
+    }
+}
+
+async fn send_heartbeat(transceiver: &mut AirCommTransceiver<'static>) {
+    let timestamp_us = Instant::now().as_micros();
+    let heartbeat = HeartbeatData::default();
+
+    match transceiver.send_heartbeat(timestamp_us, &heartbeat, &BROADCAST).await {
+        Ok(()) => {
+            info!("[ESP-NOW TX] Heartbeat sent (time={}us)", timestamp_us);
+        }
+        Err(e) => {
+            warn!("[ESP-NOW TX] Send failed: {:?}", e);
+        }
+    }
+}
+
+fn handle_received_message(msg: &SensorMessage) {
+    let src = msg.src_address;
+    let timestamp = msg.timestamp_us;
+    
+    match &msg.payload {
+        SensorPayload::Heartbeat(data) => {
+            info!(
+                "[ESP-NOW RX] Heartbeat from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | magic=0x{:02X}, time={}us",
+                src[0], src[1], src[2], src[3], src[4], src[5],
+                data.magic, timestamp
+            );
+        }
+        SensorPayload::Imu(_data) => {
+            info!(
+                "[ESP-NOW RX] IMU from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | time={}us, TODO: IMU fields",
+                src[0], src[1], src[2], src[3], src[4], src[5],
+                timestamp
+            );
+        }
+        SensorPayload::Gps(data) => {
+            info!(
+                "[ESP-NOW RX] GPS from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | time={}us, lat={:.6}, lon={:.6}",
+                src[0], src[1], src[2], src[3], src[4], src[5],
+                timestamp, data.lat, data.lon
+            );
+        }
+    }
 }

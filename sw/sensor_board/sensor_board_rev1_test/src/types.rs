@@ -1,6 +1,14 @@
 /// types.rs
 /// Defines all of the common datatypes (IMU/GPS/FUSE/etc)
 
+/// IMU sensor data structure
+#[derive(Debug, Clone, Copy)]
+pub struct ImuData {
+    // TODO: IMU data fields
+}
+
+/// GPS timestamp
+#[derive(Debug, Clone, Copy)]
 pub struct GpsTime {
     pub year: u16,
     pub month: u8,
@@ -11,6 +19,8 @@ pub struct GpsTime {
     pub millis: u16,
 }
 
+/// GPS sensor data structure
+#[derive(Debug, Clone, Copy)]
 pub struct GpsData {
     pub lat: f64,
     pub lon: f64,
