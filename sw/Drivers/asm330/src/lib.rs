@@ -1,10 +1,10 @@
 #![no_std]
 
 mod registers;
+mod sens_ctrl;
 mod types;
-mod xl_ctrl;
 
+pub use sens_ctrl::*;
 pub use types::*;
-pub use xl_ctrl::*;
 
 use registers::*;

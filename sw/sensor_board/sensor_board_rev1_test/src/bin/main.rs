@@ -10,8 +10,8 @@ use esp_hal::clock::CpuClock;
 use esp_hal::gpio::{Level, Output, OutputConfig};
 use esp_hal::main;
 use esp_hal::spi::{
-    Mode,
     master::{Config, Spi},
+    Mode,
 };
 use esp_hal::time::{Duration, Instant, Rate};
 use log::{debug, info, warn};
@@ -131,7 +131,7 @@ fn main() -> ! {
         // Update brightness with breathing effect
         if brightness_increasing {
             brightness = brightness.saturating_add(5);
-            if brightness >= 255 {
+            if brightness >= 100 {
                 brightness_increasing = false;
             }
         } else {
@@ -143,10 +143,11 @@ fn main() -> ! {
             }
         }
 
-        neopixel.set_color_with_brightness(colors[color_idx], brightness);
+        // neopixel.set_color_with_brightness(colors[color_idx], brightness);
+        neopixel.set_color_with_brightness(colors[color_idx], 10);
 
         let delay_start = Instant::now();
-        while delay_start.elapsed() < Duration::from_millis(10) {}
+        while delay_start.elapsed() < Duration::from_millis(100) {}
     }
 
     // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/esp-hal-v1.0.0-rc.1/examples/src/bin
