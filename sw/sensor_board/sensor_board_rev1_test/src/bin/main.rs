@@ -71,7 +71,7 @@ fn main() -> ! {
     let mut imu_spi = imu_spi_maybe.expect("Spi must be initialized to continue!");
 
     let fsr_a = AccelFs::G2;
-    let odr_a = Odr::Hz104;
+    // let odr_a = Odr::Hz104;
     // let _ = old_asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
     // let _ = old_asm330::set_xl_odr(&mut imu_spi, odr_a);
     info!("Hello world!");
@@ -86,7 +86,8 @@ fn main() -> ! {
     }
 
     let lpf2_en: bool = true;
-    asm330::enable_xl(
+    let _ = asm330::enable_xl(
+        // TODO: Fix this...
         &mut imu_spi,
         asm330::Odr::Hz104,
         asm330::AccelFs::G2,
