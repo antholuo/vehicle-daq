@@ -3,6 +3,7 @@ edition      = "2024"
 name         = "sensor_board_rev1_test"
 rust-version = "1.88"
 version      = "0.1.0"
+default-run  = "sensor_board_rev1_test"
 
 [[bin]]
 name = "sensor_board_rev1_test"
@@ -20,6 +21,8 @@ esp-println      = { version = "0.16.0", features = ["esp32c6", "log-04"] }
 embedded-hal = "1.0.0"
 esp-hal-smartled2 = "0.28.1"
 smart-leds = "0.4"
+esp-rtos = { version = "0.2.0", features = ["embassy", "esp32c6"] }
+embassy-executor = "0.9.1"
 
 
 [profile.dev]
