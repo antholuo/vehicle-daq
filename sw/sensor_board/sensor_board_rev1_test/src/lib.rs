@@ -6,6 +6,7 @@ use esp_hal::gpio::Output;
 
 pub mod app;
 pub mod asm330;
+pub mod hmi;
 pub mod neopixel;
 pub mod old_asm330;
 
