@@ -1,4 +1,5 @@
-use log::{info, trace};
+#[allow(unused_imports)]
+use log::{debug, error, info, trace, warn};
 
 use crate::BoardPeripherals;
 use crate::hmi::start_hmi;
