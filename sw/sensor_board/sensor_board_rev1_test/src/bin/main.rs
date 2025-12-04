@@ -19,8 +19,8 @@ use esp_hal::spi::{
 use esp_hal::time::{Duration, Instant, Rate};
 use log::{debug, info, warn};
 
+use sensor_board_rev1_test::hmi::neopixel::{Color, NeoPixel};
 use sensor_board_rev1_test::old_asm330;
-use sensor_board_rev1_test::neopixel::{NeoPixel, Color};
 
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! {
@@ -153,7 +153,7 @@ fn main() -> ! {
                 color_idx = (color_idx + 1) % colors.len();
             }
         }
-        
+
         neopixel.set_color_with_brightness(colors[color_idx], brightness);
 
         let delay_start = Instant::now();
