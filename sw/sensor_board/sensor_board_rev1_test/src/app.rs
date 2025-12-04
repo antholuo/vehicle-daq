@@ -1,9 +1,12 @@
+/// app.rs
+/// responsible for starting the "app" and setting any necessary configs
+
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
 use crate::BoardPeripherals;
+use crate::hmi::neopixel;
 use crate::hmi::start_hmi;
-use crate::neopixel;
 
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
     info!("app is starting execution now");

@@ -10,7 +10,7 @@ use embassy_executor::Spawner;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
-use sensor_board_rev1_test::{BoardPeripherals, app::app_run, neopixel};
+use sensor_board_rev1_test::{BoardPeripherals, app::app_run, hmi::neopixel};
 
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! {
