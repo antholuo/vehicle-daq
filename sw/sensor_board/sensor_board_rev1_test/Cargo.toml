@@ -24,8 +24,8 @@ smart-leds = "0.4"
 esp-rtos = { version = "0.2.0", features = ["embassy", "esp32c6"] }
 embassy-executor = "0.9.1"
 embassy-time = "0.5.0"
-# nmea-parser = {version = "0.11.0", default-features = false}
-
+nmea-parser = {path="../../Drivers/nmea-parser/", default-features=false, features = []}
+esp-alloc = "0.8.0"
 
 [profile.dev]
 # Rust debug is too slow.
@@ -40,3 +40,6 @@ incremental      = false
 lto              = 'fat'
 opt-level        = 's'
 overflow-checks  = false
+
+[patch.crates-io]
+# nmea-parser = { git="https://github.com/mrdxxm/nmea-parser.git", branch="no_std"}
