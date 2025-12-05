@@ -1,3 +1,6 @@
 [submodule "ee/sensor_board/vehicle_daq_pcb_rev1"]
 	path = ee/sensor_board/vehicle_daq_pcb_rev1
 	url = https://github.com/HardyYu/vehicle_daq_pcb_rev1
+[submodule "sw/Drivers/nmea-parser"]
+	path = sw/Drivers/nmea-parser
+	url = https://github.com/antholuo/nmea-parser.git
