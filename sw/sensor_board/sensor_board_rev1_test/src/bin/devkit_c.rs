@@ -20,7 +20,7 @@ fn panic(_: &core::panic::PanicInfo) -> ! {
 }
 
 fn init_heap() {
-    const HEAP_SIZE: usize = 32 * 1024;
+    const HEAP_SIZE: usize = 128 * 1024;
     static mut HEAP: [u8; HEAP_SIZE] = [0; HEAP_SIZE];
 
     unsafe {
