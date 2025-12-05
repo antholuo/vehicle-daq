@@ -9,6 +9,7 @@ pub mod asm330;
 pub mod gps;
 pub mod hmi;
 pub mod old_asm330;
+pub mod types;
 
 pub trait BoardPeripherals {
     fn take_user_led(&mut self) -> Output<'static>;
