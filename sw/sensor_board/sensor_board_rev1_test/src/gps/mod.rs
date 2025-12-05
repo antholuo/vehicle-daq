@@ -40,9 +40,6 @@ pub async fn start_gps(mut gps2_uart: Uart<'static, Async>) {
                     Ok(parsed_data) => {
                         match parsed_data {
                             nmea_parser::ParsedMessage::Gga(gga) => {
-                                if let Some(time) = gga.timestamp {
-                                    info!("GPS time is: {}", time);
-                                }
                                 info!(
                                     "GPGGA FIX: Lat={}, Lon={}, HDOP={}, SATS={}",
                                     gga.latitude.unwrap_or(0.0),
@@ -52,7 +49,9 @@ pub async fn start_gps(mut gps2_uart: Uart<'static, Async>) {
                                 );
                             }
                             nmea_parser::ParsedMessage::Rmc(rmc) => {
-                                debug!("GPRMC Status: {:?}", rmc);
+                                if let Some(time) = rmc.timestamp {
+                                    info!("GPS rmc time is: {}", time);
+                                }
                             }
                             nmea_parser::ParsedMessage::Vtg(vtg) => {
                                 // Velocity over ground in knots (N) and kilometers per hour (K)
