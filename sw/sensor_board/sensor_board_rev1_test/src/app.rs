@@ -5,6 +5,7 @@
 use log::{debug, error, info, trace, warn};
 
 use crate::BoardPeripherals;
+use crate::gps::start_gps;
 use crate::hmi::neopixel;
 use crate::hmi::start_hmi;
 
@@ -15,8 +16,11 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     trace!("User Led initialized!");
     let mut neopixel = board.take_neopixel();
     trace!("NeoPixel initialized!");
+    let mut gps2_uart = board.take_gps2_uart();
+    trace!("Gps2_Uart initialized!");
 
     spawner.spawn(start_hmi_task(neopixel)).unwrap();
+    spawner.spawn(start_gps_task(gps2_uart)).unwrap();
 
     loop {
         embassy_time::Timer::after_secs(1).await
@@ -29,4 +33,9 @@ async fn start_hmi_task(mut neopixel: neopixel::NeoPixel<'static>) {
     let neopixel_brightness: u8 = 15;
 
     start_hmi(neopixel, neopixel_brightness).await;
+}
+
+#[embassy_executor::task]
+async fn start_gps_task(mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Async>) {
+    start_gps(gps2_uart).await;
 }

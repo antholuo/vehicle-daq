@@ -20,6 +20,7 @@ fn panic(_: &core::panic::PanicInfo) -> ! {
 pub struct DevkitC {
     pub user_led: Option<esp_hal::gpio::Output<'static>>,
     pub neopixel: Option<neopixel::NeoPixel<'static>>,
+    pub gps2_uart: Option<esp_hal::uart::Uart<'static, esp_hal::Async>>,
 }
 
 impl DevkitC {
@@ -42,10 +43,19 @@ impl DevkitC {
             esp_hal::rmt::Rmt::new(peripherals.RMT, esp_hal::time::Rate::from_mhz(80)).unwrap();
         let neopixel = neopixel::NeoPixel::new(rmt.channel0, peripherals.GPIO8);
 
+        let gps2_uart_config = esp_hal::uart::Config::default().with_baudrate(9600);
+        info!("baudrate for gps2_uart_set");
+        let gps2_uart = esp_hal::uart::Uart::new(peripherals.UART1, gps2_uart_config)
+            .unwrap()
+            .with_rx(peripherals.GPIO23)
+            .with_tx(peripherals.GPIO22)
+            .into_async();
+
         debug!(">>> devkitC returned things correctly");
         Self {
             user_led: Some(user_led),
             neopixel: Some(neopixel),
+            gps2_uart: Some(gps2_uart),
         }
     }
 }
@@ -59,6 +69,11 @@ impl BoardPeripherals for DevkitC {
     fn take_neopixel(&mut self) -> neopixel::NeoPixel<'static> {
         trace!("neopixel take called");
         self.neopixel.take().expect("NeoPixel already taken")
+    }
+
+    fn take_gps2_uart(&mut self) -> esp_hal::uart::Uart<'static, esp_hal::Async> {
+        trace!("gps2_uart take called");
+        self.gps2_uart.take().expect("gps2_uart already taken")
     }
 }
 
