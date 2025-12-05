@@ -12,9 +12,25 @@ use log::{debug, error, info, trace, warn};
 
 use sensor_board_rev1_test::{BoardPeripherals, app::app_run, hmi::neopixel};
 
+use esp_alloc as _;
+
 #[panic_handler]
 fn panic(_: &core::panic::PanicInfo) -> ! {
     loop {}
+}
+
+fn init_heap() {
+    const HEAP_SIZE: usize = 32 * 1024;
+    static mut HEAP: [u8; HEAP_SIZE] = [0; HEAP_SIZE];
+
+    unsafe {
+        esp_alloc::HEAP.add_region(esp_alloc::HeapRegion::new(
+            // HEAP.as_ptr() as *mut u8,
+            &HEAP[0] as *const u8 as *mut u8,
+            HEAP_SIZE,
+            esp_alloc::MemoryCapability::Internal.into(),
+        ));
+    }
 }
 
 pub struct DevkitC {
@@ -80,6 +96,9 @@ impl BoardPeripherals for DevkitC {
 #[esp_rtos::main]
 async fn main(spawner: embassy_executor::Spawner) {
     esp_println::logger::init_logger_from_env();
+
+    init_heap();
+
     let config = esp_hal::Config::default().with_cpu_clock(esp_hal::clock::CpuClock::max());
     let peripherals = esp_hal::init(config);
 
