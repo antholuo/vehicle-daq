@@ -199,6 +199,15 @@ where
 ////////////////////////
 /// Configuration
 ////////////////////////
+pub fn boot<S>(spi: &mut S) -> Result<bool, S:Error>
+where
+    S: SpiBus<u8>,
+    S::Error: core::fmt::Debug,
+{
+    info!("Booting IMU");
+    OK(true)
+}
+
 pub fn configure_interrupt_pin<S>(spi: &mut S) -> Result<(), S::Error>
 where
     S: SpiBus<u8>,
