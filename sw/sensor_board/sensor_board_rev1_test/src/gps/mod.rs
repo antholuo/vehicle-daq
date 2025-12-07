@@ -47,6 +47,10 @@ async fn send_nmea_command(uart: &mut Uart<'static, Async>, payload: &str, name:
 pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uart<'static, Async> {
     info!("Starting GPS configuration using $PUBX,40 commands...");
 
+    // TODO: Configure GPS for 10hz updates & 115200 baud
+    // ONLY DO THIS WHEN THE NEW GPS COMES IN, since we will have to set baud rate at configuration
+    // time, meaning we must set the baud for all the gps's, then change the code, then use the GPS
+
     // The payloads (excluding the leading '$' and trailing '*cs')
     const GSA_PAYLOAD: &str = "PUBX,40,GSA,0,0,0,0,0,0";
     const GSV_PAYLOAD: &str = "PUBX,40,GSV,0,0,0,0,0,0";
