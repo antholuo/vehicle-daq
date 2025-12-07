@@ -26,6 +26,7 @@ embassy-executor = "0.9.1"
 embassy-time = "0.5.0"
 nmea-parser = {path="../../Drivers/nmea-parser/", default-features=false, features = []}
 esp-alloc = "0.8.0"
+heapless = "0.9.2"
 
 [profile.dev]
 # Rust debug is too slow.
