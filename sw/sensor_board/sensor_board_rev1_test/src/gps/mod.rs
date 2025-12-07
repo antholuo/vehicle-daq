@@ -5,9 +5,6 @@ use heapless::String;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
-extern crate alloc;
-// use alloc::string::String; // Need this import if using heap/alloc crate
-
 const NMEA_0183_MAX_LENGTH: usize = 83;
 const MAX_SENTENCE_LENGTH: usize = NMEA_0183_MAX_LENGTH + 2; // give ourselves buffer for newlines
 const NUM_NMEA_SENTENCES: usize = 3; // RMC, VTG, GGA
