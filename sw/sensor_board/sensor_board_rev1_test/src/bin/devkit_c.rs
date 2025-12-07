@@ -6,7 +6,6 @@
     holding buffers for the duration of a data transfer."
 )]
 
-use embassy_executor::Spawner;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 

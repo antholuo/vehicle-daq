@@ -1,7 +1,6 @@
 #![no_std]
 
 use crate::hmi::neopixel::NeoPixel;
-use core::future::Future;
 use esp_hal::Async;
 use esp_hal::gpio::Output;
 use esp_hal::uart::Uart;
