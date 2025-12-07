@@ -78,10 +78,12 @@ pub async fn start_gps(mut gps2_uart: Uart<'static, Async>) {
         };
         let chunk = core::str::from_utf8(&buf[..n]).unwrap_or("");
 
-        incomplete_line_buffer.push_str(chunk);
+        if incomplete_line_buffer.push_str(chunk).is_err() {
+            warn!("Did not succesfully push chunk to incomplete_line_buffer..continuing anyways");
+        }
 
         let mut start_idx = 0;
-        let mut sentences_processed = 0;
+        let mut _sentences_processed = 0;
 
         while let Some(end_idx) = incomplete_line_buffer.as_str()[start_idx..].find('\n') {
             let full_end_idx = start_idx + end_idx;
@@ -131,7 +133,7 @@ pub async fn start_gps(mut gps2_uart: Uart<'static, Async>) {
             }
 
             start_idx = full_end_idx + 1;
-            sentences_processed += 1;
+            _sentences_processed += 1;
         }
 
         if start_idx < incomplete_line_buffer.len() {

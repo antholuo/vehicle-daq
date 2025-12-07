@@ -13,11 +13,11 @@ use crate::hmi::start_hmi;
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
     info!("app is starting execution now");
 
-    let mut user_led = board.take_user_led();
+    let user_led = board.take_user_led();
     trace!("User Led initialized!");
-    let mut neopixel = board.take_neopixel();
+    let neopixel = board.take_neopixel();
     trace!("NeoPixel initialized!");
-    let mut gps2_uart = board.take_gps2_uart();
+    let gps2_uart = board.take_gps2_uart();
     trace!("Gps2_Uart initialized!");
 
     spawner.spawn(start_hmi_task(neopixel)).unwrap();
@@ -29,7 +29,7 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
 }
 
 #[embassy_executor::task]
-async fn start_hmi_task(mut neopixel: neopixel::NeoPixel<'static>) {
+async fn start_hmi_task(neopixel: neopixel::NeoPixel<'static>) {
     // Task configuration
     let neopixel_brightness: u8 = 15;
 

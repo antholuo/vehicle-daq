@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use embedded_hal::spi::SpiBus;
-use log::{debug, info, trace};
+use log::{debug, info};
 
 // ----- Register Addresses -----
 // --- FIFO ---
