@@ -34,13 +34,13 @@ fn init_heap() {
     }
 }
 
-pub struct SensorBoard_Rev1 {
+pub struct SensorBoardRev1 {
     pub user_led: Option<esp_hal::gpio::Output<'static>>,
     pub neopixel: Option<neopixel::NeoPixel<'static>>,
     pub gps2_uart: Option<esp_hal::uart::Uart<'static, esp_hal::Async>>,
 }
 
-impl SensorBoard_Rev1 {
+impl SensorBoardRev1 {
     pub fn from_peripherals(peripherals: esp_hal::peripherals::Peripherals) -> Self {
         // RTOS bootstrap
         let timg0 = esp_hal::timer::timg::TimerGroup::new(peripherals.TIMG0);
@@ -48,7 +48,7 @@ impl SensorBoard_Rev1 {
             esp_hal::interrupt::software::SoftwareInterruptControl::new(peripherals.SW_INTERRUPT);
 
         esp_rtos::start(timg0.timer0, software_interrupt.software_interrupt0);
-        debug!(">>> building SensorBoard_Rev1");
+        debug!(">>> building SensorBoardRev1");
 
         let user_led = esp_hal::gpio::Output::new(
             peripherals.GPIO19,
@@ -68,7 +68,7 @@ impl SensorBoard_Rev1 {
             .with_tx(peripherals.GPIO22)
             .into_async();
 
-        debug!(">>> SensorBoard_Rev1 returned things correctly");
+        debug!(">>> SensorBoardRev1 returned things correctly");
         Self {
             user_led: Some(user_led),
             neopixel: Some(neopixel),
@@ -77,7 +77,7 @@ impl SensorBoard_Rev1 {
     }
 }
 
-impl BoardPeripherals for SensorBoard_Rev1 {
+impl BoardPeripherals for SensorBoardRev1 {
     fn take_user_led(&mut self) -> esp_hal::gpio::Output<'static> {
         trace!("user led take called");
         self.user_led.take().expect("user LED already taken")
@@ -104,7 +104,7 @@ async fn main(spawner: embassy_executor::Spawner) {
     let peripherals = esp_hal::init(config);
 
     info!("Configuration complete - running app?");
-    app_run(spawner, SensorBoard_Rev1::from_peripherals(peripherals)).await;
+    app_run(spawner, SensorBoardRev1::from_peripherals(peripherals)).await;
     loop {
         embassy_time::Timer::after_secs(1).await
     }
