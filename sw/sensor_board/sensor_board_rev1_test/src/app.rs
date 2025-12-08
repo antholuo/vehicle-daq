@@ -5,11 +5,9 @@ use esp_hal::gpio::Output;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
-use crate::BoardPeripherals;
-use crate::gps::init_gps;
-use crate::gps::start_gps;
-use crate::hmi::neopixel;
-use crate::hmi::start_hmi;
+use crate::gps::{init_gps, start_gps};
+use crate::hmi::{neopixel, start_hmi};
+use crate::{BoardPeripherals, SharedSpiDevice};
 
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
     info!("app is starting execution now");
@@ -18,6 +16,10 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     trace!("User Led initialized!");
     let neopixel = board.take_neopixel();
     trace!("NeoPixel initialized!");
+    let _disp_spi_device = board.take_disp_spi_device();
+    trace!("DISPLAY_SPI device taken");
+    let imu_spi_device = board.take_imu_spi_device();
+    trace!("IMU_SPI device taken");
     let gps2_uart = board.take_gps2_uart();
     trace!("Gps2_Uart initialized!");
 
