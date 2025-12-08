@@ -8,10 +8,11 @@
 
 use embassy_embedded_hal::shared_bus::asynch::spi::SpiDevice;
 use embassy_sync::mutex::Mutex;
-use esp_alloc as _;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 use static_cell::StaticCell;
+
+use esp_alloc as _;
 
 use sensor_board_rev1_test::{
     BoardPeripherals, SharedSpiBus, SharedSpiDevice, app::app_run, hmi::neopixel,
