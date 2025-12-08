@@ -17,16 +17,6 @@ pub mod imu;
 pub mod old_asm330;
 pub mod types;
 
-// TODO: Create shared SPI device that allows SPI to be taken by both the HMI (display) and IMU
-// eg:
-//     pub type SharedSpiBus = Mutex<NoopRawMutex, Spi<'static, async>>;
-//     pub type SharedSpiDevice = SpiDevice<'static, NoopRaMutex, Spi<'static, async>,
-//     Output<'static>>; where Output is the CS pin
-//  where we can then initialize a SPI without a CS, initialize the CS pins, and then
-//  construct the two unique devices, so
-//     fn take_imu_spi_device
-//     fn take_display_spi_device
-
 pub type SharedSpiBus = Mutex<NoopRawMutex, Spi<'static, Async>>;
 
 pub type SharedSpiDevice = SpiDevice<'static, NoopRawMutex, Spi<'static, Async>, Output<'static>>;
