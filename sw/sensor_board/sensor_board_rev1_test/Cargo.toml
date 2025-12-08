@@ -7,7 +7,7 @@ default-run  = "sensor_board_rev1_test"
 
 [[bin]]
 name = "sensor_board_rev1_test"
-path = "./src/bin/main.rs"
+path = "./src/bin/sensorboard_rev1.rs"
 
 [dependencies]
 esp-hal = { version = "1.0.0", features = ["esp32c6", "log-04", "unstable"] }
