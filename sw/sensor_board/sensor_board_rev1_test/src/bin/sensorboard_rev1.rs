@@ -16,10 +16,12 @@ fn panic(_: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 
+// This creates a default app-descriptor required by the esp-idf bootloader.
+// For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
 esp_bootloader_esp_idf::esp_app_desc!();
 
 fn init_heap() {
-    const HEAP_SIZE: usize = 128 * 1024;
+    const HEAP_SIZE: usize = 128 * 1024; // arbitrary size
     static mut HEAP: [u8; HEAP_SIZE] = [0; HEAP_SIZE];
 
     unsafe {
@@ -32,13 +34,13 @@ fn init_heap() {
     }
 }
 
-pub struct DevkitC {
+pub struct SensorBoard_Rev1 {
     pub user_led: Option<esp_hal::gpio::Output<'static>>,
     pub neopixel: Option<neopixel::NeoPixel<'static>>,
     pub gps2_uart: Option<esp_hal::uart::Uart<'static, esp_hal::Async>>,
 }
 
-impl DevkitC {
+impl SensorBoard_Rev1 {
     pub fn from_peripherals(peripherals: esp_hal::peripherals::Peripherals) -> Self {
         // RTOS bootstrap
         let timg0 = esp_hal::timer::timg::TimerGroup::new(peripherals.TIMG0);
@@ -46,7 +48,7 @@ impl DevkitC {
             esp_hal::interrupt::software::SoftwareInterruptControl::new(peripherals.SW_INTERRUPT);
 
         esp_rtos::start(timg0.timer0, software_interrupt.software_interrupt0);
-        debug!(">>> building DevkitC");
+        debug!(">>> building SensorBoard_Rev1");
 
         let user_led = esp_hal::gpio::Output::new(
             peripherals.GPIO19,
@@ -56,7 +58,7 @@ impl DevkitC {
 
         let rmt =
             esp_hal::rmt::Rmt::new(peripherals.RMT, esp_hal::time::Rate::from_mhz(80)).unwrap();
-        let neopixel = neopixel::NeoPixel::new(rmt.channel0, peripherals.GPIO8);
+        let neopixel = neopixel::NeoPixel::new(rmt.channel0, peripherals.GPIO18);
 
         let gps2_uart_config = esp_hal::uart::Config::default().with_baudrate(9600);
         info!("baudrate for gps2_uart_set");
@@ -66,7 +68,7 @@ impl DevkitC {
             .with_tx(peripherals.GPIO22)
             .into_async();
 
-        debug!(">>> devkitC returned things correctly");
+        debug!(">>> SensorBoard_Rev1 returned things correctly");
         Self {
             user_led: Some(user_led),
             neopixel: Some(neopixel),
@@ -75,7 +77,7 @@ impl DevkitC {
     }
 }
 
-impl BoardPeripherals for DevkitC {
+impl BoardPeripherals for SensorBoard_Rev1 {
     fn take_user_led(&mut self) -> esp_hal::gpio::Output<'static> {
         trace!("user led take called");
         self.user_led.take().expect("user LED already taken")
@@ -102,7 +104,7 @@ async fn main(spawner: embassy_executor::Spawner) {
     let peripherals = esp_hal::init(config);
 
     info!("Configuration complete - running app?");
-    app_run(spawner, DevkitC::from_peripherals(peripherals)).await;
+    app_run(spawner, SensorBoard_Rev1::from_peripherals(peripherals)).await;
     loop {
         embassy_time::Timer::after_secs(1).await
     }
