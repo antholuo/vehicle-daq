@@ -46,7 +46,7 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
 async fn start_hmi_task(user_led: Output<'static>, neopixel: neopixel::NeoPixel<'static>) {
     // Task configuration
     let led_rate_hz: u32 = 1;
-    let neopixel_brightness: u8 = 1;
+    let neopixel_brightness: u8 = 10;
 
     start_hmi(user_led, led_rate_hz, neopixel, neopixel_brightness).await;
 }
