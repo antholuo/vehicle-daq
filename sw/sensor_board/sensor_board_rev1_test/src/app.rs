@@ -7,6 +7,7 @@ use log::{debug, error, info, trace, warn};
 
 use crate::gps::{init_gps, start_gps};
 use crate::hmi::{neopixel, start_hmi};
+use crate::imu::start_imu;
 use crate::{BoardPeripherals, SharedSpiDevice};
 
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
@@ -23,8 +24,18 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     let gps2_uart = board.take_gps2_uart();
     trace!("Gps2_Uart initialized!");
 
-    spawner.spawn(start_hmi_task(user_led, neopixel)).unwrap();
-    spawner.spawn(start_gps_task(gps2_uart)).unwrap();
+    info!("all periphs taken");
+
+    spawner
+        .spawn(start_hmi_task(user_led, neopixel))
+        .expect("HMI task did not spawn");
+
+    spawner
+        .spawn(start_imu_task(imu_spi_device))
+        .expect("imu task did not spawn");
+    spawner
+        .spawn(start_gps_task(gps2_uart))
+        .expect("GPS task did not spawn");
 
     loop {
         embassy_time::Timer::after_secs(1).await
@@ -38,6 +49,12 @@ async fn start_hmi_task(user_led: Output<'static>, neopixel: neopixel::NeoPixel<
     let neopixel_brightness: u8 = 1;
 
     start_hmi(user_led, led_rate_hz, neopixel, neopixel_brightness).await;
+}
+
+#[embassy_executor::task]
+async fn start_imu_task(mut imu_spi_device: SharedSpiDevice) {
+    info!("IMU TASK BEING SPAWNED");
+    start_imu(imu_spi_device).await;
 }
 
 #[embassy_executor::task]
