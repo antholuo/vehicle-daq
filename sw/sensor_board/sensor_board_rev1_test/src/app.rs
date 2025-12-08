@@ -1,3 +1,4 @@
+use esp_hal::gpio::Output;
 /// app.rs
 /// responsible for starting the "app" and setting any necessary configs
 
@@ -20,7 +21,7 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     let gps2_uart = board.take_gps2_uart();
     trace!("Gps2_Uart initialized!");
 
-    spawner.spawn(start_hmi_task(neopixel)).unwrap();
+    spawner.spawn(start_hmi_task(user_led, neopixel)).unwrap();
     spawner.spawn(start_gps_task(gps2_uart)).unwrap();
 
     loop {
@@ -29,11 +30,12 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
 }
 
 #[embassy_executor::task]
-async fn start_hmi_task(neopixel: neopixel::NeoPixel<'static>) {
+async fn start_hmi_task(user_led: Output<'static>, neopixel: neopixel::NeoPixel<'static>) {
     // Task configuration
+    let led_rate_hz: u32 = 1;
     let neopixel_brightness: u8 = 1;
 
-    start_hmi(neopixel, neopixel_brightness).await;
+    start_hmi(user_led, led_rate_hz, neopixel, neopixel_brightness).await;
 }
 
 #[embassy_executor::task]
