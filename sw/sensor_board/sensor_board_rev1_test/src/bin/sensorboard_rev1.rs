@@ -135,7 +135,7 @@ impl BoardPeripherals for SensorBoardRev1 {
 
     fn take_imu_spi_device(&mut self) -> SharedSpiDevice {
         trace!("imu_spi_device take called");
-        self.disp_spi.take().expect("ImuSPI device already taken")
+        self.imu_spi.take().expect("ImuSPI device already taken")
     }
 
     fn take_gps2_uart(&mut self) -> esp_hal::uart::Uart<'static, esp_hal::Async> {
@@ -146,7 +146,8 @@ impl BoardPeripherals for SensorBoardRev1 {
 
 #[esp_rtos::main]
 async fn main(spawner: embassy_executor::Spawner) {
-    esp_println::logger::init_logger_from_env();
+    esp_println::logger::init_logger(log::LevelFilter::Info);
+    // esp_println::logger::init_logger_from_env();
 
     init_heap();
 
