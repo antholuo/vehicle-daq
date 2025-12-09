@@ -25,6 +25,7 @@ fn panic(_: &core::panic::PanicInfo) -> ! {
     loop {}
 }
 
+// Required by the ESP-IDF bootloader
 esp_bootloader_esp_idf::esp_app_desc!();
 
 fn init_heap() {
@@ -33,7 +34,6 @@ fn init_heap() {
 
     unsafe {
         esp_alloc::HEAP.add_region(esp_alloc::HeapRegion::new(
-            // HEAP.as_ptr() as *mut u8,
             &HEAP[0] as *const u8 as *mut u8,
             HEAP_SIZE,
             esp_alloc::MemoryCapability::Internal.into(),
@@ -58,7 +58,6 @@ impl DevkitC {
             esp_hal::interrupt::software::SoftwareInterruptControl::new(peripherals.SW_INTERRUPT);
 
         esp_rtos::start(timg0.timer0, software_interrupt.software_interrupt0);
-        debug!(">>> building DevkitC");
 
         let user_led = esp_hal::gpio::Output::new(
             peripherals.GPIO19,
@@ -66,12 +65,12 @@ impl DevkitC {
             esp_hal::gpio::OutputConfig::default(),
         );
 
-        let rmt =
-            esp_hal::rmt::Rmt::new(peripherals.RMT, esp_hal::time::Rate::from_mhz(80)).unwrap();
+        let rmt = esp_hal::rmt::Rmt::new(peripherals.RMT, esp_hal::time::Rate::from_mhz(80))
+            .unwrap()
+            .into_async();
         let neopixel = neopixel::NeoPixel::new(rmt.channel0, peripherals.GPIO8);
 
         let gps2_uart_config = esp_hal::uart::Config::default().with_baudrate(9600);
-        info!("baudrate for gps2_uart_set");
         let gps2_uart = esp_hal::uart::Uart::new(peripherals.UART1, gps2_uart_config)
             .unwrap()
             .with_rx(peripherals.GPIO23)
@@ -100,8 +99,6 @@ impl DevkitC {
         );
         let imu_spi_device = SpiDevice::new(spi_bus, imu_spi2_cs);
         let disp_spi_device = SpiDevice::new(spi_bus, disp_spi2_cs);
-
-        debug!(">>> devkitC returned things correctly");
         Self {
             user_led: Some(user_led),
             neopixel: Some(neopixel),
@@ -150,7 +147,6 @@ async fn main(spawner: embassy_executor::Spawner) {
     let config = esp_hal::Config::default().with_cpu_clock(esp_hal::clock::CpuClock::max());
     let peripherals = esp_hal::init(config);
 
-    info!("Configuration complete - running app?");
     app_run(spawner, DevkitC::from_peripherals(peripherals)).await;
     loop {
         embassy_time::Timer::after_secs(1).await
