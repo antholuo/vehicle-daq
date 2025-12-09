@@ -9,23 +9,26 @@ default-run  = "sensor_board_rev1_test"
 name = "sensor_board_rev1_test"
 path = "./src/bin/sensorboard_rev1.rs"
 
+[[bin]]
+name = "devkit_c"
+path = "./src/bin/devkit_c.rs"
+
 [dependencies]
-esp-hal = { version = "1.0.0", features = ["esp32c6", "log-04", "unstable"] }
+# esp-hal ecosystem - using git directly until crates.io catches up with async RMT API
+# TODO: Switch to version-based deps + [patch.crates-io] when versions align
+# See: https://doc.rust-lang.org/cargo/reference/overriding-dependencies.html#using-patch-with-multiple-versions
+esp-hal = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-hal", features = ["esp32c6", "log-04", "unstable"] }
+esp-rtos = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-rtos", features = ["esp32c6", "esp-alloc", "embassy"] }
+esp-alloc = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-alloc" }
+esp-bootloader-esp-idf = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-bootloader-esp-idf", features = ["esp32c6"] }
+esp-println = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-println", features = ["esp32c6", "log-04"] }
 
-
-esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"] }
-log                    = "0.4.27"
-
+log = "0.4.27"
 critical-section = "1.2.0"
-esp-println      = { version = "0.16.0", features = ["esp32c6", "log-04"] }
 embedded-hal = "1.0.0"
-esp-hal-smartled2 = "0.28.1"
-smart-leds = "0.4"
-esp-rtos = { version = "0.2.0", features = ["embassy", "esp32c6"] }
 embassy-executor = "0.9.1"
 embassy-time = "0.5.0"
-nmea-parser = {path="../../Drivers/nmea-parser/", default-features=false, features = []}
-esp-alloc = "0.8.0"
+nmea-parser = { path = "../../Drivers/nmea-parser/", default-features = false, features = [] }
 heapless = "0.9.2"
 embassy-embedded-hal = "0.5.0"
 static_cell = "2.1.1"
@@ -46,5 +49,7 @@ lto              = 'fat'
 opt-level        = 's'
 overflow-checks  = false
 
+# Patch esp-hal-procmacros for compatibility with git dependencies
 [patch.crates-io]
-# nmea-parser = { git="https://github.com/mrdxxm/nmea-parser.git", branch="no_std"}
+esp-hal = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-hal" }
+esp-hal-procmacros = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-hal-procmacros" }

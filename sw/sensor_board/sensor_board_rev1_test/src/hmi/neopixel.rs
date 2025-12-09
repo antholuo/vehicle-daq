@@ -1,9 +1,14 @@
-//! Simple no-std NeoPixel/WS2812 driver for ESP32-C6
+//! Async WS2812/NeoPixel driver using ESP32 RMT peripheral.
+//!
+//! # References
+//! - WS2812B Datasheet: <https://cdn-shop.adafruit.com/datasheets/WS2812B.pdf>
+//! - esp-hal RMT examples: <https://github.com/esp-rs/esp-hal/tree/main/examples>
 
-use esp_hal::gpio::OutputPin;
-use esp_hal_smartled::{RmtSmartLeds, Ws2812Timing, buffer_size, color_order};
-use smart_leds::{SmartLedsWrite, RGB8};
+use esp_hal::gpio::{Level, OutputPin};
+use esp_hal::rmt::{Channel, PulseCode, TxChannelConfig, TxChannelCreator, Tx};
+use log::warn;
 
+/// Simple color enum for a single NeoPixel.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Color {
     Off,
@@ -20,8 +25,6 @@ pub enum Color {
 }
 
 impl Color {
-    /// Get an array of all predefined colors (excluding Off and Custom)
-    /// Useful for cycling through colors in animations
     pub const fn all_colors() -> [Color; 9] {
         [
             Color::Red,
@@ -36,7 +39,6 @@ impl Color {
         ]
     }
 
-    /// Convert Color to a RGB values tuple
     pub const fn to_rgb(&self) -> (u8, u8, u8) {
         match self {
             Color::Off => (0, 0, 0),
@@ -52,60 +54,101 @@ impl Color {
             Color::Custom(r, g, b) => (*r, *g, *b),
         }
     }
-
-    /// Convert to RGB8 type used by smart-leds
-    fn to_rgb8(&self) -> RGB8 {
-        let (r, g, b) = self.to_rgb();
-        RGB8 { r, g, b }
-    }
 }
 
-/// NeoPixel driver - wraps RmtSmartLeds for single LED control
+/// Minimal NeoPixel driver built directly on esp-hal RMT async channel.
 pub struct NeoPixel<'d> {
-    led: RmtSmartLeds<'d, { buffer_size::<RGB8>(1) }, esp_hal::Blocking, RGB8, color_order::Grb, Ws2812Timing>,
+    channel: Channel<'d, esp_hal::Async, Tx>,
+    buffer: [PulseCode; NeoPixel::FRAME_LEN],
 }
 
 impl<'d> NeoPixel<'d> {
-    /// Create new NeoPixel driver using an RMT channel
-    /// 
-    /// # Example
-    /// ```ignore
-    /// let rmt = Rmt::new(peripherals.RMT, 80.MHz()).unwrap();
-    /// let mut neopixel = NeoPixel::new(rmt.channel0, io.pins.gpio18);
-    /// ```
+    // 24 bits + reset + end marker
+    const FRAME_LEN: usize = 26;
+
+    /// Create a new NeoPixel driver from an RMT TX channel and GPIO pin.
     pub fn new<CH, P>(channel: CH, pin: P) -> Self
     where
-        CH: esp_hal::rmt::TxChannelCreator<'d, esp_hal::Blocking>,
+        CH: TxChannelCreator<'d, esp_hal::Async>,
         P: OutputPin + 'd,
     {
-        let led = RmtSmartLeds::new_with_memsize(channel, pin, 2).unwrap();
-        Self { led }
+        // Configure RMT for WS2812: clock divider of 1 gives us 80MHz ticks (12.5ns each)
+        // Enable idle output so the line goes low after transmission
+        let config = TxChannelConfig::default()
+            .with_clk_divider(1)
+            .with_idle_output_level(Level::Low)
+            .with_idle_output(true);
+        
+        let tx = channel
+            .configure_tx(&config)
+            .unwrap()
+            .with_pin(pin);
+
+        Self {
+            channel: tx,
+            buffer: [PulseCode::end_marker(); NeoPixel::FRAME_LEN],
+        }
     }
 
-    /// Set the NeoPixel to a specific color
-    pub fn set_color(&mut self, color: Color) {
-        let rgb = color.to_rgb8();
-        let _ = self.led.write([rgb].iter().cloned());
+    /// Async set color (non-blocking RMT transfer).
+    pub async fn set_color(&mut self, color: Color) {
+        self.fill_buffer(color);
+        if let Err(e) = self.channel.transmit(&self.buffer).await {
+            warn!("[NeoPixel] Transmit error: {:?}", e);
+        }
     }
-    
-    /// Set color with brightness scaling
-    /// 
-    /// # Arguments
-    /// * `color` - The color to display
-    /// * `brightness` - Brightness level from 0 (off) to 255 (full brightness)
-    pub fn set_color_with_brightness(&mut self, color: Color, brightness: u8) {
+
+    /// Async set color with brightness scaling (0-255).
+    pub async fn set_color_with_brightness(&mut self, color: Color, brightness: u8) {
         let (r, g, b) = color.to_rgb();
         let scale = brightness as u16;
-        
         let r_scaled = ((r as u16 * scale) / 255) as u8;
         let g_scaled = ((g as u16 * scale) / 255) as u8;
         let b_scaled = ((b as u16 * scale) / 255) as u8;
-        
-        self.set_color(Color::Custom(r_scaled, g_scaled, b_scaled));
+        self.set_color(Color::Custom(r_scaled, g_scaled, b_scaled)).await;
     }
 
-    /// Turn off the NeoPixel
-    pub fn clear(&mut self) {
-        self.set_color(Color::Off);
+    pub async fn clear(&mut self) {
+        self.set_color(Color::Off).await;
+    }
+
+    fn fill_buffer(&mut self, color: Color) {
+        // WS2812B timing @ 80MHz RMT clock (12.5ns per tick)
+        // Reference: WS2812B Datasheet - Data Transfer Time
+        //   T0H: 0.4us ±150ns (high for 0-bit)
+        //   T0L: 0.85us ±150ns (low for 0-bit)  
+        //   T1H: 0.8us ±150ns (high for 1-bit)
+        //   T1L: 0.45us ±150ns (low for 1-bit)
+        //   RES: >50us (reset/latch)
+        const T0H: u16 = 28;   // 0.35us (28 * 12.5ns)
+        const T0L: u16 = 64;   // 0.80us (64 * 12.5ns)
+        const T1H: u16 = 56;   // 0.70us (56 * 12.5ns)
+        const T1L: u16 = 48;   // 0.60us (48 * 12.5ns)
+        const RESET: u16 = 4000; // 50us (4000 * 12.5ns)
+
+        let (r, g, b) = color.to_rgb();
+        // WS2812 wants GRB order
+        let bits = [
+            g, r, b,
+        ];
+
+        let mut idx = 0;
+        for byte in bits {
+            for bit in (0..8).rev() {
+                let one = (byte >> bit) & 1 == 1;
+                let code = if one {
+                    PulseCode::new(Level::High, T1H, Level::Low, T1L)
+                } else {
+                    PulseCode::new(Level::High, T0H, Level::Low, T0L)
+                };
+                self.buffer[idx] = code;
+                idx += 1;
+            }
+        }
+        // reset/latch pulse (50us low, then a tiny low pulse to avoid length2=0 looking like end marker)
+        self.buffer[idx] = PulseCode::new(Level::Low, RESET, Level::Low, 1);
+        idx += 1;
+        // end marker
+        self.buffer[idx] = PulseCode::end_marker();
     }
 }
