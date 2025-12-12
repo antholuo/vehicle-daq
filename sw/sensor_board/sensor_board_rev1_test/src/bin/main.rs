@@ -14,22 +14,27 @@ use esp_hal::spi::{
     Mode,
 };
 use esp_hal::time::{Duration, Instant, Rate};
-use log::{debug, info, warn};
+use log::{debug, info, warn, error};
 
 use sensor_board_rev1_test::neopixel::{Color, NeoPixel};
 use sensor_board_rev1_test::old_asm330;
 
 use asm330;
 use sensor_board_rev1_test::old_asm330::{AccelFs, Odr};
+use embedded_hal::spi::SpiBus;
+use core::prelude::v1::*; 
 
 #[panic_handler]
-fn panic(_: &core::panic::PanicInfo) -> ! {
+fn panic(msg: &core::panic::PanicInfo) -> ! {
+    error!("{}", msg);
     loop {}
 }
 
 // This creates a default app-descriptor required by the esp-idf bootloader.
 // For more information see: <https://docs.espressif.com/projects/esp-idf/en/stable/esp32/api-reference/system/app_image_format.html#application-description>
 esp_bootloader_esp_idf::esp_app_desc!();
+
+
 
 #[main]
 fn main() -> ! {
@@ -70,10 +75,11 @@ fn main() -> ! {
 
     let mut imu_spi = imu_spi_maybe.expect("Spi must be initialized to continue!");
 
+    asm330::test_asm330(&mut imu_spi);
     let fsr_a = AccelFs::G2;
-    // let odr_a = Odr::Hz104;
-    // let _ = old_asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
-    // let _ = old_asm330::set_xl_odr(&mut imu_spi, odr_a);
+    let odr_a = Odr::Hz104;
+    //let _ = old_asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
+    //let _ = old_asm330::set_xl_odr(&mut imu_spi, odr_a);
     info!("Hello world!");
     user_led.toggle();
     match old_asm330::check_who_am_i(&mut imu_spi) {
@@ -86,21 +92,19 @@ fn main() -> ! {
     }
 
     let lpf2_en: bool = true;
-    let _ = asm330::enable_xl(
+    /*let _ = asm330::enable_xl(
         // TODO: Fix this...
         &mut imu_spi,
         asm330::Odr::Hz104,
         asm330::AccelFs::G2,
         lpf2_en,
-    );
-
+    );*/
     let colors = Color::all_colors();
     let mut color_idx: usize = 0;
     let mut brightness: u8 = 0;
     let mut brightness_increasing = true;
 
     let mut imu_read_1hz = Instant::now();
-
     loop {
         if imu_read_1hz.elapsed() > Duration::from_secs(1) {
             match old_asm330::read_xl_xyz(&mut imu_spi) {
@@ -149,6 +153,7 @@ fn main() -> ! {
         let delay_start = Instant::now();
         while delay_start.elapsed() < Duration::from_millis(100) {}
     }
+    panic!("Should not get here")
 
     // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/esp-hal-v1.0.0-rc.1/examples/src/bin
 }

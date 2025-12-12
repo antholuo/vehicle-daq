@@ -6,6 +6,8 @@ edition = "2024"
 [dependencies]
 embedded-hal = "1.0.0"
 log = "0.4.28"
+thiserror-no-std = "2.0.2"
+esp-hal = { version = "1.0.0", features = ["esp32c6", "log-04", "unstable"] }
 
 [lib]
 name = "asm330"
