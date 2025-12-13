@@ -17,11 +17,11 @@ Sensor Fusion
 - [x] sw_reset
 - [x] enable_accel
 - [x] disable_accel
-- [ ] enable_gyro
-- [ ] disable_accel
+- [x] enable_gyro
+- [x] disable_accel
 - [ ] enable_gyro then accel
 - [ ] enable timestamp
-- [ ] single gyro, accel, timestamp reads
+- [x] single gyro, accel, timestamp reads
 - [ ] configure_den
 - [ ] block_reads
 - [ ] accel offset

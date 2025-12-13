@@ -210,6 +210,8 @@ pub const BITMASK_CTRL4_SLEEP_G          : u8 = 0x40;
 
 pub const BITMASK_STATUS_REG_GDA         : u8 = 0x02;
 
+pub const BITMASK_CTRL10_TIMESTAMP_EN    : u8 = 0x20;
+
 // ----- SPI Interface -----
 
 pub fn spi_read_reg<S>(spi: &mut S, reg_addr: u8) -> Result<u8, S::Error>

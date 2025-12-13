@@ -468,6 +468,34 @@ where
     Ok((gyro_x_h << 8 | gyro_x_l, gyro_y_h << 8 | gyro_y_l, gyro_z_h << 8 | gyro_z_l))
 }
 
+pub fn enable_timestamp<S>(spi: &mut S) -> Result<(), Asm330Error>
+where
+    S: SpiBus<u8>,
+{
+    reg::spi_write_reg(spi, reg::ADDR_CTRL10_C, reg::BITMASK_CTRL10_TIMESTAMP_EN).unwrap();
+    Ok(())
+}
+
+pub fn disable_timestamp<S>(spi: &mut S) -> Result<(), Asm330Error>
+where
+    S: SpiBus<u8>,
+{
+    reg::spi_write_reg(spi, reg::ADDR_CTRL10_C, 0x00).unwrap();
+    Ok(())
+}
+
+pub fn read_single_timestamp<S>(spi: &mut S) -> Result<u32, Asm330Error>
+where
+    S: SpiBus<u8>,
+{
+    let ts0 = reg::spi_read_reg(spi, reg::ADDR_TIMESTAMP0_REG).unwrap();
+    let ts1 = reg::spi_read_reg(spi, reg::ADDR_TIMESTAMP1_REG).unwrap();
+    let ts2 = reg::spi_read_reg(spi, reg::ADDR_TIMESTAMP2_REG).unwrap();
+    let ts3 = reg::spi_read_reg(spi, reg::ADDR_TIMESTAMP3_REG).unwrap();
+    let ts = (ts0 as u32) | (ts1 as u32) << 8 | (ts2 as u32) << 16 | (ts3 as u32) << 24;
+    Ok(ts)
+}
+
 // pub fn configure_den<S>(
 //     spi: &mut S,
 //     enabled: bool,
@@ -760,11 +788,33 @@ where
     while rd_delay_start.elapsed() < Duration::from_millis(100) {}
     val = read_single_gyro(spi).expect("read_single_gyro_failed");
     rd_delay_start = Instant::now();
+    // loop {
+    //     while rd_delay_start.elapsed() < Duration::from_millis(100) {}
+    //     val = read_single_gyro(spi).expect("read_single_gyro_failed");
+    //     debug!("converted: ({:.2}dps, {:.2}dps, {:.2}dps)", val.0 as f64 * 0.00875, val.1 as f64 * 0.00875, val.2 as f64 * 0.00875);
+    //     rd_delay_start = Instant::now();
+    // }
+}
+
+#[cfg(debug_assertions)]
+pub fn test_single_timestamp<S>(spi: &mut S)
+where
+    S: SpiBus<u8>
+{
+    enable_timestamp(spi).expect("enable_timestamp failed");
+    let mut val0 = read_single_timestamp(spi).expect("read_single_timestamp failed");
+    let mut val1 = read_single_timestamp(spi).expect("read_single_timestamp failed");
+    assert_ne!(val0, val1);
+    disable_timestamp(spi).expect("disable_timestamp failed");
+    val0 = read_single_timestamp(spi).expect("read_single_timestamp failed");
+    val1 = read_single_timestamp(spi).expect("read_single_timestamp failed");
+    assert_eq!(val0, val1);
+    enable_timestamp(spi).expect("enable_timestamp failed");
+    let mut rd_delay_start = Instant::now();
     loop {
         while rd_delay_start.elapsed() < Duration::from_millis(100) {}
-        val = read_single_gyro(spi).expect("read_single_gyro_failed");
-        // debug!("{:?}: (0x{:04X}, 0x{:04X}, 0x{:04X})", val, val.0, val.1, val.2);
-        debug!("converted: ({:.2}mg, {:.2}mg, {:.2}mg)", val.0 as f64 * 0.00875, val.1 as f64 * 0.00875, val.2 as f64 * 0.00875);
+        val0 = read_single_timestamp(spi).expect("read_single_timestamp failed");
+        debug!("timestamp: {:.2}", (val0 as f32) * 0.000025);
         rd_delay_start = Instant::now();
     }
 }
@@ -790,6 +840,7 @@ where
     test_enable_gyro(spi);
     test_disable_gyro(spi);
     test_read_single_gyro(spi);
+    test_single_timestamp(spi);
     let mut imu_read_1hz = Instant::now();
     loop {
         if imu_read_1hz.elapsed() > Duration::from_secs(1) {
