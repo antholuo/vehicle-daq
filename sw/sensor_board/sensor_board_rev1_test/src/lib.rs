@@ -22,6 +22,14 @@ pub type SharedSpiBus = Mutex<NoopRawMutex, Spi<'static, Async>>;
 
 pub type SharedSpiDevice = SpiDevice<'static, NoopRawMutex, Spi<'static, Async>, Output<'static>>;
 
+/// WiFi resources bundle containing the controller and available interfaces
+pub struct WifiResources {
+    /// WiFi controller (manages the WiFi hardware)
+    pub controller: esp_radio::wifi::WifiController<'static>,
+    /// ESP-NOW interface for peer-to-peer communication
+    pub esp_now: esp_radio::esp_now::EspNow<'static>,
+}
+
 pub trait BoardPeripherals {
     // HMI
     fn take_user_led(&mut self) -> Output<'static>;
@@ -33,5 +41,5 @@ pub trait BoardPeripherals {
     fn take_gps2_uart(&mut self) -> Uart<'static, Async>;
 
     // WIRELESS
-    fn take_esp_now(&mut self) -> Option<esp_radio::esp_now::EspNow<'static>>;
+    fn take_wifi(&mut self) -> Option<WifiResources>;
 }

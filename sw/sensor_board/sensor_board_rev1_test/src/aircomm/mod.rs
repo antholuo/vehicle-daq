@@ -54,7 +54,7 @@ impl<'a> AirCommTransceiver<'a> {
         sender::send_gps(&mut self.esp_now, timestamp_us, data, peer_addr).await
     }
 
-    /// Receive sensor data asynchronously (blocking until data arrives)
+    /// Receive sensor data (suspends until data arrives)
     pub async fn receive(&mut self) -> Result<SensorMessage> {
         receiver::receive(&mut self.esp_now).await
     }

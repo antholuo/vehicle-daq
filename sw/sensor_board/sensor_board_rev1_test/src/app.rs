@@ -41,12 +41,12 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
         .expect("GPS task did not spawn");
 
     // ESP-NOW / AirComm task
-    if let Some(esp_now) = board.take_esp_now() {
-        match AirCommTransceiver::new(esp_now) {
+    if let Some(wifi) = board.take_wifi() {
+        match AirCommTransceiver::new(wifi.esp_now) {
             Ok(transceiver) => {
                 info!("AirComm transceiver initialized");
                 spawner
-                    .spawn(espnow_task(transceiver))
+                    .spawn(espnow_task(transceiver, wifi.controller))
                     .expect("ESP-NOW task did not spawn");
             }
             Err(e) => {
@@ -54,7 +54,7 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
             }
         }
     } else {
-        warn!("ESP-NOW not available - skipping wireless communication");
+        warn!("WiFi not available - skipping wireless communication");
     }
 
     loop {
@@ -87,8 +87,13 @@ async fn start_gps_task(mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Asy
 ///
 /// Handles both sending heartbeats at regular intervals and receiving messages.
 /// Uses timeout-based receive to avoid blocking heartbeat transmission.
+///
+/// Note: `_wifi_controller` must be kept alive for ESP-NOW to function properly.
 #[embassy_executor::task]
-async fn espnow_task(mut transceiver: AirCommTransceiver<'static>) {
+async fn espnow_task(
+    mut transceiver: AirCommTransceiver<'static>,
+    _wifi_controller: esp_radio::wifi::WifiController<'static>,
+) {
     info!("[ESP-NOW] Task started");
 
     const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(1);
