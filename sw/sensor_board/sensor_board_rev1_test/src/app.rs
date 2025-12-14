@@ -1,46 +1,75 @@
 /// app.rs
 /// responsible for starting the "app" and setting any necessary configs
 
-use embassy_time::{Duration, Instant};
+#[cfg(feature = "wifi")]
+use embassy_time::Duration;
+#[cfg(feature = "wifi")]
+use embassy_time::Instant;
+#[cfg(feature = "hmi")]
 use esp_hal::gpio::Output;
 
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
+#[cfg(feature = "wifi")]
 use crate::aircomm::{AirCommTransceiver, HeartbeatData, SensorMessage, SensorPayload, BROADCAST};
+#[cfg(feature = "gps")]
 use crate::gps::{init_gps, start_gps};
+#[cfg(feature = "hmi")]
 use crate::hmi::{neopixel, start_hmi};
+#[cfg(feature = "imu")]
 use crate::imu::start_imu;
-use crate::{BoardPeripherals, SharedSpiDevice};
+use crate::BoardPeripherals;
+#[cfg(feature = "imu")]
+use crate::SharedSpiDevice;
 
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
     info!("app is starting execution now");
 
+    #[cfg(feature = "hmi")]
     let user_led = board.take_user_led();
+    #[cfg(feature = "hmi")]
     trace!("User Led initialized!");
+    
+    #[cfg(feature = "hmi")]
     let neopixel = board.take_neopixel();
+    #[cfg(feature = "hmi")]
     trace!("NeoPixel initialized!");
+    
+    #[cfg(feature = "hmi")]
     let _disp_spi_device = board.take_disp_spi_device();
+    #[cfg(feature = "hmi")]
     trace!("DISPLAY_SPI device taken");
+    
+    #[cfg(feature = "imu")]
     let imu_spi_device = board.take_imu_spi_device();
+    #[cfg(feature = "imu")]
     trace!("IMU_SPI device taken");
+    
+    #[cfg(feature = "gps")]
     let gps2_uart = board.take_gps2_uart();
+    #[cfg(feature = "gps")]
     trace!("Gps2_Uart initialized!");
 
     info!("all periphs taken");
 
+    #[cfg(feature = "hmi")]
     spawner
         .spawn(start_hmi_task(user_led, neopixel))
         .expect("HMI task did not spawn");
 
+    #[cfg(feature = "imu")]
     spawner
         .spawn(start_imu_task(imu_spi_device))
         .expect("imu task did not spawn");
+    
+    #[cfg(feature = "gps")]
     spawner
         .spawn(start_gps_task(gps2_uart))
         .expect("GPS task did not spawn");
 
     // ESP-NOW / AirComm task
+    #[cfg(feature = "wifi")]
     if let Some(wifi) = board.take_wifi() {
         match AirCommTransceiver::new(wifi.esp_now) {
             Ok(transceiver) => {
@@ -62,6 +91,7 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     }
 }
 
+#[cfg(feature = "hmi")]
 #[embassy_executor::task]
 async fn start_hmi_task(user_led: Output<'static>, neopixel: neopixel::NeoPixel<'static>) {
     // Task configuration
@@ -71,12 +101,14 @@ async fn start_hmi_task(user_led: Output<'static>, neopixel: neopixel::NeoPixel<
     start_hmi(user_led, led_rate_hz, neopixel, neopixel_brightness).await;
 }
 
+#[cfg(feature = "imu")]
 #[embassy_executor::task]
 async fn start_imu_task(imu_spi_device: SharedSpiDevice) {
     info!("IMU TASK BEING SPAWNED");
     start_imu(imu_spi_device).await;
 }
 
+#[cfg(feature = "gps")]
 #[embassy_executor::task]
 async fn start_gps_task(mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Async>) {
     gps2_uart = init_gps(gps2_uart).await;
@@ -89,6 +121,7 @@ async fn start_gps_task(mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Asy
 /// Uses timeout-based receive to avoid blocking heartbeat transmission.
 ///
 /// Note: `_wifi_controller` must be kept alive for ESP-NOW to function properly.
+#[cfg(feature = "wifi")]
 #[embassy_executor::task]
 async fn espnow_task(
     mut transceiver: AirCommTransceiver<'static>,
@@ -134,6 +167,7 @@ async fn espnow_task(
     }
 }
 
+#[cfg(feature = "wifi")]
 async fn send_heartbeat(transceiver: &mut AirCommTransceiver<'static>) {
     let timestamp_us = Instant::now().as_micros();
     let heartbeat = HeartbeatData::default();
@@ -148,6 +182,7 @@ async fn send_heartbeat(transceiver: &mut AirCommTransceiver<'static>) {
     }
 }
 
+#[cfg(feature = "wifi")]
 fn handle_received_message(msg: &SensorMessage) {
     let src = msg.src_address;
     let timestamp = msg.timestamp_us;

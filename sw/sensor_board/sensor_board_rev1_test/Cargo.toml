@@ -5,6 +5,13 @@ rust-version = "1.88"
 version      = "0.1.0"
 default-run  = "sensor_board_rev1_test"
 
+[features]
+default = ["hmi", "imu", "gps", "wifi"]
+hmi = []      # User LED, NeoPixel, Display
+imu = []      # IMU sensor (SPI)
+gps = []      # GPS sensor (UART)
+wifi = []     # WiFi/ESP-NOW wireless communication
+
 [[bin]]
 name = "sensor_board_rev1_test"
 path = "./src/bin/sensorboard_rev1.rs"
