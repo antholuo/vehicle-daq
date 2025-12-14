@@ -5,6 +5,13 @@ rust-version = "1.88"
 version      = "0.1.0"
 default-run  = "sensor_board_rev1_test"
 
+[features]
+default = ["hmi", "imu", "gps", "wifi"]
+hmi = []      # User LED, NeoPixel, Display
+imu = []      # IMU sensor (SPI)
+gps = []      # GPS sensor (UART)
+wifi = []     # WiFi/ESP-NOW wireless communication
+
 [[bin]]
 name = "sensor_board_rev1_test"
 path = "./src/bin/sensorboard_rev1.rs"
@@ -18,10 +25,13 @@ path = "./src/bin/devkit_c.rs"
 # TODO: Switch to version-based deps + [patch.crates-io] when versions align
 # See: https://doc.rust-lang.org/cargo/reference/overriding-dependencies.html#using-patch-with-multiple-versions
 esp-hal = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-hal", features = ["esp32c6", "log-04", "unstable"] }
-esp-rtos = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-rtos", features = ["esp32c6", "esp-alloc", "embassy"] }
+esp-rtos = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-rtos", features = ["esp32c6", "esp-alloc", "embassy", "esp-radio"] }
 esp-alloc = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-alloc" }
 esp-bootloader-esp-idf = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-bootloader-esp-idf", features = ["esp32c6"] }
 esp-println = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-println", features = ["esp32c6", "log-04"] }
+
+# ESP-NOW wireless communication
+esp-radio = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-radio", features = ["esp32c6", "esp-now", "unstable", "esp-alloc"] }
 
 log = "0.4.27"
 critical-section = "1.2.0"
@@ -30,6 +40,7 @@ embassy-executor = "0.9.1"
 embassy-time = "0.5.0"
 nmea-parser = { path = "../../Drivers/nmea-parser/", default-features = false, features = [] }
 heapless = "0.9.2"
+byteorder = { version = "1.5", default-features = false }
 embassy-embedded-hal = "0.5.0"
 static_cell = "2.1.1"
 embassy-sync = "0.7.2"

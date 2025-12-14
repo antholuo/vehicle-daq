@@ -1,0 +1,260 @@
+//! Protocol layer for serialization and deserialization
+//!
+//! This module handles converting sensor data structures to/from byte arrays
+//! for transmission over ESP-NOW. Uses simple binary protocol with message
+//! type header.
+
+use byteorder::{ByteOrder, LittleEndian};
+
+use super::message::*;
+use super::error::{AirCommError, Result};
+use crate::types::{GpsData, GpsTime};
+
+/// Maximum payload size for ESP-NOW (250 bytes)
+pub const MAX_PAYLOAD_SIZE: usize = 250;
+
+/// Protocol header size (message type + timestamp)
+pub const HEADER_SIZE: usize = 1 + 8; // message_type(1) + timestamp_us(8) = 9 bytes
+
+/// Serialize heartbeat data into a byte buffer
+///
+/// Format: [MessageType:1][Timestamp:8][Magic:1]
+///
+/// # Arguments
+/// * `timestamp_us` - Sender's timestamp in microseconds
+/// * `data` - Heartbeat data to serialize
+/// * `buffer` - Output buffer (must be at least HEADER_SIZE + HeartbeatData::SERIALIZED_SIZE)
+///
+/// # Returns
+/// Number of bytes written
+pub fn serialize_heartbeat(timestamp_us: u64, data: &HeartbeatData, buffer: &mut [u8]) -> Result<usize> {
+    let required_size = HEADER_SIZE + HeartbeatData::SERIALIZED_SIZE;
+    if buffer.len() < required_size {
+        return Err(AirCommError::BufferTooSmall);
+    }
+
+    let mut offset = 0;
+    
+    // Write message type
+    buffer[offset] = MessageType::Heartbeat.to_u8();
+    offset += 1;
+    
+    // Write timestamp
+    LittleEndian::write_u64(&mut buffer[offset..], timestamp_us);
+    offset += 8;
+    
+    // Write magic byte
+    buffer[offset] = data.magic;
+    offset += 1;
+    
+    Ok(offset)
+}
+
+/// Serialize IMU data into a byte buffer
+///
+/// Format: [MessageType:1][Timestamp:8][ImuData:TBD]
+///
+/// # Arguments
+/// * `timestamp_us` - Sender's timestamp in microseconds
+/// * `data` - IMU data to serialize
+/// * `buffer` - Output buffer (must be at least HEADER_SIZE + IMU_SERIALIZED_SIZE)
+///
+/// # Returns
+/// Number of bytes written
+pub fn serialize_imu(timestamp_us: u64, data: &ImuData, buffer: &mut [u8]) -> Result<usize> {
+    let required_size = HEADER_SIZE + IMU_SERIALIZED_SIZE;
+    if buffer.len() < required_size {
+        return Err(AirCommError::BufferTooSmall);
+    }
+
+    // TODO: Implement serialization
+    // - Write message type
+    // - Write timestamp
+    // - Write IMU data fields in little-endian format
+    
+    todo!("Implement serialize_imu")
+}
+
+/// Serialize GPS data into a byte buffer
+///
+/// Format: [MessageType:1][Timestamp:8][lat:8][lon:8][alt:4][speed:4][heading:2][year:2][month:1][day:1][hours:1][minutes:1][seconds:1][millis:2]
+///
+/// # Arguments
+/// * `timestamp_us` - Sender's timestamp in microseconds
+/// * `data` - GPS data to serialize
+/// * `buffer` - Output buffer (must be at least HEADER_SIZE + GPS_SERIALIZED_SIZE)
+///
+/// # Returns
+/// Number of bytes written
+pub fn serialize_gps(timestamp_us: u64, data: &GpsData, buffer: &mut [u8]) -> Result<usize> {
+    let required_size = HEADER_SIZE + GPS_SERIALIZED_SIZE;
+    if buffer.len() < required_size {
+        return Err(AirCommError::BufferTooSmall);
+    }
+
+    let mut offset = 0;
+    
+    // Write message type
+    buffer[offset] = MessageType::Gps.to_u8();
+    offset += 1;
+    
+    // Write timestamp
+    LittleEndian::write_u64(&mut buffer[offset..], timestamp_us);
+    offset += 8;
+    
+    // Write GPS fields
+    LittleEndian::write_f64(&mut buffer[offset..], data.lat);
+    offset += 8;
+    
+    LittleEndian::write_f64(&mut buffer[offset..], data.lon);
+    offset += 8;
+    
+    LittleEndian::write_f32(&mut buffer[offset..], data.alt);
+    offset += 4;
+    
+    LittleEndian::write_f32(&mut buffer[offset..], data.speed_kts);
+    offset += 4;
+    
+    LittleEndian::write_u16(&mut buffer[offset..], data.heading);
+    offset += 2;
+    
+    // Write GpsTime fields
+    LittleEndian::write_u16(&mut buffer[offset..], data.utc_time.year);
+    offset += 2;
+    
+    buffer[offset] = data.utc_time.month;
+    offset += 1;
+    
+    buffer[offset] = data.utc_time.day;
+    offset += 1;
+    
+    buffer[offset] = data.utc_time.hours;
+    offset += 1;
+    
+    buffer[offset] = data.utc_time.minutes;
+    offset += 1;
+    
+    buffer[offset] = data.utc_time.seconds;
+    offset += 1;
+    
+    LittleEndian::write_u16(&mut buffer[offset..], data.utc_time.millis);
+    offset += 2;
+    
+    Ok(offset)
+}
+
+/// Deserialize received data into a sensor message
+///
+/// Reads the message type header, timestamp, and deserializes the appropriate payload
+///
+/// # Arguments
+/// * `data` - Raw received data
+/// * `src_address` - Source MAC address
+///
+/// # Returns
+/// Parsed sensor message with timestamp and payload
+pub fn deserialize(data: &[u8], src_address: [u8; 6]) -> Result<SensorMessage> {
+    if data.len() < HEADER_SIZE {
+        return Err(AirCommError::InvalidMessage);
+    }
+
+    let msg_type = MessageType::from_u8(data[0])
+        .ok_or(AirCommError::UnknownMessageType)?;
+    
+    // Read timestamp (always at offset 1)
+    let timestamp_us = LittleEndian::read_u64(&data[1..]);
+    let payload_offset = 9; // After message type (1) + timestamp (8)
+
+    let payload = match msg_type {
+        MessageType::Imu => deserialize_imu(data, payload_offset)?,
+        MessageType::Gps => deserialize_gps(data, payload_offset)?,
+        MessageType::Heartbeat => deserialize_heartbeat(data, payload_offset)?,
+    };
+    
+    Ok(SensorMessage {
+        src_address,
+        timestamp_us,
+        payload,
+    })
+}
+
+/// Deserialize IMU payload from buffer
+fn deserialize_imu(_data: &[u8], _payload_offset: usize) -> Result<SensorPayload> {
+    // TODO: Deserialize IMU data
+    todo!("Implement IMU deserialization")
+}
+
+/// Deserialize GPS payload from buffer
+fn deserialize_gps(data: &[u8], payload_offset: usize) -> Result<SensorPayload> {
+    let required_size = HEADER_SIZE + GPS_SERIALIZED_SIZE;
+    if data.len() < required_size {
+        return Err(AirCommError::InvalidMessage);
+    }
+    
+    let mut offset = payload_offset;
+    
+    // Read GPS fields
+    let lat = LittleEndian::read_f64(&data[offset..]);
+    offset += 8;
+    
+    let lon = LittleEndian::read_f64(&data[offset..]);
+    offset += 8;
+    
+    let alt = LittleEndian::read_f32(&data[offset..]);
+    offset += 4;
+    
+    let speed_kts = LittleEndian::read_f32(&data[offset..]);
+    offset += 4;
+    
+    let heading = LittleEndian::read_u16(&data[offset..]);
+    offset += 2;
+    
+    // Read GpsTime fields
+    let year = LittleEndian::read_u16(&data[offset..]);
+    offset += 2;
+    
+    let month = data[offset];
+    offset += 1;
+    
+    let day = data[offset];
+    offset += 1;
+    
+    let hours = data[offset];
+    offset += 1;
+    
+    let minutes = data[offset];
+    offset += 1;
+    
+    let seconds = data[offset];
+    offset += 1;
+    
+    let millis = LittleEndian::read_u16(&data[offset..]);
+    
+    Ok(SensorPayload::Gps(GpsData {
+        lat,
+        lon,
+        alt,
+        speed_kts,
+        heading,
+        utc_time: GpsTime {
+            year,
+            month,
+            day,
+            hours,
+            minutes,
+            seconds,
+            millis,
+        },
+    }))
+}
+
+/// Deserialize Heartbeat payload from buffer
+fn deserialize_heartbeat(data: &[u8], payload_offset: usize) -> Result<SensorPayload> {
+    let required_size = HEADER_SIZE + HeartbeatData::SERIALIZED_SIZE;
+    if data.len() < required_size {
+        return Err(AirCommError::InvalidMessage);
+    }
+    
+    let magic = data[payload_offset];
+    Ok(SensorPayload::Heartbeat(HeartbeatData { magic }))
+}
