@@ -20,8 +20,7 @@ use sensor_board_rev1_test::neopixel::{Color, NeoPixel};
 use sensor_board_rev1_test::old_asm330;
 
 use asm330;
-use sensor_board_rev1_test::old_asm330::{AccelFs, Odr};
-use embedded_hal::spi::SpiBus;
+use sensor_board_rev1_test::old_asm330::{AccelFs};
 use core::prelude::v1::*; 
 
 #[panic_handler]
@@ -77,7 +76,7 @@ fn main() -> ! {
 
     asm330::test_asm330(&mut imu_spi);
     let fsr_a = AccelFs::G2;
-    let odr_a = Odr::Hz104;
+    // let odr_a = Odr::Hz104;
     //let _ = old_asm330::set_xl_fsr(&mut imu_spi, &fsr_a); // hiding the warnings for now
     //let _ = old_asm330::set_xl_odr(&mut imu_spi, odr_a);
     info!("Hello world!");
@@ -91,7 +90,7 @@ fn main() -> ! {
         }
     }
 
-    let lpf2_en: bool = true;
+    // let lpf2_en: bool = true;
     /*let _ = asm330::enable_xl(
         // TODO: Fix this...
         &mut imu_spi,
@@ -153,7 +152,7 @@ fn main() -> ! {
         let delay_start = Instant::now();
         while delay_start.elapsed() < Duration::from_millis(100) {}
     }
-    panic!("Should not get here")
+    // panic!("Should not get here")
 
     // for inspiration have a look at the examples at https://github.com/esp-rs/esp-hal/tree/esp-hal-v1.0.0-rc.1/examples/src/bin
 }

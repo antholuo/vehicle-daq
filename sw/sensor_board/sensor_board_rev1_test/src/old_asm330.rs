@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 use embedded_hal::spi::SpiBus;
-use log::{debug, info, trace};
+use log::{debug, info};
 
 // ----- Register Addresses -----
 // --- FIFO ---
@@ -199,14 +199,14 @@ where
 ////////////////////////
 /// Configuration
 ////////////////////////
-pub fn boot<S>(spi: &mut S) -> Result<bool, S::Error>
-where
-    S: SpiBus<u8>,
-    S::Error: core::fmt::Debug,
-{
-    info!("Booting IMU");
-    Ok(true)
-}
+// pub fn boot<S>(spi: &mut S) -> Result<bool, S::Error>
+// where
+//     S: SpiBus<u8>,
+//     S::Error: core::fmt::Debug,
+// {
+//     info!("Booting IMU");
+//     Ok(true)
+// }
 
 pub fn configure_interrupt_pin<S>(spi: &mut S) -> Result<(), S::Error>
 where
