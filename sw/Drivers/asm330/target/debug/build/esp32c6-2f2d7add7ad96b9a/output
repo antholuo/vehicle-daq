@@ -1,0 +1,3 @@
+cargo:rustc-link-search=/home/eugen/vehicle-daq/sw/Drivers/asm330/target/debug/build/esp32c6-2f2d7add7ad96b9a/out
+cargo:rerun-if-changed=device.x
+cargo:rerun-if-changed=build.rs

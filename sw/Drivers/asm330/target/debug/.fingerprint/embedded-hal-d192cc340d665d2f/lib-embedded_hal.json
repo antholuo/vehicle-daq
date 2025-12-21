@@ -1,0 +1,1 @@
+{"rustc":4826714390000139368,"features":"[]","declared_features":"[\"defmt-03\"]","target":10543535235496234955,"profile":15657897354478470176,"path":13961136155299566405,"deps":[],"local":[{"CheckDepInfo":{"dep_info":"debug/.fingerprint/embedded-hal-d192cc340d665d2f/dep-lib-embedded_hal","checksum":false}}],"rustflags":[],"config":2069994364910194474,"compile_kind":0}

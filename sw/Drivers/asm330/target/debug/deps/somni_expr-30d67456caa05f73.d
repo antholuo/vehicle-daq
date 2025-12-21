@@ -1,0 +1,11 @@
+/home/eugen/vehicle-daq/sw/Drivers/asm330/target/debug/deps/somni_expr-30d67456caa05f73.d: /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/lib.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/error.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/function.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/value.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/visitor.rs
+
+/home/eugen/vehicle-daq/sw/Drivers/asm330/target/debug/deps/libsomni_expr-30d67456caa05f73.rlib: /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/lib.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/error.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/function.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/value.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/visitor.rs
+
+/home/eugen/vehicle-daq/sw/Drivers/asm330/target/debug/deps/libsomni_expr-30d67456caa05f73.rmeta: /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/lib.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/error.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/function.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/value.rs /home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/visitor.rs
+
+/home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/lib.rs:
+/home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/error.rs:
+/home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/function.rs:
+/home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/value.rs:
+/home/eugen/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/somni-expr-0.2.0/src/visitor.rs:

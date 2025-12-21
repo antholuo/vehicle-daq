@@ -1,0 +1,1 @@
+{"rustc":4826714390000139368,"features":"","declared_features":"","target":0,"profile":0,"path":0,"deps":[[8252752842343598796,"build_script_build",false,3026287863406240527]],"local":[{"RerunIfChanged":{"output":"debug/build/esp32c6-2f2d7add7ad96b9a/output","paths":["device.x","build.rs"]}}],"rustflags":[],"config":0,"compile_kind":0}

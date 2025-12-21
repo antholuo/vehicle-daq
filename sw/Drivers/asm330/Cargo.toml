@@ -2,12 +2,15 @@
 name = "asm330"
 version = "0.1.0"
 edition = "2024"
+rust-version = "1.88"
 
 [dependencies]
-embedded-hal = "1.0.0"
-log = "0.4.28"
-thiserror-no-std = "2.0.2"
 esp-hal = { version = "1.0.0", features = ["esp32c6", "log-04", "unstable"] }
+embedded-hal = "1.0.0"
+log                    = "0.4.27"
+thiserror-no-std = "2.0.2"
+esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"] }
+
 
 [lib]
 name = "asm330"
