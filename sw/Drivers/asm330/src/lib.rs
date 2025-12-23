@@ -53,6 +53,14 @@ impl<
     }
 }
 
+fn safe_write<S: SpiBus<u8>>(spi: &mut S, addr: u8, value: u8, mask: u8) -> Result<(), Asm330Error> {
+    let mut reg_value = spi_read_reg(spi, addr)?;
+    reg_value &= mask;
+    reg_value |= value;
+    spi_write_reg(spi, addr, reg_value)?;
+    Ok(())
+}
+
 impl<
         const ADDR: u8,
         const OFFSET: u8,
@@ -87,17 +95,20 @@ impl<
             let mut upper: u8 = (self.value >> 8) as u8;
             let lower: u8 = (self.value & 0x00ff) as u8;
             spi_write_reg(spi, ADDR, lower)?;
+            let mut mask = 0xff >> (16-WIDTH);
             if LEAK_PORTION == LEAK_PORTION_UPPER {
                 upper <<= 16 - WIDTH;
+                mask <<= 16 - WIDTH;
             }
             if LEAK_REG == LEAK_REG_DOWN {
-                spi_write_reg(spi, ADDR - 1, upper);
+                safe_write(spi, ADDR - 1, upper, mask)?;
             } else {
-                spi_write_reg(spi, ADDR + 1, upper)?;
+                safe_write(spi, ADDR + 1, upper, mask)?;
             }
             return Ok(());
         } else {
-            spi_write_reg(spi, ADDR, (self.value & 0x00ff) as u8)?;
+            let mask = (0xff >> (8-WIDTH)) << OFFSET;
+            safe_write(spi, ADDR, (self.value as u8) << OFFSET, mask)?;
             return Ok(());
         }
     }

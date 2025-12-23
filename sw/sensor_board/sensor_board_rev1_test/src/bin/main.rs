@@ -75,6 +75,9 @@ fn test_asm330<S: SpiBus<u8>>(imu_spi: &mut S) {
         low_pass_on_6d: asm330::Setting::new::<0b0>(),
         usr_off_w: asm330::Setting::new::<0b0>(),
         usr_off_on_out: asm330::Setting::new::<0b0>(),
+        x_ofs_usr: asm330::Setting::default(),
+        y_ofs_usr: asm330::Setting::default(),
+        z_ofs_usr: asm330::Setting::default(),
     };
     let _ = asm330::SystemConfig::default();
     panic!("tests passed");
