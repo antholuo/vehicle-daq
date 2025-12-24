@@ -4,7 +4,18 @@
 /// IMU sensor data structure
 #[derive(Debug, Clone, Copy)]
 pub struct ImuData {
-    // TODO: IMU data fields
+    /// Accelerometer X-axis in g
+    pub accel_x: f32,
+    /// Accelerometer Y-axis in g
+    pub accel_y: f32,
+    /// Accelerometer Z-axis in g
+    pub accel_z: f32,
+    /// Gyroscope X-axis in degrees/second
+    pub gyro_x: f32,
+    /// Gyroscope Y-axis in degrees/second
+    pub gyro_y: f32,
+    /// Gyroscope Z-axis in degrees/second
+    pub gyro_z: f32,
 }
 
 /// GPS timestamp

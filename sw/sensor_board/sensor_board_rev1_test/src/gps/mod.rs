@@ -5,6 +5,8 @@ use heapless::String;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
+use crate::types::{GpsData, GpsTime};
+
 const NMEA_0183_MAX_LENGTH: usize = 83;
 const MAX_SENTENCE_LENGTH: usize = NMEA_0183_MAX_LENGTH + 2; // give ourselves buffer for newlines
 const NUM_NMEA_SENTENCES: usize = 3; // RMC, VTG, GGA
@@ -64,12 +66,34 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
     gps2_uart
 }
 
-pub async fn start_gps(mut gps2_uart: Uart<'static, Async>) {
+/// Start GPS task with a callback for each data sample
+///
+/// The callback `on_data` is invoked whenever a valid GPS fix is available.
+/// This allows the caller to decide what to do with the data (log, send, etc.)
+/// without the driver needing to know about channels or networking.
+///
+/// # Arguments
+/// * `gps2_uart` - The UART peripheral for GPS communication
+/// * `on_data` - Callback invoked with each GPS fix
+pub async fn start_gps<F>(mut gps2_uart: Uart<'static, Async>, on_data: F)
+where
+    F: Fn(GpsData),
+{
+    use nmea_parser::chrono::{Datelike, Timelike};
+
     let mut parser = nmea_parser::NmeaParser::new();
 
     // Use a String to buffer incomplete lines across loop iterations
     let mut incomplete_line_buffer: heapless::String<UNPROCESSED_BUFF_SIZE> =
         heapless::String::new();
+
+    // Track latest values from different NMEA sentences
+    let mut last_lat: Option<f64> = None;
+    let mut last_lon: Option<f64> = None;
+    let mut last_alt: Option<f32> = None;
+    let mut last_speed_kts: Option<f32> = None;
+    let mut last_heading: Option<u16> = None;
+    let mut last_time: Option<GpsTime> = None;
 
     loop {
         let mut buf = [0u8; CHUNK_BUFF_SIZE];
@@ -111,10 +135,57 @@ pub async fn start_gps(mut gps2_uart: Uart<'static, Async>) {
                                 gga.hdop.unwrap_or(0.0),
                                 gga.satellite_count.unwrap_or(0),
                             );
+
+                            // Update cached values from GGA
+                            if let Some(lat) = gga.latitude {
+                                last_lat = Some(lat);
+                            }
+                            if let Some(lon) = gga.longitude {
+                                last_lon = Some(lon);
+                            }
+                            if let Some(alt) = gga.altitude {
+                                last_alt = Some(alt as f32);
+                            }
+
+                            // Try to construct and send GPS data if we have position
+                            try_send_gps_data(
+                                &on_data,
+                                last_lat,
+                                last_lon,
+                                last_alt,
+                                last_speed_kts,
+                                last_heading,
+                                last_time,
+                            );
                         }
                         nmea_parser::ParsedMessage::Rmc(rmc) => {
                             if let Some(time) = rmc.timestamp {
                                 info!("GPS rmc time is: {}", time);
+
+                                // Update cached time from RMC
+                                last_time = Some(GpsTime {
+                                    year: time.year() as u16,
+                                    month: time.month() as u8,
+                                    day: time.day() as u8,
+                                    hours: time.hour() as u8,
+                                    minutes: time.minute() as u8,
+                                    seconds: time.second() as u8,
+                                    millis: (time.nanosecond() / 1_000_000) as u16,
+                                });
+                            }
+
+                            // RMC also contains position data
+                            if let Some(lat) = rmc.latitude {
+                                last_lat = Some(lat);
+                            }
+                            if let Some(lon) = rmc.longitude {
+                                last_lon = Some(lon);
+                            }
+                            if let Some(sog) = rmc.sog_knots {
+                                last_speed_kts = Some(sog as f32);
+                            }
+                            if let Some(bearing) = rmc.bearing {
+                                last_heading = Some(bearing as u16);
                             }
                         }
                         nmea_parser::ParsedMessage::Vtg(vtg) => {
@@ -124,6 +195,25 @@ pub async fn start_gps(mut gps2_uart: Uart<'static, Async>) {
                             info!(
                                 "GNVTG VELOCITY: Speed={:.2} knots ({:.2} km/h); Heading: {}",
                                 speed_knots, speed_kph, course
+                            );
+
+                            // Update cached values from VTG
+                            if vtg.sog_knots.is_some() {
+                                last_speed_kts = Some(speed_knots as f32);
+                            }
+                            if vtg.cog_true.is_some() {
+                                last_heading = Some(course as u16);
+                            }
+
+                            // Try to construct and send GPS data after VTG
+                            try_send_gps_data(
+                                &on_data,
+                                last_lat,
+                                last_lon,
+                                last_alt,
+                                last_speed_kts,
+                                last_heading,
+                                last_time,
                             );
                         }
                         other_message => {
@@ -153,5 +243,40 @@ pub async fn start_gps(mut gps2_uart: Uart<'static, Async>) {
         } else {
             incomplete_line_buffer.clear(); // everything processed
         }
+    }
+}
+
+/// Helper to construct and send GPS data if we have at least position
+fn try_send_gps_data<F>(
+    on_data: &F,
+    lat: Option<f64>,
+    lon: Option<f64>,
+    alt: Option<f32>,
+    speed_kts: Option<f32>,
+    heading: Option<u16>,
+    time: Option<GpsTime>,
+)
+where
+    F: Fn(GpsData),
+{
+    // Only send if we have at least lat/lon
+    if let (Some(lat), Some(lon)) = (lat, lon) {
+        let gps_data = GpsData {
+            lat,
+            lon,
+            alt: alt.unwrap_or(0.0),
+            speed_kts: speed_kts.unwrap_or(0.0),
+            heading: heading.unwrap_or(0),
+            utc_time: time.unwrap_or(GpsTime {
+                year: 0,
+                month: 0,
+                day: 0,
+                hours: 0,
+                minutes: 0,
+                seconds: 0,
+                millis: 0,
+            }),
+        };
+        on_data(gps_data);
     }
 }

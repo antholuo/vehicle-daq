@@ -383,16 +383,18 @@ where
     S::Error: core::fmt::Debug,
 {
     debug!("Attempting to read raw XL XYZ registers");
-    const READ_CMD: u8 = 0x80 | REG_OUTX_L_A; // in place read all 6 bytes
-    let mut buf: [u8; 6] = [READ_CMD, 0, 0, 0, 0, 0];
+    const READ_CMD: u8 = 0x80 | REG_OUTX_L_A;
+    // Need 7 bytes: 1 command + 6 data bytes (X_L, X_H, Y_L, Y_H, Z_L, Z_H)
+    let mut buf: [u8; 7] = [READ_CMD, 0, 0, 0, 0, 0, 0];
     spi.transfer_in_place(&mut buf).await?;
-    let x = i16::from_le_bytes([buf[0], buf[1]]);
-    let y = i16::from_le_bytes([buf[2], buf[3]]);
-    let z = i16::from_le_bytes([buf[4], buf[5]]);
+    // After transfer: buf[0] = garbage, buf[1..7] = data
+    let x = i16::from_le_bytes([buf[1], buf[2]]);
+    let y = i16::from_le_bytes([buf[3], buf[4]]);
+    let z = i16::from_le_bytes([buf[5], buf[6]]);
 
     debug!("Got X, Y, Z raw as {} {} {}", x, y, z);
 
-    Ok(XlRawData { x: x, y: y, z: z })
+    Ok(XlRawData { x, y, z })
 }
 
 pub async fn read_xl_x<S>(spi: &mut S) -> Result<i16, S::Error>
