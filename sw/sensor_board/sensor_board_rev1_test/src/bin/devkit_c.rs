@@ -62,6 +62,8 @@ pub struct DevkitC {
     pub gps2_uart: Option<esp_hal::uart::Uart<'static, esp_hal::Async>>,
     #[cfg(feature = "wifi")]
     pub wifi: Option<WifiResources>,
+    /// USB Serial TX for host communication (bridge mode)
+    pub usb_serial_tx: Option<esp_hal::usb_serial_jtag::UsbSerialJtagTx<'static, esp_hal::Async>>,
 }
 
 impl DevkitC {
@@ -160,6 +162,14 @@ impl DevkitC {
             }
         };
 
+        // USB Serial/JTAG initialization for bridge mode
+        // Note: USB Serial/JTAG uses dedicated pins (GPIO12/13 on ESP32-C6)
+        // and doesn't need explicit GPIO configuration
+        let usb_serial = esp_hal::usb_serial_jtag::UsbSerialJtag::new(peripherals.USB_DEVICE)
+            .into_async();
+        let (_, usb_serial_tx) = usb_serial.split();
+        info!("USB Serial/JTAG initialized for bridge mode");
+
         Self {
             #[cfg(feature = "hmi")]
             user_led: Some(user_led),
@@ -173,6 +183,7 @@ impl DevkitC {
             gps2_uart: Some(gps2_uart),
             #[cfg(feature = "wifi")]
             wifi,
+            usb_serial_tx: Some(usb_serial_tx),
         }
     }
 }
@@ -218,8 +229,13 @@ impl BoardPeripherals for DevkitC {
 
     #[cfg(feature = "wifi")]
     fn espnow_mode(&self) -> EspNowMode {
-        // DevKit-C acts as a generic receiver for now
-        EspNowMode::Transceiver
+        // DevKit-C acts as a bridge: receives ESP-NOW and forwards to USB
+        EspNowMode::Bridge
+    }
+
+    fn take_usb_serial_tx(&mut self) -> Option<esp_hal::usb_serial_jtag::UsbSerialJtagTx<'static, esp_hal::Async>> {
+        trace!("usb_serial_tx take called");
+        self.usb_serial_tx.take()
     }
 }
 

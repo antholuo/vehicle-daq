@@ -29,6 +29,10 @@ use crate::BoardPeripherals;
 use crate::EspNowMode;
 #[cfg(feature = "imu")]
 use crate::SharedSpiDevice;
+#[cfg(feature = "usb")]
+use crate::usb::{UsbSerial, serialize_forwarded_message, format_mac, MAX_USB_MESSAGE_SIZE};
+#[cfg(all(feature = "wifi", feature = "usb"))]
+use crate::types::NodeId;
 
 /// Capacity of the sensor data channel
 /// Allows buffering sensor samples while ESP-NOW sends
@@ -105,6 +109,28 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
                         }
                         EspNowMode::Transceiver => {
                             info!("ESP-NOW mode: Transceiver (receive + heartbeat)");
+                            spawner
+                                .spawn(espnow_transceiver_task(transceiver, wifi.controller))
+                                .expect("ESP-NOW transceiver task did not spawn");
+                        }
+                        #[cfg(feature = "usb")]
+                        EspNowMode::Bridge => {
+                            info!("ESP-NOW mode: Bridge (receive + forward to USB)");
+                            if let Some(usb_tx) = board.take_usb_serial_tx() {
+                                let usb_serial = UsbSerial::new(usb_tx);
+                                spawner
+                                    .spawn(espnow_bridge_task(transceiver, wifi.controller, usb_serial))
+                                    .expect("ESP-NOW bridge task did not spawn");
+                            } else {
+                                warn!("USB Serial not available - falling back to transceiver mode");
+                                spawner
+                                    .spawn(espnow_transceiver_task(transceiver, wifi.controller))
+                                    .expect("ESP-NOW transceiver task did not spawn");
+                            }
+                        }
+                        #[cfg(not(feature = "usb"))]
+                        EspNowMode::Bridge => {
+                            warn!("Bridge mode requires USB feature - falling back to transceiver mode");
                             spawner
                                 .spawn(espnow_transceiver_task(transceiver, wifi.controller))
                                 .expect("ESP-NOW transceiver task did not spawn");
@@ -315,6 +341,89 @@ async fn espnow_sender_task(
         if last_heartbeat.elapsed() >= HEARTBEAT_INTERVAL {
             send_heartbeat(&mut transceiver).await;
             last_heartbeat = Instant::now();
+        }
+    }
+}
+
+/// ESP-NOW bridge task
+///
+/// Receives ESP-NOW messages from sensor nodes and forwards them to USB.
+/// This is the core of the sensor bridge functionality.
+///
+/// Message format over USB (COBS-framed):
+/// [MAC (6B)][NodeId (2B)][Timestamp (8B)][MsgType (1B)][Payload]
+///
+/// Note: `_wifi_controller` must be kept alive for ESP-NOW to function properly.
+#[cfg(all(feature = "wifi", feature = "usb"))]
+#[embassy_executor::task]
+async fn espnow_bridge_task(
+    mut transceiver: AirCommTransceiver<'static>,
+    _wifi_controller: esp_radio::wifi::WifiController<'static>,
+    mut usb_serial: UsbSerial,
+) {
+    info!("[BRIDGE] Bridge task started (ESP-NOW -> USB)");
+
+    // Buffer for serializing messages
+    let mut msg_buffer = [0u8; MAX_USB_MESSAGE_SIZE];
+
+    // Statistics
+    let mut messages_forwarded: u32 = 0;
+    let mut errors: u32 = 0;
+
+    loop {
+        // Wait for incoming ESP-NOW message
+        match transceiver.receive().await {
+            Ok(msg) => {
+                let src_mac: [u8; 6] = msg.src_address;
+                let timestamp_us = msg.timestamp_us;
+
+                // For now, use a default NodeId - in production this would be
+                // looked up from a MAC -> NodeId mapping table
+                let node_id = NodeId::default();
+
+                // Serialize the message
+                match serialize_forwarded_message(
+                    &src_mac,
+                    &node_id,
+                    timestamp_us,
+                    &msg.payload,
+                    &mut msg_buffer,
+                ) {
+                    Ok(len) => {
+                        // Send via USB with COBS framing
+                        match usb_serial.write_framed(&msg_buffer[..len]).await {
+                            Ok(()) => {
+                                messages_forwarded += 1;
+                                trace!(
+                                    "[BRIDGE] Forwarded {:?} from {} (total: {})",
+                                    msg.payload.message_type(),
+                                    format_mac(&src_mac),
+                                    messages_forwarded
+                                );
+                            }
+                            Err(e) => {
+                                errors += 1;
+                                warn!("[BRIDGE] USB write error: {:?}", e);
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        errors += 1;
+                        warn!("[BRIDGE] Serialize error: {:?}", e);
+                    }
+                }
+
+                // Log periodically
+                if messages_forwarded % 100 == 0 && messages_forwarded > 0 {
+                    info!(
+                        "[BRIDGE] Stats: {} forwarded, {} errors",
+                        messages_forwarded, errors
+                    );
+                }
+            }
+            Err(e) => {
+                warn!("[BRIDGE] Receive error: {:?}", e);
+            }
         }
     }
 }

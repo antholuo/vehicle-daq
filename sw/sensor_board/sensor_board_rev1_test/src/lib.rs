@@ -10,6 +10,7 @@ use esp_hal::gpio::Output;
 use esp_hal::spi::master::Spi;
 #[cfg(feature = "gps")]
 use esp_hal::uart::Uart;
+use esp_hal::usb_serial_jtag::UsbSerialJtagTx;
 
 #[cfg(feature = "wifi")]
 pub mod aircomm;
@@ -23,6 +24,7 @@ pub mod hmi;
 pub mod imu;
 pub mod old_asm330;
 pub mod types;
+pub mod usb;
 
 pub type SharedSpiBus = Mutex<NoopRawMutex, Spi<'static, Async>>;
 
@@ -38,6 +40,9 @@ pub enum EspNowMode {
     /// Transceiver mode: receives ESP-NOW messages + sends heartbeats
     /// Used for testing purposes, receives data from other nodes
     Transceiver,
+    /// Bridge mode: receives ESP-NOW messages and forwards to USB
+    /// Used by bridge nodes that forward data to a host (e.g., Raspberry Pi)
+    Bridge,
 }
 
 /// WiFi resources bundle containing the controller and available interfaces
@@ -71,4 +76,11 @@ pub trait BoardPeripherals {
     /// Returns the ESP-NOW operating mode for this board
     #[cfg(feature = "wifi")]
     fn espnow_mode(&self) -> EspNowMode;
+
+    // USB
+    /// Take the USB Serial TX interface for host communication
+    /// Returns None if USB is not available or not configured for this board
+    fn take_usb_serial_tx(&mut self) -> Option<UsbSerialJtagTx<'static, Async>> {
+        None // Default: USB not available
+    }
 }
