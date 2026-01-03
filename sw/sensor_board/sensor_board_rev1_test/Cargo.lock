@@ -3,6 +3,12 @@
 version = 4
 
 [[package]]
+name = "allocator-api2"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c583acf993cf4245c4acb0a2cc2ab1f9cc097de73411bb6d3647ff6af2b1013d"
+
+[[package]]
 name = "asm330"
 version = "0.1.0"
 dependencies = [
@@ -18,6 +24,12 @@ name = "autocfg"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c08606f8c3cbf4ce6ec8e28fb0014a2c086708fe954eaa885384a6165172e7e8"
+
+[[package]]
+name = "base64"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
 name = "bitfield"
@@ -62,6 +74,12 @@ name = "cfg-if"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
+
+[[package]]
+name = "const-default"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0b396d1f76d455557e1218ec8066ae14bba60b4b36ecd55577ba979f5db7ecaa"
 
 [[package]]
 name = "critical-section"
@@ -344,6 +362,21 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "877a4ace8713b0bcf2a4e7eec82529c029f1d0619886d18145fea96c3ffe5c0f"
 
 [[package]]
+name = "esp-alloc"
+version = "0.9.0"
+source = "git+https://github.com/esp-rs/esp-hal?branch=main#6b735e1510d75b8620503ae6aa2f7fd6948dfa08"
+dependencies = [
+ "allocator-api2",
+ "cfg-if",
+ "document-features",
+ "enumset",
+ "esp-config 0.6.1 (git+https://github.com/esp-rs/esp-hal?branch=main)",
+ "esp-sync 0.1.1 (git+https://github.com/esp-rs/esp-hal?branch=main)",
+ "linked_list_allocator",
+ "rlsf",
+]
+
+[[package]]
 name = "esp-bootloader-esp-idf"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -352,7 +385,7 @@ dependencies = [
  "cfg-if",
  "document-features",
  "embedded-storage",
- "esp-config",
+ "esp-config 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "esp-rom-sys",
  "jiff",
  "strum",
@@ -365,7 +398,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "102871054f8dd98202177b9890cb4b71d0c6fe1f1413b7a379a8e0841fc2473c"
 dependencies = [
  "document-features",
- "esp-metadata-generated",
+ "esp-metadata-generated 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "serde",
+ "serde_yaml",
+ "somni-expr",
+]
+
+[[package]]
+name = "esp-config"
+version = "0.6.1"
+source = "git+https://github.com/esp-rs/esp-hal?branch=main#6b735e1510d75b8620503ae6aa2f7fd6948dfa08"
+dependencies = [
+ "document-features",
+ "esp-metadata-generated 0.3.0 (git+https://github.com/esp-rs/esp-hal?branch=main)",
  "serde",
  "serde_yaml",
  "somni-expr",
@@ -396,12 +441,12 @@ dependencies = [
  "embedded-io-async 0.6.1",
  "embedded-io-async 0.7.0",
  "enumset",
- "esp-config",
+ "esp-config 0.6.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "esp-hal-procmacros",
- "esp-metadata-generated",
+ "esp-metadata-generated 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "esp-riscv-rt",
  "esp-rom-sys",
- "esp-sync",
+ "esp-sync 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "esp32",
  "esp32c2",
  "esp32c3",
@@ -420,7 +465,7 @@ dependencies = [
  "riscv",
  "strum",
  "ufmt-write",
- "xtensa-lx",
+ "xtensa-lx 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "xtensa-lx-rt",
 ]
 
@@ -457,14 +502,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a93e39c8ad8d390d248dc7b9f4b59a873f313bf535218b8e2351356972399e3"
 
 [[package]]
+name = "esp-metadata-generated"
+version = "0.3.0"
+source = "git+https://github.com/esp-rs/esp-hal?branch=main#6b735e1510d75b8620503ae6aa2f7fd6948dfa08"
+
+[[package]]
 name = "esp-println"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5a30e6c9fbcc01c348d46706fef8131c7775ab84c254a3cd65d0cd3f6414d592"
 dependencies = [
  "document-features",
- "esp-metadata-generated",
- "esp-sync",
+ "esp-metadata-generated 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "esp-sync 0.1.1 (registry+https://github.com/rust-lang/crates.io-index)",
  "log",
  "portable-atomic",
 ]
@@ -488,7 +538,7 @@ checksum = "cd66cccc6dd2d13e9f33668a57717ab14a6d217180ec112e6be533de93e7ecbf"
 dependencies = [
  "cfg-if",
  "document-features",
- "esp-metadata-generated",
+ "esp-metadata-generated 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [[package]]
@@ -501,9 +551,23 @@ dependencies = [
  "document-features",
  "embassy-sync 0.6.2",
  "embassy-sync 0.7.2",
- "esp-metadata-generated",
+ "esp-metadata-generated 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "riscv",
- "xtensa-lx",
+ "xtensa-lx 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "esp-sync"
+version = "0.1.1"
+source = "git+https://github.com/esp-rs/esp-hal?branch=main#6b735e1510d75b8620503ae6aa2f7fd6948dfa08"
+dependencies = [
+ "cfg-if",
+ "document-features",
+ "embassy-sync 0.6.2",
+ "embassy-sync 0.7.2",
+ "esp-metadata-generated 0.3.0 (git+https://github.com/esp-rs/esp-hal?branch=main)",
+ "riscv",
+ "xtensa-lx 0.13.0 (git+https://github.com/esp-rs/esp-hal?branch=main)",
 ]
 
 [[package]]
@@ -737,6 +801,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "libc"
+version = "0.2.178"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "37c93d8daa9d8a012fd8ab92f088405fb202ea0b6ab73ee2482ae66af4f42091"
+
+[[package]]
+name = "linked_list_allocator"
+version = "0.10.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9afa463f5405ee81cdb9cc2baf37e08ec7e4c8209442b5d72c04cfb2cd6e6286"
+
+[[package]]
 name = "litrs"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -925,6 +1001,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b1376b15f3ff160e9b1e8ea564ce427f2f6fcf77528cc0a8bf405cb476f9cea7"
 
 [[package]]
+name = "rlsf"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "222fb240c3286247ecdee6fa5341e7cdad0ffdf8e7e401d9937f2d58482a20bf"
+dependencies = [
+ "cfg-if",
+ "const-default",
+ "libc",
+ "svgbobdoc",
+]
+
+[[package]]
 name = "rustversion"
 version = "1.0.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -943,6 +1031,7 @@ dependencies = [
  "asm330",
  "critical-section",
  "embedded-hal 1.0.0",
+ "esp-alloc",
  "esp-bootloader-esp-idf",
  "esp-hal",
  "esp-hal-smartled2",
@@ -1061,6 +1150,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "svgbobdoc"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f2c04b93fc15d79b39c63218f15e3fdffaa4c227830686e3b7c5f41244eb3e50"
+dependencies = [
+ "base64",
+ "proc-macro2",
+ "quote",
+ "syn 1.0.109",
+ "unicode-width",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1160,6 +1262,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9312f7c4f6ff9069b165498234ce8be658059c6728633667c526e27dc2cf1df5"
 
 [[package]]
+name = "unicode-width"
+version = "0.1.14"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7dd6e30e90baa6f72411720665d41d89b9a3d039dc45b8faea1ddd07f617f6af"
+
+[[package]]
 name = "unsafe-libyaml"
 version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1226,13 +1334,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "xtensa-lx"
+version = "0.13.0"
+source = "git+https://github.com/esp-rs/esp-hal?branch=main#6b735e1510d75b8620503ae6aa2f7fd6948dfa08"
+dependencies = [
+ "critical-section",
+]
+
+[[package]]
 name = "xtensa-lx-rt"
 version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8709f037fb123fe7ff146d2bce86f9dc0dfc53045c016bfd9d703317b6502845"
 dependencies = [
  "document-features",
- "xtensa-lx",
+ "xtensa-lx 0.13.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "xtensa-lx-rt-proc-macros",
 ]
 

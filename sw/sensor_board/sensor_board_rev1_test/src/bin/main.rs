@@ -32,9 +32,7 @@ esp_bootloader_esp_idf::esp_app_desc!();
 #[main]
 fn main() -> ! {
     // generator version: 0.6.0
-
     esp_println::logger::init_logger_from_env();
-
     let config = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
     let _peripherals = esp_hal::init(config);
 
@@ -64,21 +62,6 @@ fn main() -> ! {
 }
 
 fn test_asm330<S: SpiBus<u8>>(imu_spi: &mut S) {
-    let v = asm330::XLConfig {
-        odr_xl: asm330::Setting::new::<0b1000>(),
-        fs_xl: asm330::Setting::new::<0b11>(),
-        lpf2_xl_en: asm330::Setting::new::<0b0>(),
-        hpcf_xl: asm330::Setting::new::<0b0>(),
-        hp_ref_mode_xl: asm330::Setting::new::<0b0>(),
-        fast_settle_mode_xl: asm330::Setting::new::<0b0>(),
-        hp_slope_xl_en: asm330::Setting::new::<0b0>(),
-        low_pass_on_6d: asm330::Setting::new::<0b0>(),
-        usr_off_w: asm330::Setting::new::<0b0>(),
-        usr_off_on_out: asm330::Setting::new::<0b0>(),
-        x_ofs_usr: asm330::Setting::default(),
-        y_ofs_usr: asm330::Setting::default(),
-        z_ofs_usr: asm330::Setting::default(),
-    };
-    let _ = asm330::SystemConfig::default();
+    let _ = asm330::DeviceConfig::default();
     panic!("tests passed");
 }

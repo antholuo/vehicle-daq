@@ -141,6 +141,14 @@ pub const VALUE_WHO_AM_I: u8 = 0x6B;
 
 pub const BITMASK_SPI_RW: u8 = 0x80;
 
+pub enum FifoSensorTag {
+    Gyro = 0x01,
+    Accel = 0x02,
+    Temp = 0x03,
+    Time = 0x04,
+    Cfg = 0x05,
+}
+
 // ----- SPI Interface -----
 
 pub fn spi_read_reg<S>(spi: &mut S, reg_addr: u8) -> Result<u8, Asm330Error>
