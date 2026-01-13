@@ -49,10 +49,6 @@ async fn send_nmea_command(uart: &mut Uart<'static, Async>, payload: &str, name:
 pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uart<'static, Async> {
     info!("Starting GPS configuration using $PUBX,40 commands...");
 
-    // TODO: Configure GPS for 10hz updates & 115200 baud
-    // ONLY DO THIS WHEN THE NEW GPS COMES IN, since we will have to set baud rate at configuration
-    // time, meaning we must set the baud for all the gps's, then change the code, then use the GPS
-
     // The payloads (excluding the leading '$' and trailing '*cs')
     const GSA_PAYLOAD: &str = "PUBX,40,GSA,0,0,0,0,0,0";
     const GSV_PAYLOAD: &str = "PUBX,40,GSV,0,0,0,0,0,0";
@@ -62,6 +58,30 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
     send_nmea_command(&mut gps2_uart, GSA_PAYLOAD, "GSA").await;
     send_nmea_command(&mut gps2_uart, GSV_PAYLOAD, "GSV").await;
     send_nmea_command(&mut gps2_uart, GLL_PAYLOAD, "GLL").await;
+
+    // TODO: Configure GPS for 10hz updates & 115200 baud
+    // ONLY DO THIS WHEN THE NEW GPS COMES IN, since we will have to set baud rate at configuration
+    // time, meaning we must set the baud for all the gps's, then change the code, then use the GPS
+
+    // This sets baud to 460800
+    // default for M8 is 9600, default for F10 is 38400. Reset to default, set high baud, then set
+    // high baud. Theoretically we can reconfigure the uart on the fly by dropping and re-creating
+    // but that seems really difficult and I don't want to do that
+    // send_nmea_command(&mut gps2_uart, "PUBX,41,1,3,3,460800,0", "SET BAUD 460800").await;
+
+    // This *should* set 10hz updates but I need to implement send_ubx_packet
+    const UBX_CFG_VALSET_10HZ: [u8; 17] = [
+        0xB5, 0x62, // Sync
+        0x06, 0x8A, // Class: CFG, ID: VALSET
+        0x09, 0x00, // Length: 9 bytes
+        0x00, // Version 0
+        0x01, // Layers (1 = RAM only, use 0x07 for RAM+Flash+BBR)
+        0x00, 0x00, // Reserved
+        0x01, 0x00, 0x21, 0x30, // Key ID: CFG-RATE-MEAS (0x30210001) - Little Endian
+        0x64, // 0x64 == 100 ms
+        0x60, 0x34, // Checksum A/B
+    ];
+    // send_ubx_packet(&mut gps2_uart, &UBX_CFG_VALSET_25HZ, "CFG-RATE-MEAS 25Hz").await;
 
     gps2_uart
 }
