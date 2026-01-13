@@ -89,7 +89,7 @@ impl SensorBoardRev1 {
             .into_async();
         let neopixel = neopixel::NeoPixel::new(rmt.channel0, peripherals.GPIO18);
 
-        let gps2_uart_config = esp_hal::uart::Config::default().with_baudrate(9600);
+        let gps2_uart_config = esp_hal::uart::Config::default().with_baudrate(38400);
         info!("baudrate for gps2_uart_set");
         let gps2_uart = esp_hal::uart::Uart::new(peripherals.UART1, gps2_uart_config)
             .unwrap()
