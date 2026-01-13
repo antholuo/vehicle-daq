@@ -28,6 +28,18 @@ pub type SharedSpiBus = Mutex<NoopRawMutex, Spi<'static, Async>>;
 
 pub type SharedSpiDevice = SpiDevice<'static, NoopRawMutex, Spi<'static, Async>, Output<'static>>;
 
+/// ESP-NOW operating mode for the board
+#[cfg(feature = "wifi")]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EspNowMode {
+    /// Sender mode: transmits sensor data from channel + heartbeats
+    /// Used by sensor nodes that collect and send data
+    Sender,
+    /// Transceiver mode: receives ESP-NOW messages + sends heartbeats
+    /// Used for testing purposes, receives data from other nodes
+    Transceiver,
+}
+
 /// WiFi resources bundle containing the controller and available interfaces
 #[cfg(feature = "wifi")]
 pub struct WifiResources {
@@ -55,4 +67,8 @@ pub trait BoardPeripherals {
     // WIRELESS
     #[cfg(feature = "wifi")]
     fn take_wifi(&mut self) -> Option<WifiResources>;
+
+    /// Returns the ESP-NOW operating mode for this board
+    #[cfg(feature = "wifi")]
+    fn espnow_mode(&self) -> EspNowMode;
 }

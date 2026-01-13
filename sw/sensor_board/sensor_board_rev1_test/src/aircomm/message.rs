@@ -66,8 +66,8 @@ impl HeartbeatData {
 // Serialization sizes for aircomm protocol (payload only, excluding header)
 // Header is always: message_type(1) + timestamp(8) = 9 bytes
 // HeartbeatData: magic(1) = 1 byte (timestamp moved to message level)
-// ImuData: TBD (timestamp moved to message level)
-pub const IMU_SERIALIZED_SIZE: usize = 0; // TODO: Update when IMU fields are implemented
+// ImuData: accel_x(4) + accel_y(4) + accel_z(4) + gyro_x(4) + gyro_y(4) + gyro_z(4) = 24 bytes
+pub const IMU_SERIALIZED_SIZE: usize = 6 * 4; // 6 f32 fields = 24 bytes
 // GpsTime: year(2) + month(1) + day(1) + hours(1) + minutes(1) + seconds(1) + millis(2) = 9 bytes
 pub const GPS_TIME_SERIALIZED_SIZE: usize = 2 + 1 + 1 + 1 + 1 + 1 + 2;
 // GpsData: lat(8) + lon(8) + alt(4) + speed(4) + heading(2) + time(9) = 35 bytes

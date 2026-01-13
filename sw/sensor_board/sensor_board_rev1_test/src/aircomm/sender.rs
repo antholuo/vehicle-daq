@@ -27,7 +27,6 @@ pub(crate) async fn send_heartbeat(
 }
 
 /// Send IMU data asynchronously
-#[allow(dead_code)]
 pub(crate) async fn send_imu(
     esp_now: &mut EspNow<'_>,
     timestamp_us: u64,
@@ -43,7 +42,6 @@ pub(crate) async fn send_imu(
 }
 
 /// Send GPS data asynchronously
-#[allow(dead_code)]
 pub(crate) async fn send_gps(
     esp_now: &mut EspNow<'_>,
     timestamp_us: u64,

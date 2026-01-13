@@ -12,6 +12,11 @@ use esp_hal::gpio::Output;
 use log::{debug, error, info, trace, warn};
 
 #[cfg(feature = "wifi")]
+use embassy_sync::channel::Channel;
+#[cfg(feature = "wifi")]
+use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
+
+#[cfg(feature = "wifi")]
 use crate::aircomm::{AirCommTransceiver, HeartbeatData, SensorMessage, SensorPayload, BROADCAST};
 #[cfg(feature = "gps")]
 use crate::gps::{init_gps, start_gps};
@@ -20,8 +25,21 @@ use crate::hmi::{neopixel, start_hmi};
 #[cfg(feature = "imu")]
 use crate::imu::start_imu;
 use crate::BoardPeripherals;
+#[cfg(feature = "wifi")]
+use crate::EspNowMode;
 #[cfg(feature = "imu")]
 use crate::SharedSpiDevice;
+
+/// Capacity of the sensor data channel
+/// Allows buffering sensor samples while ESP-NOW sends
+#[cfg(feature = "wifi")]
+const SENSOR_CHANNEL_CAPACITY: usize = 8;
+
+/// Sensor data channel for inter-task communication
+/// Sensors push data here, ESP-NOW sender task consumes and transmits
+#[cfg(feature = "wifi")]
+static SENSOR_CHANNEL: Channel<CriticalSectionRawMutex, SensorPayload, SENSOR_CHANNEL_CAPACITY> =
+    Channel::new();
 
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
     info!("app is starting execution now");
@@ -30,22 +48,22 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     let user_led = board.take_user_led();
     #[cfg(feature = "hmi")]
     trace!("User Led initialized!");
-    
+
     #[cfg(feature = "hmi")]
     let neopixel = board.take_neopixel();
     #[cfg(feature = "hmi")]
     trace!("NeoPixel initialized!");
-    
+
     #[cfg(feature = "hmi")]
     let _disp_spi_device = board.take_disp_spi_device();
     #[cfg(feature = "hmi")]
     trace!("DISPLAY_SPI device taken");
-    
+
     #[cfg(feature = "imu")]
     let imu_spi_device = board.take_imu_spi_device();
     #[cfg(feature = "imu")]
     trace!("IMU_SPI device taken");
-    
+
     #[cfg(feature = "gps")]
     let gps2_uart = board.take_gps2_uart();
     #[cfg(feature = "gps")]
@@ -58,32 +76,48 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
         .spawn(start_hmi_task(user_led, neopixel))
         .expect("HMI task did not spawn");
 
+    // Sensor tasks with callbacks for data
     #[cfg(feature = "imu")]
     spawner
         .spawn(start_imu_task(imu_spi_device))
         .expect("imu task did not spawn");
-    
+
     #[cfg(feature = "gps")]
     spawner
         .spawn(start_gps_task(gps2_uart))
         .expect("GPS task did not spawn");
 
-    // ESP-NOW / AirComm task
+    // WiFi/ESP-NOW tasks - spawn based on board's configured mode
     #[cfg(feature = "wifi")]
-    if let Some(wifi) = board.take_wifi() {
-        match AirCommTransceiver::new(wifi.esp_now) {
-            Ok(transceiver) => {
-                info!("AirComm transceiver initialized");
-                spawner
-                    .spawn(espnow_task(transceiver, wifi.controller))
-                    .expect("ESP-NOW task did not spawn");
+    {
+        let mode = board.espnow_mode();
+        if let Some(wifi) = board.take_wifi() {
+            match AirCommTransceiver::new(wifi.esp_now) {
+                Ok(transceiver) => {
+                    info!("AirComm transceiver initialized");
+
+                    match mode {
+                        EspNowMode::Sender => {
+                            info!("ESP-NOW mode: Sender (transmit sensor data)");
+                            spawner
+                                .spawn(espnow_sender_task(transceiver, wifi.controller))
+                                .expect("ESP-NOW sender task did not spawn");
+                        }
+                        EspNowMode::Transceiver => {
+                            info!("ESP-NOW mode: Transceiver (receive + heartbeat)");
+                            spawner
+                                .spawn(espnow_transceiver_task(transceiver, wifi.controller))
+                                .expect("ESP-NOW transceiver task did not spawn");
+                        }
+                    }
+                }
+                Err(e) => {
+                    warn!("Failed to create AirComm transceiver: {:?}", e);
+                }
             }
-            Err(e) => {
-                warn!("Failed to create AirComm transceiver: {:?}", e);
-            }
+        } else {
+            warn!("WiFi not available - skipping wireless communication");
         }
-    } else {
-        warn!("WiFi not available - skipping wireless communication");
     }
 
     loop {
@@ -105,29 +139,73 @@ async fn start_hmi_task(user_led: Output<'static>, neopixel: neopixel::NeoPixel<
 #[embassy_executor::task]
 async fn start_imu_task(imu_spi_device: SharedSpiDevice) {
     info!("IMU TASK BEING SPAWNED");
-    start_imu(imu_spi_device).await;
+
+    // Callback: send IMU data to channel for transmission
+    #[cfg(feature = "wifi")]
+    let on_imu_data = |data: crate::types::ImuData| {
+        if SENSOR_CHANNEL
+            .try_send(SensorPayload::Imu(data))
+            .is_err()
+        {
+            warn!("[IMU] Channel full, dropping sample");
+        } else {
+            trace!("[IMU] Sent data to channel");
+        }
+    };
+
+    // No-op callback when wifi is disabled
+    #[cfg(not(feature = "wifi"))]
+    let on_imu_data = |_data: crate::types::ImuData| {
+        // Data is logged in start_imu, nothing else to do
+    };
+
+    start_imu(imu_spi_device, on_imu_data).await;
 }
 
 #[cfg(feature = "gps")]
 #[embassy_executor::task]
 async fn start_gps_task(mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Async>) {
     gps2_uart = init_gps(gps2_uart).await;
-    start_gps(gps2_uart).await;
+
+    // Callback: send GPS data to channel for transmission
+    #[cfg(feature = "wifi")]
+    let on_gps_data = |data: crate::types::GpsData| {
+        if SENSOR_CHANNEL
+            .try_send(SensorPayload::Gps(data))
+            .is_err()
+        {
+            warn!("[GPS] Channel full, dropping sample");
+        } else {
+            trace!("[GPS] Sent data to channel");
+        }
+    };
+
+    // No-op callback when wifi is disabled
+    #[cfg(not(feature = "wifi"))]
+    let on_gps_data = |_data: crate::types::GpsData| {
+        // Data is logged in start_gps, nothing else to do
+    };
+
+    start_gps(gps2_uart, on_gps_data).await;
 }
+
+// =============================================================================
+// ESP-NOW Tasks
+// =============================================================================
 
 /// ESP-NOW transceiver task
 ///
-/// Handles both sending heartbeats at regular intervals and receiving messages.
-/// Uses timeout-based receive to avoid blocking heartbeat transmission.
+/// Handles both receiving ESP-NOW messages and sending periodic heartbeats.
+/// Used by bridge/receiver nodes (e.g., DevKit-C) for testing or forwarding data.
 ///
 /// Note: `_wifi_controller` must be kept alive for ESP-NOW to function properly.
 #[cfg(feature = "wifi")]
 #[embassy_executor::task]
-async fn espnow_task(
+async fn espnow_transceiver_task(
     mut transceiver: AirCommTransceiver<'static>,
     _wifi_controller: esp_radio::wifi::WifiController<'static>,
 ) {
-    info!("[ESP-NOW] Task started");
+    info!("[ESP-NOW] Transceiver task started (RX + TX heartbeats)");
 
     const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(1);
 
@@ -144,7 +222,7 @@ async fn espnow_task(
             HEARTBEAT_INTERVAL - elapsed
         };
 
-        // Try to receive with timeout (doesn't cancel the receive, just times out)
+        // Try to receive with timeout
         match embassy_time::with_timeout(timeout, transceiver.receive()).await {
             Ok(Ok(msg)) => {
                 // Successfully received a message
@@ -167,12 +245,93 @@ async fn espnow_task(
     }
 }
 
+/// ESP-NOW sender task (default)
+///
+/// Receives sensor data from the channel and transmits via ESP-NOW.
+/// Also sends periodic heartbeats to indicate the node is alive.
+///
+/// Note: `_wifi_controller` must be kept alive for ESP-NOW to function properly.
+#[cfg(feature = "wifi")]
+#[embassy_executor::task]
+async fn espnow_sender_task(
+    mut transceiver: AirCommTransceiver<'static>,
+    _wifi_controller: esp_radio::wifi::WifiController<'static>,
+) {
+    info!("[ESP-NOW] Sender task started");
+
+    const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(1);
+
+    // Send first heartbeat immediately
+    send_heartbeat(&mut transceiver).await;
+    let mut last_heartbeat = Instant::now();
+
+    loop {
+        // Calculate how long until next heartbeat is due
+        let elapsed = last_heartbeat.elapsed();
+        let timeout = if elapsed >= HEARTBEAT_INTERVAL {
+            Duration::from_millis(0)
+        } else {
+            HEARTBEAT_INTERVAL - elapsed
+        };
+
+        // Try to receive sensor data from channel with timeout
+        match embassy_time::with_timeout(timeout, SENSOR_CHANNEL.receive()).await {
+            Ok(payload) => {
+                // Got sensor data, transmit it
+                let timestamp_us = Instant::now().as_micros();
+
+                let result = match &payload {
+                    SensorPayload::Imu(data) => {
+                        debug!("[ESP-NOW TX] Sending IMU data");
+                        transceiver.send_imu(timestamp_us, data, &BROADCAST).await
+                    }
+                    SensorPayload::Gps(data) => {
+                        debug!("[ESP-NOW TX] Sending GPS data");
+                        transceiver.send_gps(timestamp_us, data, &BROADCAST).await
+                    }
+                    SensorPayload::Heartbeat(data) => {
+                        debug!("[ESP-NOW TX] Sending Heartbeat");
+                        transceiver
+                            .send_heartbeat(timestamp_us, data, &BROADCAST)
+                            .await
+                    }
+                };
+
+                match result {
+                    Ok(()) => {
+                        trace!("[ESP-NOW TX] Sent {:?}", payload.message_type());
+                    }
+                    Err(e) => {
+                        warn!("[ESP-NOW TX] Send failed: {:?}", e);
+                    }
+                }
+            }
+            Err(_) => {
+                // Timeout - no sensor data, that's fine
+            }
+        }
+
+        // Check if it's time to send heartbeat
+        if last_heartbeat.elapsed() >= HEARTBEAT_INTERVAL {
+            send_heartbeat(&mut transceiver).await;
+            last_heartbeat = Instant::now();
+        }
+    }
+}
+
+// =============================================================================
+// Helper Functions
+// =============================================================================
+
 #[cfg(feature = "wifi")]
 async fn send_heartbeat(transceiver: &mut AirCommTransceiver<'static>) {
     let timestamp_us = Instant::now().as_micros();
     let heartbeat = HeartbeatData::default();
 
-    match transceiver.send_heartbeat(timestamp_us, &heartbeat, &BROADCAST).await {
+    match transceiver
+        .send_heartbeat(timestamp_us, &heartbeat, &BROADCAST)
+        .await
+    {
         Ok(()) => {
             info!("[ESP-NOW TX] Heartbeat sent (time={}us)", timestamp_us);
         }
@@ -186,7 +345,7 @@ async fn send_heartbeat(transceiver: &mut AirCommTransceiver<'static>) {
 fn handle_received_message(msg: &SensorMessage) {
     let src = msg.src_address;
     let timestamp = msg.timestamp_us;
-    
+
     match &msg.payload {
         SensorPayload::Heartbeat(data) => {
             info!(
@@ -195,11 +354,11 @@ fn handle_received_message(msg: &SensorMessage) {
                 data.magic, timestamp
             );
         }
-        SensorPayload::Imu(_data) => {
+        SensorPayload::Imu(data) => {
             info!(
-                "[ESP-NOW RX] IMU from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | time={}us, TODO: IMU fields",
+                "[ESP-NOW RX] IMU from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | time={}us, accel=[{:.3}, {:.3}, {:.3}]",
                 src[0], src[1], src[2], src[3], src[4], src[5],
-                timestamp
+                timestamp, data.accel_x, data.accel_y, data.accel_z
             );
         }
         SensorPayload::Gps(data) => {

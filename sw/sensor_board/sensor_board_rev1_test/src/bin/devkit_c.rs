@@ -22,7 +22,7 @@ use sensor_board_rev1_test::hmi::neopixel;
 #[cfg(any(feature = "hmi", feature = "imu"))]
 use sensor_board_rev1_test::{SharedSpiBus, SharedSpiDevice};
 #[cfg(feature = "wifi")]
-use sensor_board_rev1_test::WifiResources;
+use sensor_board_rev1_test::{EspNowMode, WifiResources};
 use sensor_board_rev1_test::{BoardPeripherals, app::app_run};
 
 #[cfg(any(feature = "hmi", feature = "imu"))]
@@ -214,6 +214,12 @@ impl BoardPeripherals for DevkitC {
     fn take_wifi(&mut self) -> Option<WifiResources> {
         trace!("wifi take called");
         self.wifi.take()
+    }
+
+    #[cfg(feature = "wifi")]
+    fn espnow_mode(&self) -> EspNowMode {
+        // DevKit-C acts as a generic receiver for now
+        EspNowMode::Transceiver
     }
 }
 

@@ -3,7 +3,7 @@ edition      = "2024"
 name         = "sensor_board_rev1_test"
 rust-version = "1.88"
 version      = "0.1.0"
-default-run  = "sensor_board_rev1_test"
+default-run  = "rev1_board"
 
 [features]
 default = ["hmi", "imu", "gps", "wifi"]
@@ -13,7 +13,8 @@ gps = []      # GPS sensor (UART)
 wifi = []     # WiFi/ESP-NOW wireless communication
 
 [[bin]]
-name = "sensor_board_rev1_test"
+# A shorter name
+name = "rev1_board"
 path = "./src/bin/sensorboard_rev1.rs"
 
 [[bin]]
