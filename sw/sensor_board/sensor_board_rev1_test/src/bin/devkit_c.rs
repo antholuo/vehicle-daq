@@ -19,11 +19,11 @@ use esp_alloc as _;
 
 #[cfg(feature = "hmi")]
 use sensor_board_rev1_test::hmi::neopixel;
-#[cfg(any(feature = "hmi", feature = "imu"))]
-use sensor_board_rev1_test::{SharedSpiBus, SharedSpiDevice};
+use sensor_board_rev1_test::{BoardPeripherals, app::app_run};
 #[cfg(feature = "wifi")]
 use sensor_board_rev1_test::{EspNowMode, WifiResources};
-use sensor_board_rev1_test::{BoardPeripherals, app::app_run};
+#[cfg(any(feature = "hmi", feature = "imu"))]
+use sensor_board_rev1_test::{SharedSpiBus, SharedSpiDevice};
 
 #[cfg(any(feature = "hmi", feature = "imu"))]
 static SPI_BUS: StaticCell<SharedSpiBus> = StaticCell::new();
@@ -165,8 +165,8 @@ impl DevkitC {
         // USB Serial/JTAG initialization for bridge mode
         // Note: USB Serial/JTAG uses dedicated pins (GPIO12/13 on ESP32-C6)
         // and doesn't need explicit GPIO configuration
-        let usb_serial = esp_hal::usb_serial_jtag::UsbSerialJtag::new(peripherals.USB_DEVICE)
-            .into_async();
+        let usb_serial =
+            esp_hal::usb_serial_jtag::UsbSerialJtag::new(peripherals.USB_DEVICE).into_async();
         let (_, usb_serial_tx) = usb_serial.split();
         info!("USB Serial/JTAG initialized for bridge mode");
 
@@ -233,7 +233,9 @@ impl BoardPeripherals for DevkitC {
         EspNowMode::Bridge
     }
 
-    fn take_usb_serial_tx(&mut self) -> Option<esp_hal::usb_serial_jtag::UsbSerialJtagTx<'static, esp_hal::Async>> {
+    fn take_usb_serial_tx(
+        &mut self,
+    ) -> Option<esp_hal::usb_serial_jtag::UsbSerialJtagTx<'static, esp_hal::Async>> {
         trace!("usb_serial_tx take called");
         self.usb_serial_tx.take()
     }

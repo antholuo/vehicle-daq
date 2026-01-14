@@ -34,7 +34,9 @@ pub async fn start_hmi(
             led_on = !led_on;
 
             // Update NeoPixel color (async)
-            neopixel.set_color_with_brightness(color, neopixel_brightness).await;
+            neopixel
+                .set_color_with_brightness(color, neopixel_brightness)
+                .await;
 
             // Wait for the next tick based on rate
             Timer::after(period).await;

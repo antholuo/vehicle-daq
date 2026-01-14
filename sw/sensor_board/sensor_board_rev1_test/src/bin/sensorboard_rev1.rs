@@ -19,11 +19,11 @@ use esp_alloc as _;
 
 #[cfg(feature = "hmi")]
 use sensor_board_rev1_test::hmi::neopixel;
-#[cfg(any(feature = "hmi", feature = "imu"))]
-use sensor_board_rev1_test::{SharedSpiBus, SharedSpiDevice};
+use sensor_board_rev1_test::{BoardPeripherals, app::app_run};
 #[cfg(feature = "wifi")]
 use sensor_board_rev1_test::{EspNowMode, WifiResources};
-use sensor_board_rev1_test::{BoardPeripherals, app::app_run};
+#[cfg(any(feature = "hmi", feature = "imu"))]
+use sensor_board_rev1_test::{SharedSpiBus, SharedSpiDevice};
 
 #[cfg(any(feature = "hmi", feature = "imu"))]
 static SPI_BUS: StaticCell<SharedSpiBus> = StaticCell::new();
@@ -84,10 +84,9 @@ impl SensorBoardRev1 {
             esp_hal::gpio::OutputConfig::default(),
         );
 
-        let rmt =
-            esp_hal::rmt::Rmt::new(peripherals.RMT, esp_hal::time::Rate::from_mhz(80))
-                .unwrap()
-                .into_async();
+        let rmt = esp_hal::rmt::Rmt::new(peripherals.RMT, esp_hal::time::Rate::from_mhz(80))
+            .unwrap()
+            .into_async();
         let neopixel = neopixel::NeoPixel::new(rmt.channel0, peripherals.GPIO18);
 
         let gps2_uart_config = esp_hal::uart::Config::default().with_baudrate(9600);

@@ -11,13 +11,13 @@ pub type Result<T> = core::result::Result<T, AirCommError>;
 pub enum AirCommError {
     /// ESP-NOW underlying error
     EspNowError(EspNowError),
-    
+
     /// Buffer too small for serialization
     BufferTooSmall,
-    
+
     /// Invalid message format
     InvalidMessage,
-    
+
     /// Unknown message type
     UnknownMessageType,
 }
@@ -38,4 +38,3 @@ impl From<EspNowError> for AirCommError {
         AirCommError::EspNowError(e)
     }
 }
-

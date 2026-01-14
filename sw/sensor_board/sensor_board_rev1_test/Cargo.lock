@@ -1253,6 +1253,7 @@ dependencies = [
  "embassy-executor",
  "embassy-sync 0.7.2",
  "embassy-time",
+ "embassy-time-queue-utils",
  "embedded-hal 1.0.0",
  "embedded-hal-async",
  "esp-alloc",

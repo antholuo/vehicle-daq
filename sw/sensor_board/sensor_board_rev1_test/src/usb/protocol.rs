@@ -1,16 +1,15 @@
+use crate::aircomm::{MessageType, SensorPayload};
 /// USB Protocol for sensor data forwarding
 ///
 /// Defines the message format for forwarding ESP-NOW received data to a host.
-/// 
+///
 /// Message format:
 /// ```text
 /// [MAC Address (6B)][NodeId (2B)][Timestamp (8B)][MessageType (1B)][Payload (variable)]
 /// ```
 ///
 /// The entire message is COBS-encoded and terminated with 0x00.
-
 use crate::types::NodeId;
-use crate::aircomm::{SensorPayload, MessageType};
 use byteorder::{ByteOrder, LittleEndian};
 
 /// Header size: MAC (6) + NodeId (2) + Timestamp (8) + MsgType (1) = 17 bytes
@@ -142,4 +141,3 @@ pub enum ForwardError {
     /// Output buffer is too small
     BufferTooSmall,
 }
-

@@ -5,13 +5,12 @@
 ///
 /// Uses COBS (Consistent Overhead Byte Stuffing) framing to ensure
 /// reliable message delimiting over the serial connection.
-
 pub mod protocol;
 
-use esp_hal::usb_serial_jtag::UsbSerialJtagTx;
 use esp_hal::Async;
+use esp_hal::usb_serial_jtag::UsbSerialJtagTx;
 
-pub use protocol::{serialize_forwarded_message, format_mac, ForwardError, MAX_USB_MESSAGE_SIZE};
+pub use protocol::{ForwardError, MAX_USB_MESSAGE_SIZE, format_mac, serialize_forwarded_message};
 
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
@@ -67,7 +66,11 @@ impl UsbSerial {
         // Flush to ensure data is sent
         self.tx.flush_tx().unwrap();
 
-        trace!("[USB] Sent {} bytes ({} encoded + delimiter)", data.len(), encoded_len);
+        trace!(
+            "[USB] Sent {} bytes ({} encoded + delimiter)",
+            data.len(),
+            encoded_len
+        );
 
         Ok(())
     }
@@ -87,4 +90,3 @@ pub enum UsbError {
     /// Message exceeds maximum allowed size
     MessageTooLarge,
 }
-

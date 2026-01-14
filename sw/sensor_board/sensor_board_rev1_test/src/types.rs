@@ -103,36 +103,56 @@ impl Default for NodeId {
 }
 
 /// Get the car position configured via Cargo features.
-/// 
+///
 /// Set at compile time using one of: `pos_front_left`, `pos_center`, etc.
 /// Defaults to `Custom` if no position feature is enabled.
-/// 
+///
 /// Example build command:
 /// ```bash
 /// cargo build --bin rev1_board --features "pos_front_left"
 /// ```
 pub const fn configured_position() -> CarPosition {
     #[cfg(feature = "pos_front_left")]
-    { return CarPosition::FrontLeft; }
+    {
+        return CarPosition::FrontLeft;
+    }
     #[cfg(feature = "pos_front_center")]
-    { return CarPosition::FrontCenter; }
+    {
+        return CarPosition::FrontCenter;
+    }
     #[cfg(feature = "pos_front_right")]
-    { return CarPosition::FrontRight; }
+    {
+        return CarPosition::FrontRight;
+    }
     #[cfg(feature = "pos_left")]
-    { return CarPosition::Left; }
+    {
+        return CarPosition::Left;
+    }
     #[cfg(feature = "pos_center")]
-    { return CarPosition::Center; }
+    {
+        return CarPosition::Center;
+    }
     #[cfg(feature = "pos_right")]
-    { return CarPosition::Right; }
+    {
+        return CarPosition::Right;
+    }
     #[cfg(feature = "pos_rear_left")]
-    { return CarPosition::RearLeft; }
+    {
+        return CarPosition::RearLeft;
+    }
     #[cfg(feature = "pos_rear_center")]
-    { return CarPosition::RearCenter; }
+    {
+        return CarPosition::RearCenter;
+    }
     #[cfg(feature = "pos_rear_right")]
-    { return CarPosition::RearRight; }
+    {
+        return CarPosition::RearRight;
+    }
     #[cfg(feature = "pos_roof")]
-    { return CarPosition::Roof; }
-    
+    {
+        return CarPosition::Roof;
+    }
+
     // Default when no position feature is set
     #[allow(unreachable_code)]
     CarPosition::Custom

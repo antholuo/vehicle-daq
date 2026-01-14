@@ -43,12 +43,22 @@ impl<'a> AirCommTransceiver<'a> {
     }
 
     /// Send IMU data to a peer
-    pub async fn send_imu(&mut self, timestamp_us: u64, data: &ImuData, peer_addr: &[u8; 6]) -> Result<()> {
+    pub async fn send_imu(
+        &mut self,
+        timestamp_us: u64,
+        data: &ImuData,
+        peer_addr: &[u8; 6],
+    ) -> Result<()> {
         sender::send_imu(&mut self.esp_now, timestamp_us, data, peer_addr).await
     }
 
     /// Send GPS data to a peer
-    pub async fn send_gps(&mut self, timestamp_us: u64, data: &GpsData, peer_addr: &[u8; 6]) -> Result<()> {
+    pub async fn send_gps(
+        &mut self,
+        timestamp_us: u64,
+        data: &GpsData,
+        peer_addr: &[u8; 6],
+    ) -> Result<()> {
         sender::send_gps(&mut self.esp_now, timestamp_us, data, peer_addr).await
     }
 
