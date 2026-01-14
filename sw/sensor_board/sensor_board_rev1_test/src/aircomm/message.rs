@@ -45,10 +45,10 @@ pub struct HeartbeatData {
 impl HeartbeatData {
     /// Size in bytes when serialized
     pub const SERIALIZED_SIZE: usize = 1; // magic only
-    
+
     /// Default magic byte value
     pub const DEFAULT_MAGIC: u8 = 0x42;
-    
+
     /// Create a new heartbeat with magic byte
     ///
     /// # Arguments
@@ -56,7 +56,7 @@ impl HeartbeatData {
     pub fn new(magic: u8) -> Self {
         Self { magic }
     }
-    
+
     /// Create a new heartbeat with default magic byte
     pub fn default() -> Self {
         Self::new(Self::DEFAULT_MAGIC)
@@ -103,4 +103,3 @@ impl SensorPayload {
         }
     }
 }
-

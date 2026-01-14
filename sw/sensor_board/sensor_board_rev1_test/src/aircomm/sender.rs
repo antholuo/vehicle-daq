@@ -5,7 +5,7 @@
 
 use super::error::Result;
 use super::message::*;
-use super::protocol::{serialize_gps, serialize_heartbeat, serialize_imu, MAX_PAYLOAD_SIZE};
+use super::protocol::{MAX_PAYLOAD_SIZE, serialize_gps, serialize_heartbeat, serialize_imu};
 use esp_radio::esp_now::EspNow;
 
 /// Broadcast MAC address for sending to all peers

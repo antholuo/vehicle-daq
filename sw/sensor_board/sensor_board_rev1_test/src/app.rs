@@ -12,23 +12,27 @@ use esp_hal::gpio::Output;
 use log::{debug, error, info, trace, warn};
 
 #[cfg(feature = "wifi")]
-use embassy_sync::channel::Channel;
-#[cfg(feature = "wifi")]
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
-
 #[cfg(feature = "wifi")]
-use crate::aircomm::{AirCommTransceiver, HeartbeatData, SensorMessage, SensorPayload, BROADCAST};
+use embassy_sync::channel::Channel;
+
+use crate::BoardPeripherals;
+#[cfg(feature = "wifi")]
+use crate::EspNowMode;
+#[cfg(feature = "imu")]
+use crate::SharedSpiDevice;
+#[cfg(feature = "wifi")]
+use crate::aircomm::{AirCommTransceiver, BROADCAST, HeartbeatData, SensorMessage, SensorPayload};
 #[cfg(feature = "gps")]
 use crate::gps::{init_gps, start_gps};
 #[cfg(feature = "hmi")]
 use crate::hmi::{neopixel, start_hmi};
 #[cfg(feature = "imu")]
 use crate::imu::start_imu;
-use crate::BoardPeripherals;
-#[cfg(feature = "wifi")]
-use crate::EspNowMode;
-#[cfg(feature = "imu")]
-use crate::SharedSpiDevice;
+#[cfg(all(feature = "wifi", feature = "usb"))]
+use crate::types::NodeId;
+#[cfg(feature = "usb")]
+use crate::usb::{MAX_USB_MESSAGE_SIZE, UsbSerial, format_mac, serialize_forwarded_message};
 
 /// Capacity of the sensor data channel
 /// Allows buffering sensor samples while ESP-NOW sends
@@ -109,6 +113,36 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
                                 .spawn(espnow_transceiver_task(transceiver, wifi.controller))
                                 .expect("ESP-NOW transceiver task did not spawn");
                         }
+                        #[cfg(feature = "usb")]
+                        EspNowMode::Bridge => {
+                            info!("ESP-NOW mode: Bridge (receive + forward to USB)");
+                            if let Some(usb_tx) = board.take_usb_serial_tx() {
+                                let usb_serial = UsbSerial::new(usb_tx);
+                                spawner
+                                    .spawn(espnow_bridge_task(
+                                        transceiver,
+                                        wifi.controller,
+                                        usb_serial,
+                                    ))
+                                    .expect("ESP-NOW bridge task did not spawn");
+                            } else {
+                                warn!(
+                                    "USB Serial not available - falling back to transceiver mode"
+                                );
+                                spawner
+                                    .spawn(espnow_transceiver_task(transceiver, wifi.controller))
+                                    .expect("ESP-NOW transceiver task did not spawn");
+                            }
+                        }
+                        #[cfg(not(feature = "usb"))]
+                        EspNowMode::Bridge => {
+                            warn!(
+                                "Bridge mode requires USB feature - falling back to transceiver mode"
+                            );
+                            spawner
+                                .spawn(espnow_transceiver_task(transceiver, wifi.controller))
+                                .expect("ESP-NOW transceiver task did not spawn");
+                        }
                     }
                 }
                 Err(e) => {
@@ -143,10 +177,7 @@ async fn start_imu_task(imu_spi_device: SharedSpiDevice) {
     // Callback: send IMU data to channel for transmission
     #[cfg(feature = "wifi")]
     let on_imu_data = |data: crate::types::ImuData| {
-        if SENSOR_CHANNEL
-            .try_send(SensorPayload::Imu(data))
-            .is_err()
-        {
+        if SENSOR_CHANNEL.try_send(SensorPayload::Imu(data)).is_err() {
             warn!("[IMU] Channel full, dropping sample");
         } else {
             trace!("[IMU] Sent data to channel");
@@ -170,10 +201,7 @@ async fn start_gps_task(mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Asy
     // Callback: send GPS data to channel for transmission
     #[cfg(feature = "wifi")]
     let on_gps_data = |data: crate::types::GpsData| {
-        if SENSOR_CHANNEL
-            .try_send(SensorPayload::Gps(data))
-            .is_err()
-        {
+        if SENSOR_CHANNEL.try_send(SensorPayload::Gps(data)).is_err() {
             warn!("[GPS] Channel full, dropping sample");
         } else {
             trace!("[GPS] Sent data to channel");
@@ -319,6 +347,89 @@ async fn espnow_sender_task(
     }
 }
 
+/// ESP-NOW bridge task
+///
+/// Receives ESP-NOW messages from sensor nodes and forwards them to USB.
+/// This is the core of the sensor bridge functionality.
+///
+/// Message format over USB (COBS-framed):
+/// [MAC (6B)][NodeId (2B)][Timestamp (8B)][MsgType (1B)][Payload]
+///
+/// Note: `_wifi_controller` must be kept alive for ESP-NOW to function properly.
+#[cfg(all(feature = "wifi", feature = "usb"))]
+#[embassy_executor::task]
+async fn espnow_bridge_task(
+    mut transceiver: AirCommTransceiver<'static>,
+    _wifi_controller: esp_radio::wifi::WifiController<'static>,
+    mut usb_serial: UsbSerial,
+) {
+    info!("[BRIDGE] Bridge task started (ESP-NOW -> USB)");
+
+    // Buffer for serializing messages
+    let mut msg_buffer = [0u8; MAX_USB_MESSAGE_SIZE];
+
+    // Statistics
+    let mut messages_forwarded: u32 = 0;
+    let mut errors: u32 = 0;
+
+    loop {
+        // Wait for incoming ESP-NOW message
+        match transceiver.receive().await {
+            Ok(msg) => {
+                let src_mac: [u8; 6] = msg.src_address;
+                let timestamp_us = msg.timestamp_us;
+
+                // For now, use a default NodeId - in production this would be
+                // looked up from a MAC -> NodeId mapping table
+                let node_id = NodeId::default();
+
+                // Serialize the message
+                match serialize_forwarded_message(
+                    &src_mac,
+                    &node_id,
+                    timestamp_us,
+                    &msg.payload,
+                    &mut msg_buffer,
+                ) {
+                    Ok(len) => {
+                        // Send via USB with COBS framing
+                        match usb_serial.write_framed(&msg_buffer[..len]).await {
+                            Ok(()) => {
+                                messages_forwarded += 1;
+                                trace!(
+                                    "[BRIDGE] Forwarded {:?} from {} (total: {})",
+                                    msg.payload.message_type(),
+                                    format_mac(&src_mac),
+                                    messages_forwarded
+                                );
+                            }
+                            Err(e) => {
+                                errors += 1;
+                                warn!("[BRIDGE] USB write error: {:?}", e);
+                            }
+                        }
+                    }
+                    Err(e) => {
+                        errors += 1;
+                        warn!("[BRIDGE] Serialize error: {:?}", e);
+                    }
+                }
+
+                // Log periodically
+                if messages_forwarded % 100 == 0 && messages_forwarded > 0 {
+                    info!(
+                        "[BRIDGE] Stats: {} forwarded, {} errors",
+                        messages_forwarded, errors
+                    );
+                }
+            }
+            Err(e) => {
+                warn!("[BRIDGE] Receive error: {:?}", e);
+            }
+        }
+    }
+}
+
 // =============================================================================
 // Helper Functions
 // =============================================================================
@@ -350,22 +461,28 @@ fn handle_received_message(msg: &SensorMessage) {
         SensorPayload::Heartbeat(data) => {
             info!(
                 "[ESP-NOW RX] Heartbeat from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | magic=0x{:02X}, time={}us",
-                src[0], src[1], src[2], src[3], src[4], src[5],
-                data.magic, timestamp
+                src[0], src[1], src[2], src[3], src[4], src[5], data.magic, timestamp
             );
         }
         SensorPayload::Imu(data) => {
             info!(
                 "[ESP-NOW RX] IMU from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | time={}us, accel=[{:.3}, {:.3}, {:.3}]",
-                src[0], src[1], src[2], src[3], src[4], src[5],
-                timestamp, data.accel_x, data.accel_y, data.accel_z
+                src[0],
+                src[1],
+                src[2],
+                src[3],
+                src[4],
+                src[5],
+                timestamp,
+                data.accel_x,
+                data.accel_y,
+                data.accel_z
             );
         }
         SensorPayload::Gps(data) => {
             info!(
                 "[ESP-NOW RX] GPS from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | time={}us, lat={:.6}, lon={:.6}",
-                src[0], src[1], src[2], src[3], src[4], src[5],
-                timestamp, data.lat, data.lon
+                src[0], src[1], src[2], src[3], src[4], src[5], timestamp, data.lat, data.lon
             );
         }
     }

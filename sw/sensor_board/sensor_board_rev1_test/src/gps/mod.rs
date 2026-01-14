@@ -255,8 +255,7 @@ fn try_send_gps_data<F>(
     speed_kts: Option<f32>,
     heading: Option<u16>,
     time: Option<GpsTime>,
-)
-where
+) where
     F: Fn(GpsData),
 {
     // Only send if we have at least lat/lon
