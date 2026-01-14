@@ -54,6 +54,7 @@ async fn send_ubx_packet(
     name: &str,
 ) {
     let len = payload.len() as u16;
+    info!("payload len for msg UBX rate resolved to {}", len);
     let len_bytes = len.to_le_bytes(); // UBX is Little Endian
 
     // 1. Build the part of the packet used for checksum calculation
@@ -114,25 +115,23 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
     // send_nmea_command(&mut gps2_uart, "PUBX,41,1,3,3,460800,0", "SET BAUD 460800").await;
 
     // This *should* set 10hz updates but I need to implement send_ubx_packet
-    const UBX_CFG_VALSET_10HZ: [u8; 17] = [
-        0xB5, 0x62, // Sync
-        0x06, 0x8A, // Class: CFG, ID: VALSET
-        0x09, 0x00, // Length: 9 bytes
+    // Correct 10-byte payload for VALSET
+    const UBX_CFG_VALSET_10HZ_PAYLOAD: [u8; 10] = [
         0x00, // Version 0
-        0x07, // Layers (1 = RAM only, use 0x07 for RAM+Flash+BBR)
+        0x07, // Layer: 7 = RAM + Flash + BBR (Persistent)
         0x00, 0x00, // Reserved
-        0x01, 0x00, 0x21, 0x30, // Key ID: CFG-RATE-MEAS (0x30210001) - Little Endian
-        0x64, // 0x64 == 100 ms
-        0x60, 0x34, // Checksum A/B
+        0x01, 0x00, 0x21, 0x30, // Key ID: CFG-RATE-MEAS
+        0x64, 0x00, // Value: 100ms (Little Endian U2)
     ];
-    send_ubx_packet(
-        &mut gps2_uart,
-        0x06, // class: CFG
-        0x8A, // id: valset
-        &UBX_CFG_VALSET_10HZ,
-        "CFG-RATE-MEAS 10Hz", // update this if 25
-    )
-    .await;
+    // UNCOMMENT BELOW IF CONFIGURING A NEW GPS (saved to ROM)
+    // send_ubx_packet(
+    //     &mut gps2_uart,
+    //     0x06, // class: CFG
+    //     0x8A, // id: valset
+    //     &UBX_CFG_VALSET_10HZ_PAYLOAD,
+    //     "CFG-RATE-MEAS 10Hz", // update this if 25
+    // )
+    // .await;
 
     gps2_uart
 }
