@@ -1,7 +1,7 @@
 use core::fmt::Write;
 use esp_hal::Async;
 use esp_hal::uart::Uart;
-use heapless::String;
+use heapless::{String, Vec};
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
@@ -46,6 +46,50 @@ async fn send_nmea_command(uart: &mut Uart<'static, Async>, payload: &str, name:
     }
 }
 
+async fn send_ubx_packet(
+    uart: &mut Uart<'static, Async>,
+    class: u8,
+    id: u8,
+    payload: &[u8],
+    name: &str,
+) {
+    let len = payload.len() as u16;
+    let len_bytes = len.to_le_bytes(); // UBX is Little Endian
+
+    // 1. Build the part of the packet used for checksum calculation
+    // Checksum is calculated over: Class, ID, Length, and Payload
+    let mut checksum_data = Vec::<u8, 128>::new(); // Use a fixed-capacity stack vector
+    checksum_data.push(class).ok();
+    checksum_data.push(id).ok();
+    checksum_data.extend_from_slice(&len_bytes).ok();
+    checksum_data.extend_from_slice(payload).ok();
+
+    // 2. Calculate Fletcher-8 Checksum
+    let mut ck_a: u8 = 0;
+    let mut ck_b: u8 = 0;
+    for &byte in checksum_data.iter() {
+        ck_a = ck_a.wrapping_add(byte);
+        ck_b = ck_b.wrapping_add(ck_a);
+    }
+
+    // 3. Assemble the full frame
+    // [Sync1, Sync2, ChecksumData..., CK_A, CK_B]
+    let mut full_packet = Vec::<u8, 134>::new();
+    full_packet.push(0xB5).ok(); // Sync 1
+    full_packet.push(0x62).ok(); // Sync 2
+    full_packet.extend_from_slice(&checksum_data).ok();
+    full_packet.push(ck_a).ok();
+    full_packet.push(ck_b).ok();
+
+    info!("Sending UBX {} command...", name);
+
+    // 4. Send over UART
+    match uart.write_async(&full_packet).await {
+        Ok(_) => info!("UBX {} sent.", name),
+        Err(e) => error!("Failed to send UBX {}: {:?}", name, e),
+    }
+}
+
 pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uart<'static, Async> {
     info!("Starting GPS configuration using $PUBX,40 commands...");
 
@@ -75,13 +119,20 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
         0x06, 0x8A, // Class: CFG, ID: VALSET
         0x09, 0x00, // Length: 9 bytes
         0x00, // Version 0
-        0x01, // Layers (1 = RAM only, use 0x07 for RAM+Flash+BBR)
+        0x07, // Layers (1 = RAM only, use 0x07 for RAM+Flash+BBR)
         0x00, 0x00, // Reserved
         0x01, 0x00, 0x21, 0x30, // Key ID: CFG-RATE-MEAS (0x30210001) - Little Endian
         0x64, // 0x64 == 100 ms
         0x60, 0x34, // Checksum A/B
     ];
-    // send_ubx_packet(&mut gps2_uart, &UBX_CFG_VALSET_25HZ, "CFG-RATE-MEAS 25Hz").await;
+    send_ubx_packet(
+        &mut gps2_uart,
+        0x06, // class: CFG
+        0x8A, // id: valset
+        &UBX_CFG_VALSET_10HZ,
+        "CFG-RATE-MEAS 10Hz", // update this if 25
+    )
+    .await;
 
     gps2_uart
 }
