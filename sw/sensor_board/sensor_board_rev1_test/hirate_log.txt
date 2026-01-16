@@ -3,7 +3,7 @@ Crystal frequency: 40 MHz
 Flash size:        8MB
 Features:          WiFi 6, BT 5
 MAC address:       58:8c:81:40:be:0c
-App/part. size:    866,992/8,323,072 bytes, 10.42%
+App/part. size:    868,416/8,323,072 bytes, 10.43%
 Commands:
     CTRL+R    Reset chip
     CTRL+C    Exit
@@ -11,7 +11,7 @@ Commands:
 ESP-ROM:esp32c6-20220919
 Build:Sep 19 2022
 rst:0x15 (USB_UART_HPSYS),boot:0x3f (SPI_FAST_FLASH_BOOT)
-Saved PC:0x40800822
+Saved PC:0x40800826
 SPIWP:0xee
 mode:DIO, clock div:2
 load:0x40875730,len:0x175c
@@ -32,12 +32,12 @@ I (53) boot:  0 nvs              WiFi data        01 02 00009000 00006000
 I (59) boot:  1 phy_init         RF data          01 01 0000f000 00001000
 I (66) boot:  2 factory          factory app      00 00 00010000 007f0000
 I (72) boot: End of partition table
-I (76) esp_image: segment 0: paddr=00010020 vaddr=42000020 size=2e8b4h (190644) map
-I (119) esp_image: segment 1: paddr=0003e8dc vaddr=40800000 size=00014h (    20) load
-I (120) esp_image: segment 2: paddr=0003e8f8 vaddr=4202e8f8 size=92a6ch (600684) map
-I (238) esp_image: segment 3: paddr=000d136c vaddr=40800014 size=0e628h ( 58920) load
-I (252) esp_image: segment 4: paddr=000df99c vaddr=4080e640 size=03efch ( 16124) load
-I (256) esp_image: segment 5: paddr=000e38a0 vaddr=40812540 size=001e0h (   480) load
+I (76) esp_image: segment 0: paddr=00010020 vaddr=42000020 size=2e8ech (190700) map
+I (119) esp_image: segment 1: paddr=0003e914 vaddr=40800000 size=00014h (    20) load
+I (120) esp_image: segment 2: paddr=0003e930 vaddr=4202e930 size=92fd0h (602064) map
+I (238) esp_image: segment 3: paddr=000d1908 vaddr=40800014 size=0e628h ( 58920) load
+I (252) esp_image: segment 4: paddr=000dff38 vaddr=4080e640 size=03efch ( 16124) load
+I (256) esp_image: segment 5: paddr=000e3e3c vaddr=40812540 size=001e0h (   480) load
 I (261) boot: Loaded app from partition at offset 0x10000
 I (261) boot: Disabling RNG early entropy source...
 [32mINFO - Configuration complete - running app?[0m
@@ -56,425 +56,250 @@ I (261) boot: Disabling RNG early entropy source...
 [32mINFO - IMU TASK BEING SPAWNED[0m
 [32mINFO - In imu task![0m
 [32mINFO - Attempting to read WHOAMI at reg: 0x0F[0m
-[32mINFO - [ESP-NOW TX] Heartbeat sent (time=363609us)[0m
+[32mINFO - [ESP-NOW TX] Heartbeat sent (time=364240us)[0m
 [32mINFO - WhoAmI value is 0x6B[0m
-[32mINFO - Timestamp enabled[0m
-[32mINFO - TS: 8073196 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.700dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8073735 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.630dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:15 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.08 knots (0.14 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329366666666, Lon=-80.53687566666666, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8074376 Accel: X=-0.053g Y=0.202g Z=0.986g Gyro: X=0.630dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - TS: 8074922 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - TS: 8075460 Accel: X=-0.052g Y=0.200g Z=0.989g Gyro: X=0.595dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - TS: 8076000 Accel: X=-0.052g Y=0.200g Z=0.989g Gyro: X=0.700dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8076537 Accel: X=-0.053g Y=0.201g Z=0.989g Gyro: X=0.595dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8077074 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.735dps Y=-1.575dps Z=-0.945dps[0m
-[32mINFO - TS: 8077604 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - TS: 8078142 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.735dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:15 UTC[0m
+[32mINFO - IMU configured with BDU enabled[0m
+[32mINFO - TS: 25595623 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.630dps Y=-1.540dps Z=-1.015dps[0m
+[32mINFO - TS: 25596166 Accel: X=-0.054g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.435dps Z=-0.910dps[0m
+[32mINFO - TS: 25596696 Accel: X=-0.052g Y=0.202g Z=0.986g Gyro: X=0.770dps Y=-1.505dps Z=-0.910dps[0m
+[32mINFO - TS: 25597231 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.735dps Y=-1.505dps Z=-0.945dps[0m
+[32mINFO - TS: 25597765 Accel: X=-0.052g Y=0.200g Z=0.989g Gyro: X=0.525dps Y=-1.505dps Z=-0.875dps[0m
+[32mINFO - TS: 25598303 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.470dps Z=-0.840dps[0m
+[31mERROR - UART Read Error: FifoOverflowed[0m
+[31mERROR - UART Read Error: FifoOverflowed[0m
+[33mWARN - NMEA Parse Error: Invalid NMEA sentence: Invalid NMEA sentence: .0,M,,*74 for sentence: '.0,M,,*74'[0m
+[32mINFO - TS: 25598840 Accel: X=-0.051g Y=0.198g Z=0.987g Gyro: X=0.525dps Y=-1.470dps Z=-0.840dps[0m
+[32mINFO - TS: 25599374 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.560dps Y=-1.470dps Z=-0.770dps[0m
+[32mINFO - TS: 25599911 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.575dps Z=-0.910dps[0m
+[32mINFO - TS: 25600445 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.525dps Y=-1.575dps Z=-0.980dps[0m
+[32mINFO - TS: 25600984 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.400dps Z=-0.910dps[0m
+[32mINFO - TS: 25601521 Accel: X=-0.053g Y=0.199g Z=0.987g Gyro: X=0.700dps Y=-1.470dps Z=-1.050dps[0m
+[32mINFO - TS: 25602055 Accel: X=-0.051g Y=0.199g Z=0.987g Gyro: X=0.595dps Y=-1.295dps Z=-0.945dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:15 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.06 knots (0.11 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331783333333, Lon=-80.53670866666667, HDOP=2.05, SATS=8[0m
+[32mINFO - TS: 25602750 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.470dps Z=-0.840dps[0m
+[32mINFO - TS: 25603292 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.505dps Z=-0.805dps[0m
+[32mINFO - TS: 25603828 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.595dps Y=-1.645dps Z=-0.910dps[0m
+[32mINFO - TS: 25604371 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.700dps Y=-1.610dps Z=-0.910dps[0m
+[32mINFO - TS: 25604907 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.665dps Y=-1.540dps Z=-0.875dps[0m
+[32mINFO - TS: 25605437 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.595dps Y=-1.505dps Z=-0.910dps[0m
+[32mINFO - TS: 25605961 Accel: X=-0.051g Y=0.202g Z=0.987g Gyro: X=0.630dps Y=-1.470dps Z=-0.910dps[0m
+[32mINFO - TS: 25606507 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.735dps Y=-1.575dps Z=-0.805dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:15 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.09 knots (0.17 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331766666667, Lon=-80.53670916666667, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25607050 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.575dps Z=-0.770dps[0m
+[32mINFO - TS: 25607584 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.630dps Y=-1.470dps Z=-0.910dps[0m
+[32mINFO - TS: 25608121 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.595dps Y=-1.540dps Z=-0.875dps[0m
+[32mINFO - TS: 25608658 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.435dps Z=-0.805dps[0m
+[32mINFO - TS: 25609196 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.700dps Y=-1.540dps Z=-0.910dps[0m
+[32mINFO - TS: 25609730 Accel: X=-0.055g Y=0.199g Z=0.986g Gyro: X=0.700dps Y=-1.470dps Z=-0.805dps[0m
+[32mINFO - TS: 25610263 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.665dps Y=-1.470dps Z=-0.945dps[0m
+[32mINFO - TS: 25610797 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.735dps Y=-1.400dps Z=-0.805dps[0m
+[31mERROR - UART Read Error: FifoOverflowed[0m
+[33mWARN - NMEA Parse Error: Invalid NMEA sentence: Invalid NMEA sentence: 8032.20254,W,2,09,1.80,386.1,M,-36.0,M,,*7C for sentence: '8032.20254,W,2,09,1.80,386.1,M,-36.0,M,,*7C'[0m
+[32mINFO - TS: 25611330 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.735dps Y=-1.470dps Z=-0.840dps[0m
+[32mINFO - TS: 25611863 Accel: X=-0.053g Y=0.200g Z=0.988g Gyro: X=0.700dps Y=-1.540dps Z=-0.875dps[0m
+[32mINFO - TS: 25612403 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.700dps Y=-1.540dps Z=-0.805dps[0m
+[32mINFO - TS: 25612937 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.595dps Y=-1.505dps Z=-0.910dps[0m
+[32mINFO - TS: 25613475 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.560dps Y=-1.505dps Z=-0.945dps[0m
+[32mINFO - TS: 25614006 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.560dps Y=-1.505dps Z=-0.875dps[0m
+[32mINFO - TS: 25614545 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.560dps Y=-1.540dps Z=-0.980dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:15 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.19 knots (0.35 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331766666667, Lon=-80.536709, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25615237 Accel: X=-0.054g Y=0.200g Z=0.986g Gyro: X=0.665dps Y=-1.505dps Z=-0.875dps[0m
+[32mINFO - TS: 25615774 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.595dps Y=-1.505dps Z=-0.910dps[0m
+[32mINFO - TS: 25616319 Accel: X=-0.053g Y=0.199g Z=0.986g Gyro: X=0.665dps Y=-1.330dps Z=-0.875dps[0m
+[32mINFO - TS: 25616858 Accel: X=-0.050g Y=0.200g Z=0.988g Gyro: X=0.735dps Y=-1.540dps Z=-0.980dps[0m
+[32mINFO - TS: 25617396 Accel: X=-0.054g Y=0.200g Z=0.988g Gyro: X=0.630dps Y=-1.575dps Z=-0.700dps[0m
+[32mINFO - TS: 25617930 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.665dps Y=-1.400dps Z=-0.910dps[0m
+[32mINFO - TS: 25618466 Accel: X=-0.053g Y=0.200g Z=0.988g Gyro: X=0.595dps Y=-1.575dps Z=-0.945dps[0m
+[32mINFO - TS: 25618996 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.400dps Z=-0.840dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:15 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.19 knots (0.36 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331783333333, Lon=-80.53670916666667, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25619561 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.735dps Y=-1.505dps Z=-0.805dps[0m
+[32mINFO - TS: 25620101 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.595dps Y=-1.470dps Z=-0.840dps[0m
+[32mINFO - TS: 25620631 Accel: X=-0.051g Y=0.198g Z=0.986g Gyro: X=0.630dps Y=-1.435dps Z=-0.910dps[0m
+[32mINFO - TS: 25621167 Accel: X=-0.052g Y=0.202g Z=0.986g Gyro: X=0.665dps Y=-1.505dps Z=-0.805dps[0m
+[32mINFO - TS: 25621700 Accel: X=-0.050g Y=0.202g Z=0.989g Gyro: X=0.560dps Y=-1.575dps Z=-0.910dps[0m
+[32mINFO - TS: 25622238 Accel: X=-0.052g Y=0.199g Z=0.987g Gyro: X=0.595dps Y=-1.365dps Z=-0.945dps[0m
+[32mINFO - TS: 25622767 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.560dps Y=-1.540dps Z=-0.945dps[0m
+[32mINFO - TS: 25623305 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.700dps Y=-1.435dps Z=-0.875dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:15 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.11 knots (0.20 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331783333333, Lon=-80.53670883333334, HDOP=2.05, SATS=8[0m
+[32mINFO - TS: 25623846 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.420dps Y=-1.470dps Z=-0.875dps[0m
+[32mINFO - TS: 25624386 Accel: X=-0.054g Y=0.202g Z=0.986g Gyro: X=0.595dps Y=-1.470dps Z=-0.910dps[0m
+[32mINFO - TS: 25624924 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.630dps Y=-1.400dps Z=-0.840dps[0m
+[32mINFO - TS: 25625458 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.560dps Y=-1.505dps Z=-0.875dps[0m
+[32mINFO - TS: 25625996 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.735dps Y=-1.365dps Z=-0.840dps[0m
+[32mINFO - TS: 25626533 Accel: X=-0.051g Y=0.201g Z=0.985g Gyro: X=0.490dps Y=-1.575dps Z=-0.805dps[0m
+[32mINFO - TS: 25627068 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.700dps Y=-1.435dps Z=-0.840dps[0m
+[32mINFO - TS: 25627603 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.735dps Y=-1.505dps Z=-0.840dps[0m
+[32mINFO - TS: 25628143 Accel: X=-0.053g Y=0.199g Z=0.987g Gyro: X=0.665dps Y=-1.435dps Z=-0.840dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
 [32mINFO - GNVTG VELOCITY: Speed=0.06 knots (0.12 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329366666666, Lon=-80.5368745, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8078685 Accel: X=-0.051g Y=0.201g Z=0.988g Gyro: X=0.735dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - TS: 8079228 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8079768 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.525dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8080308 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.595dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - TS: 8080848 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.595dps Y=-1.435dps Z=-0.945dps[0m
-[32mINFO - TS: 8081389 Accel: X=-0.051g Y=0.200g Z=0.989g Gyro: X=0.665dps Y=-1.540dps Z=-1.050dps[0m
-[32mINFO - TS: 8081928 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:15 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.02 knots (0.04 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329383333334, Lon=-80.53687433333333, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8082464 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.665dps Y=-1.435dps Z=-0.875dps[0m
-[32mINFO - TS: 8083203 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.560dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8083735 Accel: X=-0.052g Y=0.199g Z=0.987g Gyro: X=0.770dps Y=-1.575dps Z=-0.980dps[0m
-[32mINFO - TS: 8084267 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.540dps Z=-0.805dps[0m
-[32mINFO - TS: 8084817 Accel: X=-0.051g Y=0.202g Z=0.988g Gyro: X=0.665dps Y=-1.610dps Z=-0.945dps[0m
-[32mINFO - TS: 8085354 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.665dps Y=-1.400dps Z=-0.840dps[0m
-[32mINFO - TS: 8085892 Accel: X=-0.052g Y=0.201g Z=0.989g Gyro: X=0.525dps Y=-1.505dps Z=-0.805dps[0m
-[32mINFO - TS: 8086426 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.805dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:15 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.19 knots (0.34 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329366666666, Lon=-80.536876, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8086972 Accel: X=-0.052g Y=0.202g Z=0.988g Gyro: X=0.630dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8087517 Accel: X=-0.051g Y=0.199g Z=0.987g Gyro: X=0.420dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8088057 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.700dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - TS: 8088589 Accel: X=-0.054g Y=0.202g Z=0.988g Gyro: X=0.770dps Y=-1.540dps Z=-0.770dps[0m
-[32mINFO - TS: 8089120 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.595dps Y=-1.435dps Z=-0.770dps[0m
-[32mINFO - TS: 8089655 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.700dps Y=-1.470dps Z=-0.735dps[0m
-[32mINFO - TS: 8090189 Accel: X=-0.054g Y=0.201g Z=0.986g Gyro: X=0.735dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - TS: 8090728 Accel: X=-0.052g Y=0.201g Z=0.989g Gyro: X=0.595dps Y=-1.575dps Z=-0.945dps[0m
-[31mERROR - UART Read Error: FifoOverflowed[0m
-[31mERROR - UART Read Error: FifoOverflowed[0m
-[33mWARN - NMEA Parse Error: Invalid NMEA sentence: Invalid NMEA sentence: ,2,10,1.92,384.2,M,-36.0,M,,*73 for sentence: ',2,10,1.92,384.2,M,-36.0,M,,*73'[0m
-[32mINFO - TS: 8091269 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.735dps Y=-1.435dps Z=-0.945dps[0m
-[32mINFO - TS: 8091802 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.700dps Y=-1.575dps Z=-0.980dps[0m
-[32mINFO - TS: 8092339 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.525dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - TS: 8092876 Accel: X=-0.051g Y=0.202g Z=0.988g Gyro: X=0.665dps Y=-1.505dps Z=-0.770dps[0m
-[32mINFO - TS: 8093416 Accel: X=-0.051g Y=0.202g Z=0.989g Gyro: X=0.665dps Y=-1.470dps Z=-0.770dps[0m
-[32mINFO - TS: 8093952 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.560dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8094488 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.630dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:15 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.10 knots (0.18 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473293166666664, Lon=-80.5368765, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8095213 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.595dps Y=-1.400dps Z=-0.840dps[0m
-[32mINFO - TS: 8095750 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.700dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8096288 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.700dps Y=-1.575dps Z=-0.770dps[0m
-[32mINFO - TS: 8096823 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.630dps Y=-1.610dps Z=-0.910dps[0m
-[32mINFO - TS: 8097356 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.470dps Z=-0.840dps[0m
-[32mINFO - TS: 8097893 Accel: X=-0.051g Y=0.201g Z=0.988g Gyro: X=0.665dps Y=-1.645dps Z=-0.875dps[0m
-[32mINFO - TS: 8098428 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.735dps Y=-1.575dps Z=-0.945dps[0m
-[32mINFO - TS: 8098968 Accel: X=-0.051g Y=0.202g Z=0.987g Gyro: X=0.665dps Y=-1.400dps Z=-0.945dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:15 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.07 knots (0.14 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329283333333, Lon=-80.53687733333334, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8099651 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.700dps Y=-1.610dps Z=-0.875dps[0m
-[32mINFO - TS: 8100208 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.735dps Y=-1.470dps Z=-0.945dps[0m
-[32mINFO - TS: 8100740 Accel: X=-0.052g Y=0.200g Z=0.989g Gyro: X=0.525dps Y=-1.610dps Z=-0.840dps[0m
-[32mINFO - TS: 8101272 Accel: X=-0.051g Y=0.201g Z=0.989g Gyro: X=0.595dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8101807 Accel: X=-0.052g Y=0.203g Z=0.987g Gyro: X=0.840dps Y=-1.505dps Z=-0.980dps[0m
-[32mINFO - TS: 8102345 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - TS: 8102876 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.700dps Y=-1.540dps Z=-0.980dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:15 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.04 knots (0.08 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329283333333, Lon=-80.53687716666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8103562 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.560dps Y=-1.470dps Z=-0.770dps[0m
-[32mINFO - TS: 8104100 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.595dps Y=-1.505dps Z=-0.805dps[0m
-[32mINFO - TS: 8104634 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.700dps Y=-1.610dps Z=-0.910dps[0m
-[32mINFO - TS: 8105172 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.665dps Y=-1.505dps Z=-0.945dps[0m
-[32mINFO - TS: 8105706 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.525dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8106245 Accel: X=-0.053g Y=0.203g Z=0.986g Gyro: X=0.595dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8106776 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.435dps Z=-0.945dps[0m
-[32mINFO - TS: 8107307 Accel: X=-0.052g Y=0.199g Z=0.987g Gyro: X=0.525dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8107846 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.700dps Y=-1.540dps Z=-0.980dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:16 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.24 knots (0.44 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473293166666664, Lon=-80.53687733333334, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8108387 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.540dps Z=-0.805dps[0m
-[32mINFO - TS: 8108924 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8109458 Accel: X=-0.051g Y=0.201g Z=0.988g Gyro: X=0.665dps Y=-1.435dps Z=-0.875dps[0m
-[32mINFO - TS: 8109998 Accel: X=-0.054g Y=0.201g Z=0.986g Gyro: X=0.770dps Y=-1.435dps Z=-0.980dps[0m
-[32mINFO - TS: 8110529 Accel: X=-0.051g Y=0.202g Z=0.988g Gyro: X=0.700dps Y=-1.575dps Z=-0.945dps[0m
-[32mINFO - TS: 8111062 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.595dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8111600 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.505dps Z=-0.805dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:16 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.12 knots (0.23 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473293, Lon=-80.53687766666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8112142 Accel: X=-0.050g Y=0.199g Z=0.987g Gyro: X=0.700dps Y=-1.540dps Z=-0.770dps[0m
-[32mINFO - TS: 8112696 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.630dps Y=-1.645dps Z=-0.840dps[0m
-[32mINFO - TS: 8113236 Accel: X=-0.052g Y=0.202g Z=0.986g Gyro: X=0.630dps Y=-1.435dps Z=-0.910dps[0m
-[32mINFO - TS: 8113776 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.595dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8114314 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.470dps Z=-0.805dps[0m
-[32mINFO - [ESP-NOW TX] Heartbeat sent (time=1366735us)[0m
-[32mINFO - TS: 8114870 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.595dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8115407 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.595dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:16 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.11 knots (0.21 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329283333333, Lon=-80.53687783333334, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8116071 Accel: X=-0.051g Y=0.202g Z=0.986g Gyro: X=0.455dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8116624 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.595dps Y=-1.470dps Z=-0.945dps[0m
-[32mINFO - TS: 8117160 Accel: X=-0.054g Y=0.199g Z=0.988g Gyro: X=0.665dps Y=-1.540dps Z=-1.050dps[0m
-[32mINFO - TS: 8117696 Accel: X=-0.052g Y=0.202g Z=0.986g Gyro: X=0.630dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - TS: 8118232 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.665dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - TS: 8118769 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.630dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8119303 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.560dps Y=-1.540dps Z=-0.980dps[0m
-[32mINFO - TS: 8119835 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.630dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:16 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.01 knots (0.02 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473293, Lon=-80.53687766666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8120376 Accel: X=-0.052g Y=0.199g Z=0.987g Gyro: X=0.630dps Y=-1.470dps Z=-0.945dps[0m
-[32mINFO - TS: 8120910 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.700dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8121444 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.735dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - TS: 8121984 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.645dps Z=-0.840dps[0m
-[32mINFO - TS: 8122519 Accel: X=-0.050g Y=0.199g Z=0.986g Gyro: X=0.665dps Y=-1.505dps Z=-0.945dps[0m
-[32mINFO - TS: 8123051 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.735dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8123587 Accel: X=-0.053g Y=0.203g Z=0.987g Gyro: X=0.735dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8124126 Accel: X=-0.051g Y=0.200g Z=0.985g Gyro: X=0.595dps Y=-1.470dps Z=-0.805dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:16 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.02 knots (0.03 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329283333333, Lon=-80.53687783333334, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8124665 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8125205 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.575dps Z=-0.805dps[0m
-[32mINFO - TS: 8125740 Accel: X=-0.052g Y=0.200g Z=0.985g Gyro: X=0.490dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - TS: 8126275 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.595dps Y=-1.610dps Z=-0.770dps[0m
-[32mINFO - TS: 8126813 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.470dps Z=-0.840dps[0m
-[32mINFO - TS: 8127353 Accel: X=-0.051g Y=0.200g Z=0.984g Gyro: X=0.665dps Y=-1.435dps Z=-0.875dps[0m
-[32mINFO - TS: 8127890 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:16 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.18 knots (0.33 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.4732925, Lon=-80.53687816666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8128580 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.400dps Z=-0.945dps[0m
-[32mINFO - TS: 8129129 Accel: X=-0.051g Y=0.201g Z=0.988g Gyro: X=0.770dps Y=-1.505dps Z=-0.735dps[0m
-[32mINFO - TS: 8129660 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.610dps Z=-0.805dps[0m
-[32mINFO - TS: 8130195 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.560dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8130734 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.665dps Y=-1.400dps Z=-0.910dps[0m
-[32mINFO - TS: 8131271 Accel: X=-0.054g Y=0.201g Z=0.987g Gyro: X=0.595dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8131802 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.470dps Z=-0.805dps[0m
-[32mINFO - TS: 8132333 Accel: X=-0.052g Y=0.200g Z=0.984g Gyro: X=0.700dps Y=-1.435dps Z=-0.840dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:16 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.09 knots (0.16 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473292666666666, Lon=-80.5368785, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8132876 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.400dps Z=-0.805dps[0m
-[32mINFO - TS: 8133419 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8133955 Accel: X=-0.053g Y=0.200g Z=0.985g Gyro: X=0.595dps Y=-1.610dps Z=-0.910dps[0m
-[32mINFO - TS: 8134489 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.595dps Y=-1.610dps Z=-0.875dps[0m
-[32mINFO - TS: 8135030 Accel: X=-0.050g Y=0.200g Z=0.988g Gyro: X=0.560dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - TS: 8135562 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.610dps Z=-0.875dps[0m
-[32mINFO - TS: 8136100 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.735dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8136635 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.735dps Y=-1.610dps Z=-0.840dps[0m
-[31mERROR - UART Read Error: FifoOverflowed[0m
-[31mERROR - UART Read Error: FifoOverflowed[0m
-[33mWARN - NMEA Parse Error: Invalid NMEA sentence: Invalid NMEA sentence: ,M,,*77 for sentence: ',M,,*77'[0m
-[32mINFO - TS: 8137177 Accel: X=-0.053g Y=0.202g Z=0.986g Gyro: X=0.840dps Y=-1.470dps Z=-0.805dps[0m
-[32mINFO - TS: 8137713 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.630dps Y=-1.470dps Z=-0.840dps[0m
-[32mINFO - TS: 8138253 Accel: X=-0.052g Y=0.199g Z=0.986g Gyro: X=0.665dps Y=-1.610dps Z=-0.875dps[0m
-[32mINFO - TS: 8138788 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.525dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - TS: 8139327 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - TS: 8139863 Accel: X=-0.052g Y=0.199g Z=0.988g Gyro: X=0.665dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - TS: 8140398 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.560dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:16 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.06 knots (0.10 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329233333333, Lon=-80.536879, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8141069 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.645dps Z=-0.945dps[0m
-[32mINFO - TS: 8141605 Accel: X=-0.052g Y=0.201g Z=0.985g Gyro: X=0.630dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - TS: 8142143 Accel: X=-0.052g Y=0.200g Z=0.989g Gyro: X=0.665dps Y=-1.365dps Z=-0.805dps[0m
-[32mINFO - TS: 8142678 Accel: X=-0.053g Y=0.199g Z=0.988g Gyro: X=0.665dps Y=-1.540dps Z=-0.945dps[0m
-[32mINFO - TS: 8143212 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8143744 Accel: X=-0.053g Y=0.199g Z=0.984g Gyro: X=0.700dps Y=-1.400dps Z=-0.840dps[0m
-[32mINFO - TS: 8144275 Accel: X=-0.051g Y=0.201g Z=0.985g Gyro: X=0.700dps Y=-1.645dps Z=-0.875dps[0m
-[32mINFO - TS: 8144811 Accel: X=-0.051g Y=0.202g Z=0.986g Gyro: X=0.665dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:16 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.12 knots (0.21 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329216666667, Lon=-80.53687916666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8145357 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.560dps Y=-1.575dps Z=-0.805dps[0m
-[32mINFO - TS: 8145899 Accel: X=-0.052g Y=0.199g Z=0.986g Gyro: X=0.665dps Y=-1.470dps Z=-0.945dps[0m
-[32mINFO - TS: 8146434 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.735dps Y=-1.435dps Z=-0.945dps[0m
-[32mINFO - TS: 8146969 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.595dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - TS: 8147507 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.680dps Z=-0.910dps[0m
-[32mINFO - TS: 8148044 Accel: X=-0.050g Y=0.199g Z=0.987g Gyro: X=0.560dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8148580 Accel: X=-0.050g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.540dps Z=-0.945dps[0m
-[32mINFO - TS: 8149116 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8149648 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.735dps Y=-1.470dps Z=-0.945dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:17 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.07 knots (0.13 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473292, Lon=-80.53687966666666, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8150190 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.735dps Y=-1.435dps Z=-0.840dps[0m
-[32mINFO - TS: 8150729 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.455dps Y=-1.435dps Z=-0.945dps[0m
-[32mINFO - TS: 8151269 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.610dps Z=-0.910dps[0m
-[32mINFO - TS: 8151808 Accel: X=-0.052g Y=0.200g Z=0.985g Gyro: X=0.700dps Y=-1.435dps Z=-0.980dps[0m
-[32mINFO - TS: 8152341 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.400dps Z=-1.015dps[0m
-[32mINFO - TS: 8152870 Accel: X=-0.053g Y=0.201g Z=0.985g Gyro: X=0.700dps Y=-1.470dps Z=-0.945dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:17 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.01 knots (0.02 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473291833333334, Lon=-80.53688016666666, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8153559 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.595dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - TS: 8154104 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.420dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - TS: 8154644 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.470dps Z=-0.945dps[0m
-[32mINFO - TS: 8155182 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.330dps Z=-0.910dps[0m
-[32mINFO - TS: 8155718 Accel: X=-0.052g Y=0.200g Z=0.985g Gyro: X=0.805dps Y=-1.610dps Z=-0.875dps[0m
-[32mINFO - TS: 8156254 Accel: X=-0.054g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.575dps Z=-0.945dps[0m
-[32mINFO - [ESP-NOW TX] Heartbeat sent (time=2368199us)[0m
-[32mINFO - TS: 8156790 Accel: X=-0.052g Y=0.200g Z=0.985g Gyro: X=0.770dps Y=-1.435dps Z=-0.910dps[0m
-[32mINFO - TS: 8157323 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.630dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:17 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.06 knots (0.10 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329166666667, Lon=-80.53688066666666, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8157869 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.540dps Z=-0.945dps[0m
-[32mINFO - TS: 8158410 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.715dps Z=-0.875dps[0m
-[32mINFO - TS: 8158947 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.525dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8159743 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.700dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8160027 Accel: X=-0.052g Y=0.199g Z=0.985g Gyro: X=0.770dps Y=-1.365dps Z=-0.875dps[0m
-[32mINFO - TS: 8160565 Accel: X=-0.053g Y=0.199g Z=0.985g Gyro: X=0.700dps Y=-1.575dps Z=-0.805dps[0m
-[32mINFO - TS: 8161097 Accel: X=-0.052g Y=0.201g Z=0.985g Gyro: X=0.455dps Y=-1.470dps Z=-0.840dps[0m
-[32mINFO - TS: 8161629 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.595dps Y=-1.540dps Z=-0.875dps[0m
-[31mERROR - UART Read Error: FifoOverflowed[0m
-[31mERROR - UART Read Error: FifoOverflowed[0m
-[33mWARN - NMEA Parse Error: Invalid NMEA sentence: Invalid NMEA sentence: ,10,1.92,384.7,M,-36.0,M,,*7F for sentence: ',10,1.92,384.7,M,-36.0,M,,*7F'[0m
-[32mINFO - TS: 8162171 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8162712 Accel: X=-0.052g Y=0.202g Z=0.985g Gyro: X=0.770dps Y=-1.505dps Z=-0.770dps[0m
-[32mINFO - TS: 8163247 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.645dps Z=-0.805dps[0m
-[32mINFO - TS: 8163786 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.560dps Y=-1.400dps Z=-0.735dps[0m
-[32mINFO - TS: 8164326 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.560dps Y=-1.435dps Z=-0.840dps[0m
-[32mINFO - TS: 8165116 Accel: X=-0.054g Y=0.200g Z=0.986g Gyro: X=0.560dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - TS: 8165391 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.665dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:17 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.10 knots (0.19 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473291, Lon=-80.536882, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8166074 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.770dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8166610 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - TS: 8167146 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.630dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8167934 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.735dps Y=-1.610dps Z=-0.840dps[0m
-[32mINFO - TS: 8168216 Accel: X=-0.051g Y=0.204g Z=0.985g Gyro: X=0.525dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - TS: 8168750 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8169289 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.560dps Y=-1.470dps Z=-0.840dps[0m
-[32mINFO - TS: 8169821 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.595dps Y=-1.505dps Z=-0.805dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:17 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.22 knots (0.40 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473290666666664, Lon=-80.5368825, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8170367 Accel: X=-0.052g Y=0.201g Z=0.989g Gyro: X=0.490dps Y=-1.435dps Z=-0.840dps[0m
-[32mINFO - TS: 8170912 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.735dps Y=-1.575dps Z=-0.805dps[0m
-[32mINFO - TS: 8171447 Accel: X=-0.052g Y=0.200g Z=0.984g Gyro: X=0.560dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8171979 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.525dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - TS: 8172515 Accel: X=-0.051g Y=0.201g Z=0.988g Gyro: X=0.805dps Y=-1.365dps Z=-0.840dps[0m
-[32mINFO - TS: 8173050 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.595dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8173583 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.400dps Z=-0.805dps[0m
-[32mINFO - TS: 8174119 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.770dps Y=-1.505dps Z=-0.770dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:17 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.29 knots (0.54 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329083333333, Lon=-80.53688266666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8174659 Accel: X=-0.053g Y=0.201g Z=0.985g Gyro: X=0.700dps Y=-1.610dps Z=-0.910dps[0m
-[32mINFO - TS: 8175200 Accel: X=-0.053g Y=0.199g Z=0.983g Gyro: X=0.665dps Y=-1.365dps Z=-0.910dps[0m
-[32mINFO - TS: 8175732 Accel: X=-0.054g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8176265 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.805dps Y=-1.435dps Z=-0.945dps[0m
-[32mINFO - TS: 8176806 Accel: X=-0.051g Y=0.201g Z=0.988g Gyro: X=0.630dps Y=-1.470dps Z=-0.945dps[0m
-[32mINFO - TS: 8177340 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.680dps Z=-0.875dps[0m
-[32mINFO - TS: 8177880 Accel: X=-0.052g Y=0.199g Z=0.985g Gyro: X=0.630dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:17 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.10 knots (0.18 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329083333333, Lon=-80.53688233333334, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8178583 Accel: X=-0.054g Y=0.200g Z=0.988g Gyro: X=0.630dps Y=-1.540dps Z=-0.980dps[0m
-[32mINFO - TS: 8179118 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.595dps Y=-1.540dps Z=-0.805dps[0m
-[32mINFO - TS: 8179652 Accel: X=-0.052g Y=0.199g Z=0.987g Gyro: X=0.595dps Y=-1.680dps Z=-0.945dps[0m
-[32mINFO - TS: 8180186 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.470dps Z=-1.015dps[0m
-[32mINFO - TS: 8180720 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8181260 Accel: X=-0.052g Y=0.202g Z=0.986g Gyro: X=0.665dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - TS: 8181792 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - TS: 8182328 Accel: X=-0.052g Y=0.202g Z=0.985g Gyro: X=0.665dps Y=-1.575dps Z=-0.805dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:17 UTC[0m
+[32mINFO - GPGGA FIX: Lat=43.473318, Lon=-80.53670866666667, HDOP=2.05, SATS=8[0m
+[32mINFO - TS: 25628686 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.665dps Y=-1.575dps Z=-0.980dps[0m
+[32mINFO - TS: 25629220 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.665dps Y=-1.470dps Z=-0.910dps[0m
+[32mINFO - TS: 25629753 Accel: X=-0.051g Y=0.201g Z=0.988g Gyro: X=0.630dps Y=-1.540dps Z=-0.910dps[0m
+[32mINFO - TS: 25630291 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.735dps Y=-1.540dps Z=-0.945dps[0m
+[32mINFO - TS: 25630822 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.595dps Y=-1.470dps Z=-0.945dps[0m
+[32mINFO - TS: 25631358 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.575dps Z=-0.875dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
 [32mINFO - GNVTG VELOCITY: Speed=0.14 knots (0.27 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329083333333, Lon=-80.53688266666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8182875 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8183426 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.525dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8183962 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.700dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8184498 Accel: X=-0.052g Y=0.201g Z=0.985g Gyro: X=0.525dps Y=-1.575dps Z=-0.805dps[0m
-[32mINFO - TS: 8185037 Accel: X=-0.053g Y=0.201g Z=0.985g Gyro: X=0.630dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8185575 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.630dps Y=-1.435dps Z=-0.805dps[0m
-[32mINFO - TS: 8186112 Accel: X=-0.051g Y=0.203g Z=0.987g Gyro: X=0.630dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - TS: 8186652 Accel: X=-0.051g Y=0.203g Z=0.984g Gyro: X=0.630dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:17 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.27 knots (0.50 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329083333333, Lon=-80.53688283333334, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8187201 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.770dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8187744 Accel: X=-0.052g Y=0.202g Z=0.988g Gyro: X=0.665dps Y=-1.400dps Z=-0.910dps[0m
-[32mINFO - TS: 8188279 Accel: X=-0.051g Y=0.202g Z=0.986g Gyro: X=0.560dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8188818 Accel: X=-0.053g Y=0.200g Z=0.985g Gyro: X=0.560dps Y=-1.365dps Z=-0.875dps[0m
-[32mINFO - TS: 8189358 Accel: X=-0.051g Y=0.202g Z=0.986g Gyro: X=0.735dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - TS: 8189898 Accel: X=-0.053g Y=0.202g Z=0.987g Gyro: X=0.630dps Y=-1.470dps Z=-0.980dps[0m
-[32mINFO - TS: 8190430 Accel: X=-0.051g Y=0.200g Z=0.985g Gyro: X=0.630dps Y=-1.400dps Z=-0.735dps[0m
-[32mINFO - TS: 8190962 Accel: X=-0.051g Y=0.199g Z=0.986g Gyro: X=0.630dps Y=-1.610dps Z=-0.875dps[0m
-[32mINFO - TS: 8191498 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.735dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
+[32mINFO - GPGGA FIX: Lat=43.473318, Lon=-80.5367085, HDOP=2.05, SATS=8[0m
+[32mINFO - TS: 25632012 Accel: X=-0.053g Y=0.202g Z=0.987g Gyro: X=0.595dps Y=-1.540dps Z=-0.840dps[0m
+[32mINFO - TS: 25632559 Accel: X=-0.052g Y=0.203g Z=0.986g Gyro: X=0.595dps Y=-1.435dps Z=-0.875dps[0m
+[32mINFO - TS: 25633094 Accel: X=-0.052g Y=0.199g Z=0.988g Gyro: X=0.595dps Y=-1.505dps Z=-0.910dps[0m
+[32mINFO - TS: 25633627 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.735dps Y=-1.505dps Z=-0.875dps[0m
+[32mINFO - TS: 25634161 Accel: X=-0.054g Y=0.202g Z=0.988g Gyro: X=0.735dps Y=-1.610dps Z=-0.840dps[0m
+[32mINFO - TS: 25634692 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.560dps Y=-1.575dps Z=-0.910dps[0m
+[32mINFO - TS: 25635224 Accel: X=-0.052g Y=0.199g Z=0.987g Gyro: X=0.805dps Y=-1.400dps Z=-0.875dps[0m
+[32mINFO - TS: 25635761 Accel: X=-0.052g Y=0.202g Z=0.985g Gyro: X=0.735dps Y=-1.365dps Z=-0.910dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.13 knots (0.24 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.473318166666665, Lon=-80.53670833333334, HDOP=2.05, SATS=8[0m
+[32mINFO - TS: 25636304 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.735dps Y=-1.540dps Z=-0.910dps[0m
+[32mINFO - TS: 25636840 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.700dps Y=-1.540dps Z=-1.015dps[0m
+[32mINFO - [ESP-NOW TX] Heartbeat sent (time=1367320us)[0m
+[32mINFO - TS: 25637381 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.435dps Z=-0.840dps[0m
+[32mINFO - TS: 25637916 Accel: X=-0.052g Y=0.199g Z=0.987g Gyro: X=0.700dps Y=-1.435dps Z=-0.945dps[0m
+[32mINFO - TS: 25638452 Accel: X=-0.051g Y=0.202g Z=0.987g Gyro: X=0.630dps Y=-1.505dps Z=-0.770dps[0m
+[32mINFO - TS: 25638985 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.735dps Y=-1.435dps Z=-0.875dps[0m
+[32mINFO - TS: 25639524 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.770dps Y=-1.575dps Z=-0.770dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.08 knots (0.14 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.473318, Lon=-80.53670816666667, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25640057 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.505dps Z=-0.945dps[0m
+[32mINFO - TS: 25640778 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.700dps Y=-1.540dps Z=-0.875dps[0m
+[32mINFO - TS: 25641318 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.770dps Y=-1.470dps Z=-0.805dps[0m
+[32mINFO - TS: 25641850 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.700dps Y=-1.540dps Z=-0.770dps[0m
+[32mINFO - TS: 25642381 Accel: X=-0.052g Y=0.202g Z=0.986g Gyro: X=0.630dps Y=-1.540dps Z=-0.980dps[0m
+[32mINFO - TS: 25642916 Accel: X=-0.054g Y=0.200g Z=0.986g Gyro: X=0.595dps Y=-1.505dps Z=-0.840dps[0m
+[32mINFO - TS: 25643449 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.540dps Z=-0.980dps[0m
+[32mINFO - TS: 25643981 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.560dps Y=-1.505dps Z=-0.910dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.11 knots (0.20 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331783333333, Lon=-80.53670833333334, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25644572 Accel: X=-0.053g Y=0.202g Z=0.987g Gyro: X=0.665dps Y=-1.435dps Z=-0.840dps[0m
+[32mINFO - TS: 25645115 Accel: X=-0.053g Y=0.202g Z=0.986g Gyro: X=0.665dps Y=-1.540dps Z=-0.910dps[0m
+[32mINFO - TS: 25645649 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.805dps Y=-1.505dps Z=-0.840dps[0m
+[32mINFO - TS: 25646187 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.770dps Y=-1.505dps Z=-0.980dps[0m
+[32mINFO - TS: 25646724 Accel: X=-0.053g Y=0.202g Z=0.987g Gyro: X=0.525dps Y=-1.610dps Z=-0.910dps[0m
+[32mINFO - TS: 25647254 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.665dps Y=-1.400dps Z=-0.910dps[0m
+[32mINFO - TS: 25647785 Accel: X=-0.054g Y=0.200g Z=0.987g Gyro: X=0.700dps Y=-1.645dps Z=-0.840dps[0m
+[32mINFO - TS: 25648323 Accel: X=-0.051g Y=0.199g Z=0.987g Gyro: X=0.490dps Y=-1.540dps Z=-0.805dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.09 knots (0.16 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331783333333, Lon=-80.5367085, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25648866 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.525dps Y=-1.505dps Z=-0.840dps[0m
+[32mINFO - TS: 25649409 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.700dps Y=-1.435dps Z=-0.875dps[0m
+[32mINFO - TS: 25649948 Accel: X=-0.053g Y=0.200g Z=0.989g Gyro: X=0.840dps Y=-1.435dps Z=-0.980dps[0m
+[32mINFO - TS: 25650486 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.840dps Y=-1.540dps Z=-0.700dps[0m
+[32mINFO - TS: 25651018 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.735dps Y=-1.540dps Z=-0.875dps[0m
+[32mINFO - TS: 25651553 Accel: X=-0.052g Y=0.202g Z=0.988g Gyro: X=0.770dps Y=-1.435dps Z=-0.805dps[0m
+[32mINFO - TS: 25652091 Accel: X=-0.051g Y=0.201g Z=0.989g Gyro: X=0.630dps Y=-1.540dps Z=-0.980dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
 [32mINFO - GNVTG VELOCITY: Speed=0.24 knots (0.44 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329083333333, Lon=-80.536883, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8192045 Accel: X=-0.052g Y=0.199g Z=0.985g Gyro: X=0.770dps Y=-1.470dps Z=-1.015dps[0m
-[32mINFO - TS: 8192598 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.575dps Z=-0.805dps[0m
-[32mINFO - TS: 8193134 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.805dps Y=-1.540dps Z=-1.015dps[0m
-[32mINFO - TS: 8193670 Accel: X=-0.052g Y=0.201g Z=0.985g Gyro: X=0.630dps Y=-1.575dps Z=-0.945dps[0m
-[32mINFO - TS: 8194208 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.470dps Z=-0.945dps[0m
-[32mINFO - TS: 8194743 Accel: X=-0.053g Y=0.202g Z=0.985g Gyro: X=0.735dps Y=-1.645dps Z=-0.840dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.17 knots (0.32 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473290666666664, Lon=-80.53688316666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8195328 Accel: X=-0.052g Y=0.202g Z=0.988g Gyro: X=0.665dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8195878 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.770dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8196418 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.505dps Z=-0.805dps[0m
-[32mINFO - TS: 8196957 Accel: X=-0.051g Y=0.202g Z=0.985g Gyro: X=0.770dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8197491 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.735dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8198041 Accel: X=-0.053g Y=0.200g Z=0.988g Gyro: X=0.525dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - [ESP-NOW TX] Heartbeat sent (time=3371356us)[0m
-[32mINFO - TS: 8198581 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - TS: 8199120 Accel: X=-0.052g Y=0.199g Z=0.986g Gyro: X=0.700dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.12 knots (0.22 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329033333333, Lon=-80.53688366666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8199656 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.700dps Y=-1.575dps Z=-0.805dps[0m
-[32mINFO - TS: 8200192 Accel: X=-0.052g Y=0.202g Z=0.986g Gyro: X=0.595dps Y=-1.435dps Z=-0.875dps[0m
-[32mINFO - TS: 8200730 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.700dps Y=-1.470dps Z=-0.840dps[0m
-[32mINFO - TS: 8201268 Accel: X=-0.051g Y=0.202g Z=0.987g Gyro: X=0.665dps Y=-1.400dps Z=-0.910dps[0m
-[32mINFO - TS: 8201808 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.455dps Y=-1.435dps Z=-0.875dps[0m
-[32mINFO - TS: 8202345 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.595dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8202882 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.700dps Y=-1.540dps Z=-0.805dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
+[32mINFO - GPGGA FIX: Lat=43.47331783333333, Lon=-80.53670883333334, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25652807 Accel: X=-0.053g Y=0.199g Z=0.987g Gyro: X=0.700dps Y=-1.575dps Z=-0.875dps[0m
+[32mINFO - TS: 25653348 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.700dps Y=-1.575dps Z=-0.910dps[0m
+[32mINFO - TS: 25653882 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.400dps Z=-0.910dps[0m
+[32mINFO - TS: 25654419 Accel: X=-0.051g Y=0.202g Z=0.987g Gyro: X=0.700dps Y=-1.435dps Z=-0.840dps[0m
+[32mINFO - TS: 25654958 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.735dps Y=-1.435dps Z=-0.840dps[0m
+[32mINFO - TS: 25655491 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.595dps Y=-1.505dps Z=-0.805dps[0m
+[32mINFO - TS: 25656030 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.680dps Z=-0.770dps[0m
+[32mINFO - TS: 25656564 Accel: X=-0.051g Y=0.201g Z=0.988g Gyro: X=0.700dps Y=-1.680dps Z=-0.805dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.22 knots (0.41 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331833333333, Lon=-80.53670816666667, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25657158 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.505dps Z=-0.735dps[0m
+[32mINFO - TS: 25657694 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.735dps Y=-1.575dps Z=-0.875dps[0m
+[32mINFO - TS: 25658228 Accel: X=-0.052g Y=0.202g Z=0.988g Gyro: X=0.630dps Y=-1.575dps Z=-0.875dps[0m
+[32mINFO - TS: 25658765 Accel: X=-0.054g Y=0.201g Z=0.988g Gyro: X=0.630dps Y=-1.540dps Z=-1.015dps[0m
+[32mINFO - TS: 25659302 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.540dps Z=-0.840dps[0m
+[32mINFO - TS: 25659836 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.665dps Y=-1.470dps Z=-0.840dps[0m
+[32mINFO - TS: 25660367 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.700dps Y=-1.470dps Z=-0.910dps[0m
+[32mINFO - TS: 25660897 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.560dps Y=-1.505dps Z=-0.875dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.14 knots (0.25 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.473318166666665, Lon=-80.53670833333334, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25661440 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.735dps Y=-1.505dps Z=-0.875dps[0m
+[32mINFO - TS: 25661982 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.525dps Y=-1.575dps Z=-0.875dps[0m
+[32mINFO - TS: 25662521 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.735dps Y=-1.470dps Z=-0.910dps[0m
+[32mINFO - TS: 25663052 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.560dps Y=-1.400dps Z=-0.840dps[0m
+[32mINFO - TS: 25663586 Accel: X=-0.051g Y=0.199g Z=0.987g Gyro: X=0.560dps Y=-1.470dps Z=-0.840dps[0m
+[32mINFO - TS: 25664117 Accel: X=-0.053g Y=0.199g Z=0.987g Gyro: X=0.595dps Y=-1.470dps Z=-0.840dps[0m
+[32mINFO - TS: 25664647 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.610dps Z=-0.805dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:16 UTC[0m
 [32mINFO - GNVTG VELOCITY: Speed=0.15 knots (0.28 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329033333333, Lon=-80.53688366666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8203417 Accel: X=-0.051g Y=0.202g Z=0.986g Gyro: X=0.630dps Y=-1.470dps Z=-0.840dps[0m
-[32mINFO - TS: 8204133 Accel: X=-0.052g Y=0.199g Z=0.988g Gyro: X=0.595dps Y=-1.400dps Z=-0.875dps[0m
-[32mINFO - TS: 8204671 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.630dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8205207 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.560dps Y=-1.435dps Z=-0.840dps[0m
-[32mINFO - TS: 8205742 Accel: X=-0.052g Y=0.201g Z=0.985g Gyro: X=0.770dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - TS: 8206277 Accel: X=-0.051g Y=0.202g Z=0.985g Gyro: X=0.595dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8206816 Accel: X=-0.051g Y=0.202g Z=0.987g Gyro: X=0.630dps Y=-1.610dps Z=-0.945dps[0m
-[32mINFO - TS: 8207352 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.735dps Y=-1.575dps Z=-0.875dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.23 knots (0.42 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.4732905, Lon=-80.53688383333333, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8207896 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.455dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - TS: 8208453 Accel: X=-0.054g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.365dps Z=-0.770dps[0m
-[32mINFO - TS: 8208985 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - TS: 8209517 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.560dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8210057 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.575dps Z=-0.840dps[0m
-[32mINFO - TS: 8210596 Accel: X=-0.051g Y=0.199g Z=0.985g Gyro: X=0.770dps Y=-1.505dps Z=-0.980dps[0m
-[32mINFO - TS: 8211136 Accel: X=-0.051g Y=0.203g Z=0.987g Gyro: X=0.595dps Y=-1.540dps Z=-0.840dps[0m
-[32mINFO - TS: 8211675 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.15 knots (0.29 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.4732905, Lon=-80.53688383333333, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8212219 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.700dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8212759 Accel: X=-0.051g Y=0.202g Z=0.986g Gyro: X=0.455dps Y=-1.330dps Z=-0.840dps[0m
-[32mINFO - TS: 8213300 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.490dps Y=-1.400dps Z=-0.840dps[0m
-[32mINFO - TS: 8213832 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.805dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - TS: 8214370 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - TS: 8214905 Accel: X=-0.052g Y=0.201g Z=0.985g Gyro: X=0.700dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8215439 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.735dps Y=-1.540dps Z=-0.805dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.12 knots (0.23 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.4732905, Lon=-80.53688416666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8216154 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.805dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8216696 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.435dps Z=-0.945dps[0m
-[32mINFO - TS: 8217235 Accel: X=-0.054g Y=0.199g Z=0.985g Gyro: X=0.700dps Y=-1.470dps Z=-0.980dps[0m
-[32mINFO - TS: 8217770 Accel: X=-0.051g Y=0.202g Z=0.985g Gyro: X=0.630dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - TS: 8218307 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.595dps Y=-1.610dps Z=-0.980dps[0m
-[32mINFO - TS: 8218843 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.560dps Y=-1.540dps Z=-0.910dps[0m
-[32mINFO - TS: 8219375 Accel: X=-0.052g Y=0.201g Z=0.985g Gyro: X=0.630dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - TS: 8219911 Accel: X=-0.052g Y=0.200g Z=0.984g Gyro: X=0.595dps Y=-1.435dps Z=-0.945dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.17 knots (0.32 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.47329033333333, Lon=-80.53688433333333, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8220457 Accel: X=-0.054g Y=0.199g Z=0.986g Gyro: X=0.770dps Y=-1.540dps Z=-0.945dps[0m
-[32mINFO - TS: 8220991 Accel: X=-0.052g Y=0.202g Z=0.986g Gyro: X=0.630dps Y=-1.610dps Z=-0.840dps[0m
-[32mINFO - TS: 8221529 Accel: X=-0.052g Y=0.201g Z=0.984g Gyro: X=0.630dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - TS: 8222068 Accel: X=-0.052g Y=0.200g Z=0.986g Gyro: X=0.595dps Y=-1.435dps Z=-0.945dps[0m
-[32mINFO - TS: 8222607 Accel: X=-0.052g Y=0.199g Z=0.987g Gyro: X=0.595dps Y=-1.435dps Z=-0.980dps[0m
-[32mINFO - TS: 8223138 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.560dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - TS: 8223675 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.435dps Z=-0.805dps[0m
-[32mINFO - TS: 8224214 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.560dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.20 knots (0.36 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.4732905, Lon=-80.53688416666667, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8224755 Accel: X=-0.052g Y=0.201g Z=0.988g Gyro: X=0.665dps Y=-1.505dps Z=-0.910dps[0m
-[32mINFO - TS: 8225295 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.645dps Z=-0.840dps[0m
-[32mINFO - TS: 8225830 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.700dps Y=-1.400dps Z=-0.875dps[0m
-[32mINFO - TS: 8226369 Accel: X=-0.051g Y=0.201g Z=0.985g Gyro: X=0.735dps Y=-1.505dps Z=-0.840dps[0m
-[32mINFO - TS: 8226908 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.560dps Y=-1.505dps Z=-0.945dps[0m
-[32mINFO - TS: 8227447 Accel: X=-0.052g Y=0.202g Z=0.987g Gyro: X=0.595dps Y=-1.435dps Z=-0.910dps[0m
-[32mINFO - TS: 8227986 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.665dps Y=-1.540dps Z=-0.875dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:18 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.17 knots (0.32 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.473290666666664, Lon=-80.536884, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8228716 Accel: X=-0.051g Y=0.202g Z=0.986g Gyro: X=0.595dps Y=-1.470dps Z=-0.910dps[0m
-[32mINFO - TS: 8229267 Accel: X=-0.053g Y=0.199g Z=0.989g Gyro: X=0.665dps Y=-1.540dps Z=-0.980dps[0m
-[32mINFO - TS: 8229800 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.525dps Y=-1.540dps Z=-0.945dps[0m
-[32mINFO - TS: 8230335 Accel: X=-0.051g Y=0.200g Z=0.985g Gyro: X=0.735dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - TS: 8230873 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.665dps Y=-1.540dps Z=-0.945dps[0m
-[32mINFO - TS: 8231408 Accel: X=-0.051g Y=0.201g Z=0.985g Gyro: X=0.700dps Y=-1.505dps Z=-1.050dps[0m
-[32mINFO - TS: 8231938 Accel: X=-0.050g Y=0.200g Z=0.985g Gyro: X=0.630dps Y=-1.435dps Z=-0.875dps[0m
-[32mINFO - TS: 8232476 Accel: X=-0.054g Y=0.200g Z=0.988g Gyro: X=0.560dps Y=-1.610dps Z=-0.840dps[0m
-[32mINFO - TS: 8233009 Accel: X=-0.052g Y=0.202g Z=0.986g Gyro: X=0.700dps Y=-1.470dps Z=-0.840dps[0m
-[32mINFO - GPS rmc time is: 2026-01-16 03:21:19 UTC[0m
-[32mINFO - GNVTG VELOCITY: Speed=0.18 knots (0.34 km/h); Heading: 0[0m
-[32mINFO - GPGGA FIX: Lat=43.4732905, Lon=-80.5368845, HDOP=1.92, SATS=10[0m
-[32mINFO - TS: 8233679 Accel: X=-0.051g Y=0.202g Z=0.987g Gyro: X=0.770dps Y=-1.435dps Z=-0.875dps[0m
-[32mINFO - TS: 8234222 Accel: X=-0.051g Y=0.201g Z=0.986g Gyro: X=0.700dps Y=-1.505dps Z=-0.875dps[0m
-[32mINFO - TS: 8234759 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.505dps Z=-0.945dps[0m
-[32mINFO - TS: 8235293 Accel: X=-0.052g Y=0.203g Z=0.987g Gyro: X=0.700dps Y=-1.470dps Z=-0.875dps[0m
-[32mINFO - TS: 8235831 Accel: X=
+[32mINFO - GPGGA FIX: Lat=43.47331783333333, Lon=-80.53670833333334, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25665381 Accel: X=-0.053g Y=0.199g Z=0.988g Gyro: X=0.700dps Y=-1.575dps Z=-0.840dps[0m
+[32mINFO - TS: 25665936 Accel: X=-0.053g Y=0.201g Z=0.989g Gyro: X=0.630dps Y=-1.575dps Z=-0.840dps[0m
+[32mINFO - TS: 25666473 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.525dps Y=-1.575dps Z=-0.875dps[0m
+[32mINFO - TS: 25667012 Accel: X=-0.051g Y=0.202g Z=0.987g Gyro: X=0.735dps Y=-1.505dps Z=-0.770dps[0m
+[32mINFO - TS: 25667549 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.665dps Y=-1.435dps Z=-0.875dps[0m
+[32mINFO - TS: 25668087 Accel: X=-0.052g Y=0.200g Z=0.985g Gyro: X=0.525dps Y=-1.470dps Z=-0.910dps[0m
+[32mINFO - TS: 25668622 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.805dps Y=-1.435dps Z=-0.805dps[0m
+[32mINFO - TS: 25669157 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.505dps Z=-0.875dps[0m
+[32mINFO - TS: 25669695 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.525dps Y=-1.610dps Z=-0.770dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:17 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.08 knots (0.15 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331833333333, Lon=-80.53670783333334, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25670323 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.400dps Z=-0.945dps[0m
+[32mINFO - TS: 25670862 Accel: X=-0.051g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.435dps Z=-0.875dps[0m
+[32mINFO - TS: 25671399 Accel: X=-0.052g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.470dps Z=-0.875dps[0m
+[32mINFO - TS: 25671934 Accel: X=-0.051g Y=0.202g Z=0.985g Gyro: X=0.735dps Y=-1.400dps Z=-0.945dps[0m
+[32mINFO - TS: 25672471 Accel: X=-0.051g Y=0.200g Z=0.988g Gyro: X=0.700dps Y=-1.610dps Z=-0.875dps[0m
+[32mINFO - TS: 25673009 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.525dps Y=-1.540dps Z=-0.840dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:17 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.31 knots (0.58 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.473318166666665, Lon=-80.5367085, HDOP=1.8, SATS=9[0m
+[32mINFO - TS: 25673719 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.455dps Y=-1.505dps Z=-0.840dps[0m
+[32mINFO - TS: 25674275 Accel: X=-0.054g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.540dps Z=-0.840dps[0m
+[32mINFO - TS: 25674811 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.630dps Y=-1.505dps Z=-0.840dps[0m
+[32mINFO - TS: 25675344 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.595dps Y=-1.540dps Z=-0.700dps[0m
+[32mINFO - TS: 25675878 Accel: X=-0.053g Y=0.199g Z=0.987g Gyro: X=0.700dps Y=-1.505dps Z=-0.910dps[0m
+[32mINFO - TS: 25676414 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.630dps Y=-1.470dps Z=-0.910dps[0m
+[32mINFO - TS: 25676949 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.700dps Y=-1.470dps Z=-0.875dps[0m
+[32mINFO - TS: 25677486 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.505dps Z=-0.770dps[0m
+[31mERROR - UART Read Error: FifoOverflowed[0m
+[33mWARN - NMEA Parse Error: Invalid NMEA sentence: Invalid NMEA sentence: N,08032.20250,W,2,09,1.80,386.3,M,-36.0,M,,*72 for sentence: 'N,08032.20250,W,2,09,1.80,386.3,M,-36.0,M,,*72'[0m
+[32mINFO - TS: 25678021 Accel: X=-0.051g Y=0.200g Z=0.987g Gyro: X=0.525dps Y=-1.470dps Z=-0.840dps[0m
+[32mINFO - TS: 25678561 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.735dps Y=-1.610dps Z=-0.875dps[0m
+[32mINFO - [ESP-NOW TX] Heartbeat sent (time=2369161us)[0m
+[32mINFO - TS: 25679103 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.560dps Y=-1.505dps Z=-0.840dps[0m
+[32mINFO - TS: 25679633 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.595dps Y=-1.610dps Z=-0.910dps[0m
+[32mINFO - TS: 25680165 Accel: X=-0.052g Y=0.200g Z=0.987g Gyro: X=0.595dps Y=-1.435dps Z=-0.910dps[0m
+[32mINFO - TS: 25680697 Accel: X=-0.052g Y=0.200g Z=0.989g Gyro: X=0.630dps Y=-1.470dps Z=-0.805dps[0m
+[32mINFO - TS: 25681230 Accel: X=-0.052g Y=0.200g Z=0.988g Gyro: X=0.735dps Y=-1.540dps Z=-0.980dps[0m
+[32mINFO - TS: 25681760 Accel: X=-0.055g Y=0.200g Z=0.986g Gyro: X=0.595dps Y=-1.505dps Z=-0.875dps[0m
+[31mERROR - UART Read Error: FifoOverflowed[0m
+[31mERROR - UART Read Error: FifoOverflowed[0m
+[33mWARN - NMEA Parse Error: Invalid NMEA sentence: Invalid NMEA sentence: 36.0,M,,*76 for sentence: '36.0,M,,*76'[0m
+[32mINFO - TS: 25682301 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.770dps Y=-1.610dps Z=-0.910dps[0m
+[32mINFO - TS: 25682841 Accel: X=-0.051g Y=0.202g Z=0.987g Gyro: X=0.665dps Y=-1.575dps Z=-0.875dps[0m
+[32mINFO - TS: 25683379 Accel: X=-0.053g Y=0.200g Z=0.987g Gyro: X=0.665dps Y=-1.540dps Z=-0.875dps[0m
+[32mINFO - TS: 25683917 Accel: X=-0.051g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.540dps Z=-0.840dps[0m
+[32mINFO - TS: 25684456 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.770dps Y=-1.540dps Z=-0.910dps[0m
+[32mINFO - TS: 25684994 Accel: X=-0.053g Y=0.201g Z=0.987g Gyro: X=0.735dps Y=-1.470dps Z=-0.770dps[0m
+[32mINFO - TS: 25685532 Accel: X=-0.053g Y=0.201g Z=0.988g Gyro: X=0.700dps Y=-1.505dps Z=-0.945dps[0m
+[32mINFO - GPS rmc time is: 2026-01-16 03:28:17 UTC[0m
+[32mINFO - GNVTG VELOCITY: Speed=0.23 knots (0.43 km/h); Heading: 0[0m
+[32mINFO - GPGGA FIX: Lat=43.47331883333333, Lon=-80.536707, HDOP=1.8, SATS=10[0m
+[32mINFO - TS: 25686247 Accel: X=-0.053g Y=0.200g Z=0.986g Gyro: X=0.665dps Y=-1.400dps Z=-1.015dps[0m
+[32mINFO - TS: 25686790 Accel: X=-0.053g Y=0.202g Z=0.988g Gyro: X=0.700dps Y=-1.610dps Z=-0.770dps[0m
+[32mINFO - TS: 25687329 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.665dps Y=-1.505dps Z=-0.875dps[0m
+[32mINFO - TS: 25687867 Accel: X=-0.053g Y=0.202g Z=0.987g Gyro: X=0.595dps Y=-1.575dps Z=-0.735dps[0m
+[32mINFO - TS: 25688406 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.840dps Y=-1.540dps Z=-0.875dps[0m
+[32mINFO - TS: 25688941 Accel: X=-0.051g Y=0.199g Z=0.986g Gyro: X=0.700dps Y=-1.540dps Z=-0.840dps[0m
+[32mINFO - TS: 25689472 Accel: X=-0.053g Y=0.202g Z=0.986g Gyro: X=0.770dps Y=-1.610dps Z=-0.875dps[0m
+[32mINFO - TS: 25690008 Accel: X=-0.052g Y=0.201g Z=0.987g Gyro: X=0.735dps Y=-1.505dps Z=-0.910dps[0m
+[31mERROR - UART Read Error: FifoOverflowed[0m
+[33mWARN - NMEA Parse Error: Invalid NMEA sentence: Invalid NMEA sentence: 08032.20238,W,2,10,1.80,386.0,M,-36.0,M,,*7C for sentence: '08032.20238,W,2,10,1.80,386.0,M,-36.0,M,,*7C'[0m
+[32mINFO - TS: 25690545 Accel: X=-0.053g Y=0.203g Z=0.987g Gyro: X=0.595dps Y=-1.505dps Z=-0.910dps[0m
+[32mINFO - TS: 25691085 Accel: X=-0.053g Y=0.201g Z=0.986g Gyro: X=0.630dps Y=-1.610dps Z=-0.980dps[0m

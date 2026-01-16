@@ -104,10 +104,6 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
     send_nmea_command(&mut gps2_uart, GSV_PAYLOAD, "GSV").await;
     send_nmea_command(&mut gps2_uart, GLL_PAYLOAD, "GLL").await;
 
-    // TODO: Configure GPS for 10hz updates & 115200 baud
-    // ONLY DO THIS WHEN THE NEW GPS COMES IN, since we will have to set baud rate at configuration
-    // time, meaning we must set the baud for all the gps's, then change the code, then use the GPS
-
     // TODO: hide this behind cargo configuration flag
     // This sets baud to 460800
     // default for M8 is 9600, default for F10 is 38400. Reset to default, set high baud, then set

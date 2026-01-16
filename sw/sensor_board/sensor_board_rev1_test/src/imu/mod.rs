@@ -1,12 +1,13 @@
-#[allow(unused_imports)]
 mod old_asm330;
 
+#[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
 use embassy_time::{Duration, Timer};
 
 use crate::SharedSpiDevice;
-use crate::imu::old_asm330::{AccelFs, Odr, fs_a_to_g, fs_g_to_dps, poll_xl_gy_combined, read_status_data, GyroFs};
+#[allow(unused_imports)]
+use crate::imu::old_asm330::{AccelFs, Odr, configure_imu, fs_a_to_g, fs_g_to_dps, poll_xl_gy_combined, read_status_data, GyroFs};
 use crate::types::ImuData;
 
 /// Start IMU task with a callback for each data sample
@@ -34,13 +35,9 @@ where
     let fsr_a = AccelFs::G8;
     let odr_a = Odr::Hz417;
     let gyro_fs = GyroFs::DPS1000;
-    let _ = old_asm330::set_xl_fsr(&mut spi, &fsr_a).await;
-    let _ = old_asm330::set_xl_odr(&mut spi, odr_a).await;
-    let _ = old_asm330::set_gyro_config(&mut spi, odr_a, gyro_fs).await;
-    // Ensure timestamp counter is enabled in CTRL10_C
-    match old_asm330::enable_timestamp(&mut spi).await {
-        Ok(()) => info!("Timestamp enabled"),
-        Err(e) => warn!("Failed to enable timestamp: {:?}", e),
+    match old_asm330::configure_imu(&mut spi, odr_a, fsr_a, gyro_fs, true).await {
+        Ok(()) => info!("IMU configured with BDU enabled"),
+        Err(e) => warn!("Failed to configure IMU: {:?}", e),
     }
 
     let period = Duration::from_hz(100);
