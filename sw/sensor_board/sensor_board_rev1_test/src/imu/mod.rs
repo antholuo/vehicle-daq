@@ -1,11 +1,13 @@
 #[allow(unused_imports)]
+mod old_asm330;
+
 use log::{debug, error, info, trace, warn};
 
 use embassy_time::{Duration, Timer};
 
-use crate::old_asm330::{AccelFs, Odr};
+use crate::SharedSpiDevice;
+use crate::imu::old_asm330::{AccelFs, Odr, fs_a_to_g, fs_g_to_dps, poll_xl_gy_combined, read_status_data, GyroFs};
 use crate::types::ImuData;
-use crate::{SharedSpiDevice, old_asm330};
 
 /// Start IMU task with a callback for each data sample
 ///
@@ -29,42 +31,51 @@ where
             info!("SPI Error: {:?}", e);
         }
     }
-    let fsr_a = AccelFs::G2;
+    let fsr_a = AccelFs::G4;
     let odr_a = Odr::Hz104;
+    let gyro_fs = GyroFs::DPS250;
     let _ = old_asm330::set_xl_fsr(&mut spi, &fsr_a).await;
     let _ = old_asm330::set_xl_odr(&mut spi, odr_a).await;
+    let _ = old_asm330::set_gyro_config(&mut spi, odr_a, gyro_fs).await;
+    // Ensure timestamp counter is enabled in CTRL10_C
+    match old_asm330::enable_timestamp(&mut spi).await {
+        Ok(()) => info!("Timestamp enabled"),
+        Err(e) => warn!("Failed to enable timestamp: {:?}", e),
+    }
 
-    let period = Duration::from_hz(2);
+    let period = Duration::from_hz(10);
     loop {
-        match old_asm330::read_xl_xyz(&mut spi).await {
-            Ok(xl_raw_data) => {
-                debug!(
-                    "Got XL X: {}, Y: {}, Z: {}",
-                    xl_raw_data.x, xl_raw_data.y, xl_raw_data.z
-                );
-                let accel_x_g = old_asm330::fs_a_to_g(xl_raw_data.x, &fsr_a);
-                let accel_y_g = old_asm330::fs_a_to_g(xl_raw_data.y, &fsr_a);
-                let accel_z_g = old_asm330::fs_a_to_g(xl_raw_data.z, &fsr_a);
-
-                info!(
-                    "Accel: X={:.3}g Y={:.3}g Z={:.3}g",
-                    accel_x_g, accel_y_g, accel_z_g
-                );
-
-                // Invoke callback with IMU data
-                // Note: Gyro data is zeroed until driver supports gyroscope
-                let imu_data = ImuData {
-                    accel_x: accel_x_g,
-                    accel_y: accel_y_g,
-                    accel_z: accel_z_g,
-                    gyro_x: 0.0,
-                    gyro_y: 0.0,
-                    gyro_z: 0.0,
-                };
-                on_data(imu_data);
+        match old_asm330::read_status_data(&mut spi).await {
+            Ok(status) => {
+                if status.xlda && status.gda {
+                    match old_asm330::poll_xl_gy_combined(&mut spi).await {
+                        Ok(raw) => {
+                            let accel_x_g = old_asm330::fs_a_to_g(raw.xl.x, &fsr_a);
+                            let accel_y_g = old_asm330::fs_a_to_g(raw.xl.y, &fsr_a);
+                            let accel_z_g = old_asm330::fs_a_to_g(raw.xl.z, &fsr_a);
+                            let gyro_x_dps = old_asm330::fs_g_to_dps(raw.gy.x, &gyro_fs);
+                            let gyro_y_dps = old_asm330::fs_g_to_dps(raw.gy.y, &gyro_fs);
+                            let gyro_z_dps = old_asm330::fs_g_to_dps(raw.gy.z, &gyro_fs);
+                            info!("TS: {} Accel: X={:.3}g Y={:.3}g Z={:.3}g Gyro: X={:.3}dps Y={:.3}dps Z={:.3}dps",
+                                raw.ts, accel_x_g, accel_y_g, accel_z_g, gyro_x_dps, gyro_y_dps, gyro_z_dps);
+                            let imu_data = ImuData {
+                                accel_x: accel_x_g,
+                                accel_y: accel_y_g,
+                                accel_z: accel_z_g,
+                                gyro_x: gyro_x_dps,
+                                gyro_y: gyro_y_dps,
+                                gyro_z: gyro_z_dps,
+                            };
+                            on_data(imu_data);
+                        }
+                        Err(e) => { warn!("Failed to read combined XL/GY: {:?}", e); }
+                    }
+                } else {
+                    trace!("Data not ready xlda={} gda={} tda={}", status.xlda, status.gda, status.tda);
+                }
             }
             Err(e) => {
-                warn!("Failed to read XL XYZ: {:?}", e);
+                warn!("Failed to read status: {:?}", e);
             }
         }
         Timer::after(period).await;

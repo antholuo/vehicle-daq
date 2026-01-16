@@ -22,7 +22,6 @@ pub mod gps;
 pub mod hmi;
 #[cfg(feature = "imu")]
 pub mod imu;
-pub mod old_asm330;
 pub mod types;
 pub mod usb;
 
