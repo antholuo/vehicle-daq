@@ -4,6 +4,7 @@ mod old_asm330;
 use log::{debug, error, info, trace, warn};
 
 use embassy_time::{Duration, Timer};
+use crate::timebase;
 
 use crate::SharedSpiDevice;
 #[allow(unused_imports)]
@@ -56,9 +57,12 @@ where
                             let gyro_x_dps = old_asm330::fs_g_to_dps(raw.gy.x, &gyro_fs);
                             let gyro_y_dps = old_asm330::fs_g_to_dps(raw.gy.y, &gyro_fs);
                             let gyro_z_dps = old_asm330::fs_g_to_dps(raw.gy.z, &gyro_fs);
+                            // Use global timebase to compute elapsed seconds since program start
+                            let elapsed_s = timebase::elapsed_seconds();
                             info!(
-                                "TS: {} Accel: X={:.3}g Y={:.3}g Z={:.3}g Gyro: X={:.3}dps Y={:.3}dps Z={:.3}dps",
+                                "TS: {} (raw) / {:.3}s Accel: X={:.3}g Y={:.3}g Z={:.3}g Gyro: X={:.3}dps Y={:.3}dps Z={:.3}dps",
                                 raw.ts,
+                                elapsed_s,
                                 accel_x_g,
                                 accel_y_g,
                                 accel_z_g,

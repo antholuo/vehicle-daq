@@ -48,6 +48,9 @@ static SENSOR_CHANNEL: Channel<CriticalSectionRawMutex, SensorPayload, SENSOR_CH
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
     info!("app is starting execution now");
 
+    // Initialize global program start time used for unified logging timestamps
+    crate::timebase::set_program_start();
+
     #[cfg(feature = "hmi")]
     let user_led = board.take_user_led();
     #[cfg(feature = "hmi")]

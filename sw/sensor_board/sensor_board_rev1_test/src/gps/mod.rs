@@ -202,8 +202,10 @@ where
                 match parser.parse_sentence(sentence) {
                     Ok(parsed_data) => match parsed_data {
                         nmea_parser::ParsedMessage::Gga(gga) => {
+                            let elapsed_s = crate::timebase::elapsed_seconds();
                             info!(
-                                "GPGGA FIX: Lat={}, Lon={}, HDOP={}, SATS={}",
+                                "t={:.3}s GPGGA FIX: Lat={}, Lon={}, HDOP={}, SATS={}",
+                                elapsed_s,
                                 gga.latitude.unwrap_or(0.0),
                                 gga.longitude.unwrap_or(0.0),
                                 gga.hdop.unwrap_or(0.0),
@@ -234,7 +236,8 @@ where
                         }
                         nmea_parser::ParsedMessage::Rmc(rmc) => {
                             if let Some(time) = rmc.timestamp {
-                                info!("GPS rmc time is: {}", time);
+                                let elapsed_s = crate::timebase::elapsed_seconds();
+                            info!("t={:.3}s GPS rmc time is: {}", elapsed_s, time);
 
                                 // Update cached time from RMC
                                 last_time = Some(GpsTime {
@@ -266,9 +269,10 @@ where
                             let speed_knots = vtg.sog_knots.unwrap_or(0.0);
                             let speed_kph = vtg.sog_kph.unwrap_or(0.0);
                             let course = vtg.cog_true.unwrap_or(0.0);
+                            let elapsed_s = crate::timebase::elapsed_seconds();
                             info!(
-                                "GNVTG VELOCITY: Speed={:.2} knots ({:.2} km/h); Heading: {}",
-                                speed_knots, speed_kph, course
+                                "t={:.3}s GNVTG VELOCITY: Speed={:.2} knots ({:.2} km/h); Heading: {}",
+                                elapsed_s, speed_knots, speed_kph, course
                             );
 
                             // Update cached values from VTG
