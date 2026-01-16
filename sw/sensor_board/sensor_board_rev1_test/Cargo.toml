@@ -14,6 +14,8 @@ bridge  = ["usb", "wifi"]
 hmi = []      # User LED, NeoPixel, Display
 imu = []      # IMU sensor (SPI)
 gps = []      # GPS sensor (UART)
+set_gps_high_baud = [] # Optional: configure GPS to high baudrate (non-default)
+set_gps_10hz = []      # Optional: configure GPS update rate to 10Hz (non-default)
 wifi = []     # WiFi/ESP-NOW wireless communication
 usb = []      # USB Serial for bridge data forwarding
 

@@ -1,7 +1,9 @@
 use core::fmt::Write;
 use esp_hal::Async;
 use esp_hal::uart::Uart;
-use heapless::{String, Vec};
+use heapless::String;
+#[cfg(feature = "set_gps_10hz")]
+use heapless::Vec;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
@@ -46,6 +48,7 @@ async fn send_nmea_command(uart: &mut Uart<'static, Async>, payload: &str, name:
     }
 }
 
+#[cfg(feature = "set_gps_10hz")]
 async fn send_ubx_packet(
     uart: &mut Uart<'static, Async>,
     class: u8,
@@ -104,32 +107,35 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
     send_nmea_command(&mut gps2_uart, GSV_PAYLOAD, "GSV").await;
     send_nmea_command(&mut gps2_uart, GLL_PAYLOAD, "GLL").await;
 
-    // TODO: hide this behind cargo configuration flag
-    // This sets baud to 460800
-    // default for M8 is 9600, default for F10 is 38400. Reset to default, set high baud, then set
-    // high baud. Theoretically we can reconfigure the uart on the fly by dropping and re-creating
-    // but that seems really difficult and I don't want to do that
-    // send_nmea_command(&mut gps2_uart, "PUBX,41,1,3,3,460800,0", "SET BAUD 460800").await;
+    #[cfg(feature = "set_gps_high_baud")]
+    {
+        // This sets baud to 460800
+        // default for M8 is 9600, default for F10 is 38400. Reset to default, set high baud, then set
+        // high baud. Theoretically we can reconfigure the uart on the fly by dropping and re-creating
+        // but that seems really difficult and I don't want to do that
+        send_nmea_command(&mut gps2_uart, "PUBX,41,1,3,3,460800,0", "SET BAUD 460800").await;
+    }
 
-    // TODO: hide this behind cargo configuration flag
-    // This *should* set 10hz updates but I need to implement send_ubx_packet
-    // Correct 10-byte payload for VALSET
-    // const UBX_CFG_VALSET_10HZ_PAYLOAD: [u8; 10] = [
-    //     0x00, // Version 0
-    //     0x07, // Layer: 7 = RAM + Flash + BBR (Persistent)
-    //     0x00, 0x00, // Reserved
-    //     0x01, 0x00, 0x21, 0x30, // Key ID: CFG-RATE-MEAS
-    //     0x64, 0x00, // Value: 100ms (Little Endian U2)
-    // ];
-    // UNCOMMENT BELOW IF CONFIGURING A NEW GPS (saved to ROM)
-    // send_ubx_packet(
-    //     &mut gps2_uart,
-    //     0x06, // class: CFG
-    //     0x8A, // id: valset
-    //     &UBX_CFG_VALSET_10HZ_PAYLOAD,
-    //     "CFG-RATE-MEAS 10Hz", // update this if 25
-    // )
-    // .await;
+    #[cfg(feature = "set_gps_10hz")]
+    {
+        // This *should* set 10hz updates but I need to implement send_ubx_packet
+        const UBX_CFG_VALSET_10HZ_PAYLOAD: [u8; 10] = [
+            0x00, // Version 0
+            0x07, // Layer: 7 = RAM + Flash + BBR (Persistent)
+            0x00, 0x00, // Reserved
+            0x01, 0x00, 0x21, 0x30, // Key ID: CFG-RATE-MEAS
+            0x64, 0x00, // Value: 100ms (Little Endian U2)
+        ];
+        // UNCOMMENT BELOW IF CONFIGURING A NEW GPS (saved to ROM)
+        send_ubx_packet(
+            &mut gps2_uart,
+            0x06, // class: CFG
+            0x8A, // id: valset
+            &UBX_CFG_VALSET_10HZ_PAYLOAD,
+            "CFG-RATE-MEAS 10Hz",
+        )
+        .await;
+    }
 
     gps2_uart
 }

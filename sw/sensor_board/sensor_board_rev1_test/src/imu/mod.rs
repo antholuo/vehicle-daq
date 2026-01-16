@@ -7,7 +7,10 @@ use embassy_time::{Duration, Timer};
 
 use crate::SharedSpiDevice;
 #[allow(unused_imports)]
-use crate::imu::old_asm330::{AccelFs, Odr, configure_imu, fs_a_to_g, fs_g_to_dps, poll_xl_gy_combined, read_status_data, GyroFs};
+use crate::imu::old_asm330::{
+    AccelFs, GyroFs, Odr, configure_imu, fs_a_to_g, fs_g_to_dps, poll_xl_gy_combined,
+    read_status_data,
+};
 use crate::types::ImuData;
 
 /// Start IMU task with a callback for each data sample
@@ -53,8 +56,16 @@ where
                             let gyro_x_dps = old_asm330::fs_g_to_dps(raw.gy.x, &gyro_fs);
                             let gyro_y_dps = old_asm330::fs_g_to_dps(raw.gy.y, &gyro_fs);
                             let gyro_z_dps = old_asm330::fs_g_to_dps(raw.gy.z, &gyro_fs);
-                            info!("TS: {} Accel: X={:.3}g Y={:.3}g Z={:.3}g Gyro: X={:.3}dps Y={:.3}dps Z={:.3}dps",
-                                raw.ts, accel_x_g, accel_y_g, accel_z_g, gyro_x_dps, gyro_y_dps, gyro_z_dps);
+                            info!(
+                                "TS: {} Accel: X={:.3}g Y={:.3}g Z={:.3}g Gyro: X={:.3}dps Y={:.3}dps Z={:.3}dps",
+                                raw.ts,
+                                accel_x_g,
+                                accel_y_g,
+                                accel_z_g,
+                                gyro_x_dps,
+                                gyro_y_dps,
+                                gyro_z_dps
+                            );
                             let imu_data = ImuData {
                                 accel_x: accel_x_g,
                                 accel_y: accel_y_g,
@@ -65,10 +76,15 @@ where
                             };
                             on_data(imu_data);
                         }
-                        Err(e) => { warn!("Failed to read combined XL/GY: {:?}", e); }
+                        Err(e) => {
+                            warn!("Failed to read combined XL/GY: {:?}", e);
+                        }
                     }
                 } else {
-                    trace!("Data not ready xlda={} gda={} tda={}", status.xlda, status.gda, status.tda);
+                    trace!(
+                        "Data not ready xlda={} gda={} tda={}",
+                        status.xlda, status.gda, status.tda
+                    );
                 }
             }
             Err(e) => {
