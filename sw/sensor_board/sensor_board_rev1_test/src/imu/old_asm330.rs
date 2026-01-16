@@ -39,6 +39,8 @@ const REG_CTRL8_XL: u8 = 0x17;
 const REG_CTRL9_XL: u8 = 0x18;
 const REG_CTRL10_C: u8 = 0x19;
 
+const REG_STATUS_REG: u8 = 0x1E;
+
 const REG_OUTX_L_G: u8 = 0x22;
 const REG_OUTX_H_G: u8 = 0x23;
 const REG_OUTY_L_G: u8 = 0x24;
@@ -53,6 +55,11 @@ const REG_OUTY_H_A: u8 = 0x2B;
 const REG_OUTZ_L_A: u8 = 0x2C;
 const REG_OUTZ_H_A: u8 = 0x2D;
 
+const REG_TIMESTAMP0_REG: u8 = 0x40;
+const REG_TIMESTAMP1_REG: u8 = 0x41;
+const REG_TIMESTAMP2_REG: u8 = 0x42;
+const REG_TIMESTAMP3_REG: u8 = 0x43;
+
 // const REG_FIFO_DATA_OUT_X_L = 0x79;
 // const REG_FIFO_DATA_OUT_X_H = 0x7A;
 // const REG_FIFO_DATA_OUT_Y_L = 0x7B;
@@ -66,8 +73,10 @@ const GYRO_ODR_MASK: u8 = 0b1111_0000; // bits [7:4] in CTRL2_G
 const ACCEL_FSR_MASK: u8 = 0b0000_1100; // bits [3:2] in CTRL1_XL
 const ACCEL_ODR_MASK: u8 = 0b1111_0000; // bits [7:4] in CTRL1_XL
 
-const TIMER_EN_MASK: u8 = 0b0010_000; // Bit 5 in CTRL10_C
+const TIMER_EN_MASK: u8 = 0b0010_0000; // Bit 5 in CTRL10_C
 // TODO: Fix the way that our program communicates with the IMU lmao
+
+const BDU_MASK: u8 = 0b0100_0000; // Bit 6 in CTRL3_C (Block Data Update)
 
 const H_LACTIVE_MASK: u8 = 0b0010_0000; // Polarity: 0 = active high, 1 = active low
 const INT1_FIFO_TH_MASK: u8 = 0b0000_1000; // FIFO Watermark interrupt
@@ -125,36 +134,6 @@ pub enum Odr {
     Hz6667 = 0b1010_0000,
 }
 
-#[rustfmt::skip]
-#[derive(Debug, Clone, Copy)]
-#[repr(u8)]
-pub enum FifoTsDec {
-    Off   = 0b0000_0000,
-    Dec1  = 0b0100_0000,
-    Dec8  = 0b1000_0000,
-    Dec32 = 0b1100_0000,
-}
-#[rustfmt::skip]
-#[derive(Debug, Clone, Copy)]
-#[repr(u8)]
-pub enum FifoMode {
-    Bypass            = 0b0000_0000,
-    Fifo              = 0b0000_0001,
-    ContinuousToFifo  = 0b0000_0011,
-    BypassToContinuous= 0b0000_0100,
-    Continuous        = 0b0000_0110,
-    BypassToFifo      = 0b0000_0111,
-}
-
-#[derive(Debug, Clone, Copy)]
-pub struct FifoConfig {
-    pub mode: FifoMode,     // Operation mode
-    pub watermark: u16,     // number of samples before flagging watermark
-    pub batch_rate_xl: Odr, // XL batch rate (match ODR)
-    pub batch_rate_gy: Odr, // GY batch rate (match ODR)
-    pub timestamp_decimation: FifoTsDec,
-}
-
 pub async fn check_who_am_i<S>(spi: &mut S) -> Result<u8, S::Error>
 where
     S: SpiDevice<u8>,
@@ -198,19 +177,6 @@ where
 ////////////////////////
 /// Configuration
 ////////////////////////
-pub async fn configure_interrupt_pin<S>(spi: &mut S) -> Result<(), S::Error>
-where
-    S: SpiDevice<u8>,
-    S::Error: core::fmt::Debug,
-{
-    // Active high interrupt
-    let current_ctrl3_c = read_register(spi, REG_CTRL3_C).await?;
-    let new_val = current_ctrl3_c | INT1_FIFO_TH_MASK;
-    write_register(spi, REG_INT1_CTRL, new_val).await?;
-
-    Ok(())
-}
-
 pub async fn enable_timestamp<S>(spi: &mut S) -> Result<(), S::Error>
 where
     S: SpiDevice<u8>,
@@ -220,72 +186,6 @@ where
     let new_ctrl10_c = current_ctrl10_c | TIMER_EN_MASK;
     write_register(spi, REG_CTRL10_C, new_ctrl10_c).await
 }
-
-////////////////////////
-/// FIFO
-////////////////////////
-pub async fn setup_fifo<S>(spi: &mut S, config: &FifoConfig) -> Result<(), S::Error>
-where
-    S: SpiDevice<u8>,
-    S::Error: core::fmt::Debug,
-{
-    // Set watermark (FIFO_CTRL2 [8], FIFO_CTRL1 [7:0])
-    let wm_lo = config.watermark as u8;
-    let wm_hi = (config.watermark >> 8) as u8;
-    let current_fifo_ctrl2 = read_register(spi, REG_FIFO_CTRL2).await?;
-    let new_fifo_ctrl2 = (current_fifo_ctrl2 & !WTM8_MASK) | wm_hi;
-    write_register(spi, REG_FIFO_CTRL1, wm_lo).await?;
-    write_register(spi, REG_FIFO_CTRL2, new_fifo_ctrl2).await?;
-
-    // Set batch data rates for XL and GY (FIFO_CTRL3)
-    // gy gy gy gy xl xl xl xl
-    let new_fifo_ctrl3 = config.batch_rate_gy as u8 | ((config.batch_rate_xl as u8) >> 4);
-    write_register(spi, REG_FIFO_CTRL3, new_fifo_ctrl3).await?;
-
-    // Timestamp decimation, fifo mode
-    // TODO: this currently ignores temp batching since it makes the parsing a bit more difficult
-    let new_fifo_ctrl4 = config.timestamp_decimation as u8 | config.mode as u8;
-    write_register(spi, REG_FIFO_CTRL4, new_fifo_ctrl4).await?;
-
-    Ok(())
-}
-
-// pub fn read_fifo_batch<S>(
-//     spi: &mut S,
-//     raw_samples: &mut [RawImuData],
-//     fifo_depth: usize,
-// ) -> Result<usize, S::Error>
-// where
-//     S: SpiDevice<u8>,
-//     S::Error: core::fmt::Debug,
-// {
-//     // Limit how many we read to the buffer size
-//     let max_buf_size = fifo_depth.min(raw_samples.len());
-//
-//     for i in 0..max_buf_size {
-//         raw_samples[i] = get_from_fifo(spi)?;
-//     }
-//
-//     Ok(max_buf_size)
-// }
-//
-// fn get_from_fifo<S>(spi: &mut S) -> Result<RawImuData, S::Error>
-// where
-//     S: SpiDevice<u8>,
-//     S::Error: core::fmt::Debug,
-// {
-//     const READ_CMD: u8 = 0x80 | REG_FIFO_DATA_OUT_X_L; // start at the FIRST fifo reg
-//     let mut buffer: [u8; 16] = [READ_CMD, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-//     spi.transfer_in_place(&mut buffer)?;
-//     let ts_low = buffer[13];
-//     let ts_mid = buffer[14];
-//     let ts_high = buffer[15];
-//     Ok(RawImuData {
-//         gy.x: i16::from_le_bytes(buffer[1], buffer[2]),
-//         gyro_y: i16::from_le_bytes(buffer[3], buffer[4]),
-//         gyro_z: i16::from_le_bytes(buffer[5], buffer[6]),
-//     })
-// }
 
 ////////////////////////
 /// Gyro
@@ -332,7 +232,6 @@ where
 ////////////////////////
 /// Accelerometer
 ////////////////////////
-
 pub fn fs_a_to_g(raw: i16, fsr: &AccelFs) -> f32 {
     let sensitivity_mg = match fsr {
         AccelFs::G2 => 0.061,
@@ -342,6 +241,19 @@ pub fn fs_a_to_g(raw: i16, fsr: &AccelFs) -> f32 {
     };
 
     ((raw as f32) * sensitivity_mg) / 1000.0
+}
+
+pub fn fs_g_to_dps(raw: i16, fsr: &GyroFs) -> f32 {
+    // Sensitivities in mdps/LSB (millidegrees per second per LSB)
+    let sensitivity_mdps = match fsr {
+        GyroFs::DPS250 => 8.75,
+        GyroFs::DPS500 => 17.50,
+        GyroFs::DPS1000 => 35.0,
+        GyroFs::DPS2000 => 70.0,
+    };
+
+    // Convert millidegrees/sec to degrees/sec
+    ((raw as f32) * sensitivity_mdps) / 1000.0
 }
 
 pub async fn set_xl_fsr<S>(spi: &mut S, fsr: &AccelFs) -> Result<(), S::Error>
@@ -449,4 +361,123 @@ where
     let z_raw = i16::from_le_bytes([z_lo, z_hi]);
 
     Ok(z_raw)
+}
+
+pub async fn read_gy_xyz<S>(spi: &mut S) -> Result<GyRawData, S::Error>
+where
+    S: SpiDevice<u8>,
+    S::Error: core::fmt::Debug,
+{
+    debug!("Attempting to read raw GY XYZ registers");
+    const READ_CMD: u8 = 0x80 | REG_OUTX_L_G;
+    // Need 7 bytes: 1 command + 6 data bytes (X_L, X_H, Y_L, Y_H, Z_L, Z_H)
+    let mut buf: [u8; 7] = [READ_CMD, 0, 0, 0, 0, 0, 0];
+    spi.transfer_in_place(&mut buf).await?;
+
+    let x = i16::from_le_bytes([buf[1], buf[2]]);
+    let y = i16::from_le_bytes([buf[3], buf[4]]);
+    let z = i16::from_le_bytes([buf[5], buf[6]]);
+
+    Ok(GyRawData { x, y, z })
+}
+
+/// Configure both accelerometer (XL) and gyroscope (GY) ODR and FS ranges.
+/// Also enables the sensor timestamp counter.
+pub async fn configure_imu<S>(
+    spi: &mut S,
+    odr: Odr,
+    accel_fs: AccelFs,
+    gyro_fs: GyroFs,
+    enable_bdu: bool,
+) -> Result<(), S::Error>
+where
+    S: SpiDevice<u8>,
+    S::Error: core::fmt::Debug,
+{
+    // Set accelerometer ODR and full-scale range
+    set_xl_odr(spi, odr).await?;
+    set_xl_fsr(spi, &accel_fs).await?;
+
+    // Set gyroscope ODR and full-scale range
+    set_gyro_config(spi, odr, gyro_fs).await?;
+
+    // Enable sensor timestamp so we can read timestamps when polling
+    enable_timestamp(spi).await?;
+
+    // Configure Block Data Update if requested
+    let current_ctrl3 = read_register(spi, REG_CTRL3_C).await?;
+    let new_ctrl3 = if enable_bdu {
+        current_ctrl3 | BDU_MASK
+    } else {
+        current_ctrl3 & !BDU_MASK
+    };
+    write_register(spi, REG_CTRL3_C, new_ctrl3).await?;
+
+    Ok(())
+}
+
+/// Poll both accelerometer and gyroscope and return combined raw data with a timestamp.
+pub async fn poll_xl_gy_combined<S>(spi: &mut S) -> Result<RawImuData, S::Error>
+where
+    S: SpiDevice<u8>,
+    S::Error: core::fmt::Debug,
+{
+    debug!("Attempting combined SPI read for GY then XL registers");
+    const READ_CMD: u8 = 0x80 | REG_OUTX_L_G;
+    // 1 command byte + 12 data bytes (GY X/Y/Z, XL X/Y/Z)
+    let mut buf: [u8; 13] = [READ_CMD, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    spi.transfer_in_place(&mut buf).await?;
+
+    let gx = i16::from_le_bytes([buf[1], buf[2]]);
+    let gyy = i16::from_le_bytes([buf[3], buf[4]]);
+    let gz = i16::from_le_bytes([buf[5], buf[6]]);
+    let ax = i16::from_le_bytes([buf[7], buf[8]]);
+    let ay = i16::from_le_bytes([buf[9], buf[10]]);
+    let az = i16::from_le_bytes([buf[11], buf[12]]);
+
+    let gyro = GyRawData {
+        x: gx,
+        y: gyy,
+        z: gz,
+    };
+    let xl = XlRawData {
+        x: ax,
+        y: ay,
+        z: az,
+    };
+
+    let ts = get_timestamp(spi).await?;
+
+    Ok(RawImuData { xl, gy: gyro, ts })
+}
+
+pub async fn get_timestamp<S>(spi: &mut S) -> Result<u32, S::Error>
+where
+    S: SpiDevice<u8>,
+    S::Error: core::fmt::Debug,
+{
+    const READ_CMD: u8 = 0x80 | REG_TIMESTAMP0_REG;
+    let mut buf: [u8; 5] = [READ_CMD, 0, 0, 0, 0];
+    spi.transfer_in_place(&mut buf).await?;
+    let ts = u32::from_le_bytes([buf[1], buf[2], buf[3], buf[4]]);
+    Ok(ts)
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct StatusDataAvailable {
+    pub xlda: bool,
+    pub gda: bool,
+    pub tda: bool,
+}
+
+pub async fn read_status_data<S>(spi: &mut S) -> Result<StatusDataAvailable, S::Error>
+where
+    S: SpiDevice<u8>,
+    S::Error: core::fmt::Debug,
+{
+    let status = read_register(spi, REG_STATUS_REG).await?;
+    let xlda = (status & 0b0000_0001) != 0;
+    let gda = (status & 0b0000_0010) != 0;
+    let tda = (status & 0b0000_0100) != 0;
+    Ok(StatusDataAvailable { xlda, gda, tda })
 }

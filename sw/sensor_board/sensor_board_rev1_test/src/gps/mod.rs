@@ -9,7 +9,7 @@ use crate::types::{GpsData, GpsTime};
 
 const NMEA_0183_MAX_LENGTH: usize = 83;
 const MAX_SENTENCE_LENGTH: usize = NMEA_0183_MAX_LENGTH + 2; // give ourselves buffer for newlines
-const NUM_NMEA_SENTENCES: usize = 3; // RMC, VTG, GGA
+const NUM_NMEA_SENTENCES: usize = 5; // RMC, VTG, GGA
 const CHUNK_BUFF_SIZE: usize = MAX_SENTENCE_LENGTH * (NUM_NMEA_SENTENCES + 1); // buffer
 const UNPROCESSED_BUFF_SIZE: usize = CHUNK_BUFF_SIZE * 2; // hold 2 chunks
 
@@ -108,21 +108,23 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
     // ONLY DO THIS WHEN THE NEW GPS COMES IN, since we will have to set baud rate at configuration
     // time, meaning we must set the baud for all the gps's, then change the code, then use the GPS
 
+    // TODO: hide this behind cargo configuration flag
     // This sets baud to 460800
     // default for M8 is 9600, default for F10 is 38400. Reset to default, set high baud, then set
     // high baud. Theoretically we can reconfigure the uart on the fly by dropping and re-creating
     // but that seems really difficult and I don't want to do that
     // send_nmea_command(&mut gps2_uart, "PUBX,41,1,3,3,460800,0", "SET BAUD 460800").await;
 
+    // TODO: hide this behind cargo configuration flag
     // This *should* set 10hz updates but I need to implement send_ubx_packet
     // Correct 10-byte payload for VALSET
-    const UBX_CFG_VALSET_10HZ_PAYLOAD: [u8; 10] = [
-        0x00, // Version 0
-        0x07, // Layer: 7 = RAM + Flash + BBR (Persistent)
-        0x00, 0x00, // Reserved
-        0x01, 0x00, 0x21, 0x30, // Key ID: CFG-RATE-MEAS
-        0x64, 0x00, // Value: 100ms (Little Endian U2)
-    ];
+    // const UBX_CFG_VALSET_10HZ_PAYLOAD: [u8; 10] = [
+    //     0x00, // Version 0
+    //     0x07, // Layer: 7 = RAM + Flash + BBR (Persistent)
+    //     0x00, 0x00, // Reserved
+    //     0x01, 0x00, 0x21, 0x30, // Key ID: CFG-RATE-MEAS
+    //     0x64, 0x00, // Value: 100ms (Little Endian U2)
+    // ];
     // UNCOMMENT BELOW IF CONFIGURING A NEW GPS (saved to ROM)
     // send_ubx_packet(
     //     &mut gps2_uart,
