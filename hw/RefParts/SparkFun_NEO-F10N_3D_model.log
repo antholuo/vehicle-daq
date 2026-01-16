@@ -1,0 +1,147 @@
+STEP translation to Solid Edge
+Date: Friday,January 16,2026 05:03PM
+Source File: C:\Code\vehicle-daq\hw\RefParts\SparkFun_NEO-F10N_3D_model.step
+Author: Pcbnew
+Organization: Kicad
+Source System: KiCad to STEP converter
+
+Hardware:
+Processor: AMD Ryzen 7 6800HS with Radeon Graphics         
+Operating System: Windows 11 Version:25H2 Build:26200 System Type:64-bit
+Installed Memory: 15.24 GB
+
+Software Information
+Parasolid Version: 37.0.118
+PSBodyShop Version: 37.0.94
+Step Adapter Version: 15.0.142
+Solid Edge Version: 225.00.01.004 x64
+
+Step Import Options
+Import Faceted Bodies: On
+Import Check Bodies: Off
+Import Curves: On
+Import DoNotSave: On
+Import Multiple Bodies As Single Part File: On
+Import Optimize:Off
+Import Stitch Surfaces: On
+Import Boolean Solids: On
+Make Base Feature: On
+Simplify Geometry: On
+Import Imprint Curves: On
+Import Drive: C:
+Import Stitch Surfaces: On
+Import Surfaces: On
+Import Output Path: C:\Code\vehicle-daq\hw\RefParts
+Import Enable Default Output Path: On
+Import PMI: Off
+Import As Internal Components: Off
+Import Path: 
+
+Translating to Parasolid data types...
++Begin Assembly: 1
++Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\SparkFun_NEO-F10N_3D_model.asm
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\LED_0603_1608Metric_Yellow.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\USB-C_16.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\USB4105GFA_USB4105GFA.par
+|--+Total Parts: 88
+|--+Assemblies: 0
+|--+Solid Bodies: 88
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\D_SOD-323.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\D_SOD-323.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\LED_0603_1608Metric_Red.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SOT-353_SC-70-5.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SOT-23.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SO-16_3.9x9.9mm_P1.27mm.par
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\SMA-Edge.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Surface 6.par
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Surface 5.par
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Surface 4.par
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Surface 3.par
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Surface 2.par
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Surface 1.par
+|--+Total Parts: 12
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 12
+|--+End Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\D_SOD-323.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SOT-23-5.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\SOT-353_SC-70-5.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SOT-23-6.par
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\XH414H-IV01E.asm
+|  |--+Begin Assembly: 3
+|  |--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\Kathode.asm
+|  |  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\isolator.par
+|  |  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\cleme.par
+|  |--+Total Parts: 4
+|  |--+Assemblies: 0
+|  |--+Solid Bodies: 4
+|  |--+Sheet Bodies: 0
+|  |--+End Assembly: 3
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Anode.par
+|  |--+Begin Assembly: 3
+|  |--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\Pads.asm
+|  |  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Negative.par
+|  |  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Positive.par
+|  |--+Total Parts: 4
+|  |--+Assemblies: 0
+|  |--+Solid Bodies: 4
+|  |--+Sheet Bodies: 0
+|  |--+End Assembly: 3
+|--+Total Parts: 4
+|--+Assemblies: 2
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.par
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\C_0402_1005Metric.par
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\NEO.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\NEO_PCB.par
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\Shield_NEO.par
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\u-blox_NEO_label.par
+|--+Total Parts: 66
+|--+Assemblies: 0
+|--+Solid Bodies: 66
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SparkFun_NEO-F10N_copper.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SparkFun_NEO-F10N_pad.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SparkFun_NEO-F10N_silkscreen.par
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SparkFun_NEO-F10N_PCB.par
++Total Parts: 1,010
++Assemblies: 4
++Solid Bodies: 510
++Sheet Bodies: 496
++End Assembly: 1
+Translation process completed
+Total time required to translate and post process:00 : 00 : 26

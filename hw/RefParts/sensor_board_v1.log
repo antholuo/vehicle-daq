@@ -1,0 +1,608 @@
+STEP translation to Solid Edge
+Date: Friday,January 16,2026 05:05PM
+Source File: C:\Code\vehicle-daq\hw\RefParts\sensor_board_v1.step
+Author: Pcbnew
+Organization: Kicad
+Source System: KiCad to STEP converter
+
+Hardware:
+Processor: AMD Ryzen 7 6800HS with Radeon Graphics         
+Operating System: Windows 11 Version:25H2 Build:26200 System Type:64-bit
+Installed Memory: 15.24 GB
+
+Software Information
+Parasolid Version: 37.0.118
+PSBodyShop Version: 37.0.94
+Step Adapter Version: 15.0.142
+Solid Edge Version: 225.00.01.004 x64
+
+Step Import Options
+Import Faceted Bodies: On
+Import Check Bodies: Off
+Import Curves: On
+Import DoNotSave: On
+Import Multiple Bodies As Single Part File: On
+Import Optimize:Off
+Import Stitch Surfaces: On
+Import Boolean Solids: On
+Make Base Feature: On
+Simplify Geometry: On
+Import Imprint Curves: On
+Import Drive: C:
+Import Stitch Surfaces: On
+Import Surfaces: On
+Import Output Path: C:\Code\vehicle-daq\hw\RefParts
+Import Enable Default Output Path: On
+Import PMI: Off
+Import As Internal Components: Off
+Import Path: 
+
+Translating to Parasolid data types...
++Begin Assembly: 1
++Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\sensor_board_v1.asm
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\LED_0603_1608Metric.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\LED_0603_1608Metric.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric_0.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric_0.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\PinHeader_1x02_P1.00mm_Vertical.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\PinHeader_1x02_P100mm_Vertical.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\L_Changjiang_FNR5040S.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\L_Changjiang_FNR5040S.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\SOT-23-6.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SOT_23_6.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\C_0805_2012Metric.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\C_0805_2012Metric.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\JST_GH_SM07B-GHS-TB_1x07-1MP_P1.25mm_Horizontal.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\JST_SM07B_GHS_TB.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\SOT-23-6.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\QFN-24-1EP_4x4mm_P0.5mm_EP2.6x2.6mm.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\QFN-24-1EP_4x4mm_Pitch0.5mm.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\L_Changjiang_FNR4018S.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\L_Changjiang_FNR4018S.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0805_2012Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\D_SOD-523.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\D_SOD_523.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\JST_GH_SM04B-GHS-TB_1x04-1MP_P1.25mm_Horizontal.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\JST_SM04B_GHS_TB.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\ESP32-C6-WROOM-1.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\ESP32-C6-WROOM-1_V1.par
+|--+Total Parts: 414
+|--+Assemblies: 0
+|--+Solid Bodies: 414
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\TSOT-23-6.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\TSOT_23_6.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\LED_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\D_SOD-523.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0805_2012Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0805_2012Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\D_SOD-523.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\SOT-23-5.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SOT_23_5.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\PinHeader_1x02_P1.00mm_Vertical.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\JST_GH_SM07B-GHS-TB_1x07-1MP_P1.25mm_Horizontal.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\D_SOD-123.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\D_SOD_123.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\JST_GH_SM07B-GHS-TB_1x07-1MP_P1.25mm_Horizontal.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0805_2012Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\D_SOD-123.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0805_2012Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\LED_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\SOT-363_SC-70-6.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SOT_363_SC_70_6.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\D_SOD-123F.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\D_SOD_123F.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\D_SOD-523.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Created SE Assembly File C:\Code\vehicle-daq\hw\RefParts\SOIC-8_3.9x4.9mm_P1.27mm.asm
+|  |--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\SOIC_8_39x49mm_P127mm.par
+|--+Total Parts: 2
+|--+Assemblies: 0
+|--+Solid Bodies: 2
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\JST_GH_SM07B-GHS-TB_1x07-1MP_P1.25mm_Horizontal.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\D_SOD-523.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\D_SOD-523.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\SOT-23-5.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\JST_GH_SM04B-GHS-TB_1x04-1MP_P1.25mm_Horizontal.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\R_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Begin Assembly: 2
+|--+Reusing File C:\Code\vehicle-daq\hw\RefParts\C_0603_1608Metric.asm
+|--+Total Parts: 0
+|--+Assemblies: 0
+|--+Solid Bodies: 0
+|--+Sheet Bodies: 0
+|--+End Assembly: 2
+|--+Created SE Part File C:\Code\vehicle-daq\hw\RefParts\_autosave-sensor_board_v1_PCB.par
++Total Parts: 21
++Assemblies: 19
++Solid Bodies: 2
++Sheet Bodies: 0
++End Assembly: 1
+Translation process completed
+Total time required to translate and post process:00 : 00 : 16
