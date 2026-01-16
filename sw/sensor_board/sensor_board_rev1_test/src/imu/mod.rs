@@ -60,9 +60,9 @@ where
                             // Use global timebase to compute elapsed seconds since program start
                             let elapsed_s = timebase::elapsed_seconds();
                             info!(
-                                "TS: {} (raw) / {:.3}s Accel: X={:.3}g Y={:.3}g Z={:.3}g Gyro: X={:.3}dps Y={:.3}dps Z={:.3}dps",
-                                raw.ts,
+                                "t={:.3}s | TS={} Accel: X={:.3}g Y={:.3}g Z={:.3}g Gyro: X={:.3}dps Y={:.3}dps Z={:.3}dps",
                                 elapsed_s,
+                                raw.ts,
                                 accel_x_g,
                                 accel_y_g,
                                 accel_z_g,
