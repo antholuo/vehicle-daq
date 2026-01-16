@@ -31,9 +31,9 @@ where
             info!("SPI Error: {:?}", e);
         }
     }
-    let fsr_a = AccelFs::G4;
-    let odr_a = Odr::Hz104;
-    let gyro_fs = GyroFs::DPS250;
+    let fsr_a = AccelFs::G8;
+    let odr_a = Odr::Hz417;
+    let gyro_fs = GyroFs::DPS1000;
     let _ = old_asm330::set_xl_fsr(&mut spi, &fsr_a).await;
     let _ = old_asm330::set_xl_odr(&mut spi, odr_a).await;
     let _ = old_asm330::set_gyro_config(&mut spi, odr_a, gyro_fs).await;
@@ -43,7 +43,7 @@ where
         Err(e) => warn!("Failed to enable timestamp: {:?}", e),
     }
 
-    let period = Duration::from_hz(10);
+    let period = Duration::from_hz(100);
     loop {
         match old_asm330::read_status_data(&mut spi).await {
             Ok(status) => {
