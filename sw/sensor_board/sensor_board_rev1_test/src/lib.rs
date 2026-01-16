@@ -16,6 +16,7 @@ use esp_hal::usb_serial_jtag::UsbSerialJtagTx;
 pub mod aircomm;
 pub mod app;
 pub mod asm330;
+pub mod timebase;
 #[cfg(feature = "gps")]
 pub mod gps;
 #[cfg(feature = "hmi")]
