@@ -1,0 +1,32 @@
+[Unit]
+Description=RPi5 Data Logger Service (GPIO Switch Controlled)
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+Group=pi
+
+# Working directory
+WorkingDirectory=/opt/rpi_receiver
+
+# Run the GPIO monitor script
+ExecStart=/usr/bin/python3 /opt/rpi_receiver/gpio_monitor.py
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Output and error handling
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=rpi-data-logger
+
+# Security settings
+NoNewPrivileges=true
+
+# Allow GPIO access
+SupplementaryGroups=gpio
+
+[Install]
+WantedBy=multi-user.target
