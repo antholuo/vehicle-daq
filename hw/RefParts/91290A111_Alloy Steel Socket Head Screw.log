@@ -1,0 +1,42 @@
+STEP translation to Solid Edge
+Date: Saturday,January 17,2026 11:09PM
+Source File: C:\Code\vehicle-daq\hw\RefParts\91290A111_Alloy Steel Socket Head Screw.STEP
+Author: Administrator
+Organization: Managed by Terraform
+Source System: SolidWorks 2017
+
+Hardware:
+Processor: AMD Ryzen 7 6800HS with Radeon Graphics         
+Operating System: Windows 11 Version:25H2 Build:26200 System Type:64-bit
+Installed Memory: 15.24 GB
+
+Software Information
+Parasolid Version: 37.0.118
+PSBodyShop Version: 37.0.94
+Step Adapter Version: 15.0.142
+Solid Edge Version: 225.00.01.004 x64
+
+Step Import Options
+Import Faceted Bodies: On
+Import Check Bodies: Off
+Import Curves: On
+Import DoNotSave: On
+Import Multiple Bodies As Single Part File: On
+Import Optimize:Off
+Import Stitch Surfaces: On
+Import Boolean Solids: On
+Make Base Feature: On
+Simplify Geometry: On
+Import Imprint Curves: On
+Import Drive: C:
+Import Stitch Surfaces: On
+Import Surfaces: On
+Import Output Path: C:\Code\vehicle-daq\hw\RefParts
+Import Enable Default Output Path: On
+Import PMI: Off
+Import As Internal Components: Off
+Import Path: 
+
+Translating to Parasolid data types...
+Translation process completed
+Total time required to translate and post process:00 : 00 : 01
