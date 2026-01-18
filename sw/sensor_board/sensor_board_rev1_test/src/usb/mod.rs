@@ -8,6 +8,8 @@
 pub mod protocol;
 
 use esp_hal::Async;
+use embassy_time::{Duration, Instant, Timer};
+use nb::Error as NbError;
 use esp_hal::usb_serial_jtag::UsbSerialJtagTx;
 
 pub use protocol::{ForwardError, MAX_USB_MESSAGE_SIZE, format_mac, serialize_forwarded_message};
@@ -21,6 +23,9 @@ pub const MAX_MESSAGE_SIZE: usize = 128;
 
 /// COBS encoding adds at most 1 byte per 254 bytes, plus 1 overhead byte and 1 delimiter (0x00)
 pub const MAX_ENCODED_SIZE: usize = MAX_MESSAGE_SIZE + (MAX_MESSAGE_SIZE / 254) + 2;
+const USB_WRITE_TIMEOUT: Duration = Duration::from_millis(30);
+const USB_WRITE_RETRY_DELAY: Duration = Duration::from_micros(250);
+const USB_HOST_POLL_INTERVAL: Duration = Duration::from_millis(100);
 
 /// USB Serial writer with COBS framing support
 pub struct UsbSerial {
@@ -57,14 +62,17 @@ impl UsbSerial {
         // COBS encode the data
         let encoded_len = cobs::encode(data, &mut self.encode_buffer);
 
-        // Write the encoded data
-        self.tx.write(&self.encode_buffer[..encoded_len]).unwrap();
+        // Write the encoded data (non-blocking with timeout to avoid hanging when USB is idle)
+        for i in 0..encoded_len {
+            let byte = self.encode_buffer[i];
+            self.write_byte_with_timeout(byte).await?;
+        }
 
         // Write the frame delimiter (0x00)
-        self.tx.write(&[0x00]).unwrap();
+        self.write_byte_with_timeout(0x00).await?;
 
         // Flush to ensure data is sent
-        self.tx.flush_tx().unwrap();
+        self.flush_with_timeout().await?;
 
         trace!(
             "[USB] Sent {} bytes ({} encoded + delimiter)",
@@ -82,6 +90,52 @@ impl UsbSerial {
         self.tx.flush_tx().unwrap();
         Ok(())
     }
+
+    async fn write_byte_with_timeout(&mut self, byte: u8) -> Result<(), UsbError> {
+        let start = Instant::now();
+        loop {
+            match self.tx.write_byte_nb(byte) {
+                Ok(()) => return Ok(()),
+                Err(NbError::WouldBlock) => {
+                    if start.elapsed() >= USB_WRITE_TIMEOUT {
+                        return Err(UsbError::NotReady);
+                    }
+                    Timer::after(USB_WRITE_RETRY_DELAY).await;
+                }
+                Err(NbError::Other(_)) => return Err(UsbError::NotReady),
+            }
+        }
+    }
+
+    async fn flush_with_timeout(&mut self) -> Result<(), UsbError> {
+        let start = Instant::now();
+        loop {
+            match self.tx.flush_tx_nb() {
+                Ok(()) => return Ok(()),
+                Err(NbError::WouldBlock) => {
+                    if start.elapsed() >= USB_WRITE_TIMEOUT {
+                        return Err(UsbError::NotReady);
+                    }
+                    Timer::after(USB_WRITE_RETRY_DELAY).await;
+                }
+                Err(NbError::Other(_)) => return Err(UsbError::NotReady),
+            }
+        }
+    }
+}
+
+/// Wait until a USB host is detected (ESP32-C6 USB Serial/JTAG SOF flag).
+pub async fn wait_for_usb_host() {
+    while !usb_host_connected() {
+        Timer::after(USB_HOST_POLL_INTERVAL).await;
+    }
+}
+
+fn usb_host_connected() -> bool {
+    // USB_DEVICE_INT_RAW register for ESP32-C6. SOF bit indicates host traffic.
+    const USB_DEVICE_INT_RAW: *const u32 = 0x6000_f008 as *const u32;
+    const SOF_INT_MASK: u32 = 0b10;
+    unsafe { (USB_DEVICE_INT_RAW.read_volatile() & SOF_INT_MASK) != 0 }
 }
 
 /// USB Serial errors
@@ -89,4 +143,6 @@ impl UsbSerial {
 pub enum UsbError {
     /// Message exceeds maximum allowed size
     MessageTooLarge,
+    /// USB host not ready (avoid blocking forever when not connected)
+    NotReady,
 }
