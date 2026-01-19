@@ -3,16 +3,22 @@
 * Created date: 12/20/25
 * File Description: asm330 device state
 */
-
+use log::{debug};
 mod field;
 mod common;
-mod registers;
+mod reg;
 
 use common::*;
 use field::*;
-use registers::*;
 
 use embedded_hal::spi::SpiBus;
+
+pub fn test() {
+    let raw: u8 = 0b00111111;
+    let mut pin_ctrl = reg::PIN_CTRL::from_bytes([raw]);
+    pin_ctrl.set_sdo_pu_en(1);
+    debug!("before: {:08b}, after: {:08b}", raw, u8::from(pin_ctrl));
+}
 
 // pub struct SystemConfig {
 //     pub drdy_mask               : Field,

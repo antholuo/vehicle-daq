@@ -10,8 +10,7 @@ embedded-hal = "1.0.0"
 log                    = "0.4.27"
 thiserror-no-std = "2.0.2"
 esp-bootloader-esp-idf = { version = "0.3.0", features = ["esp32c6"] }
-embedded-interfaces = "0.10.3"
-bytemuck = "1.24.0"
+modular-bitfield = "0.13.1"
 
 
 [lib]
