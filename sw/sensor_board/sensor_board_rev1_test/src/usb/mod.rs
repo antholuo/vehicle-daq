@@ -125,10 +125,15 @@ impl UsbSerial {
 }
 
 /// Wait until a USB host is detected (ESP32-C6 USB Serial/JTAG SOF flag).
-pub async fn wait_for_usb_host() {
+pub async fn wait_for_usb_host_timeout(timeout: Duration) -> bool {
+    let start = Instant::now();
     while !usb_host_connected() {
+        if start.elapsed() >= timeout {
+            return false;
+        }
         Timer::after(USB_HOST_POLL_INTERVAL).await;
     }
+    true
 }
 
 fn usb_host_connected() -> bool {

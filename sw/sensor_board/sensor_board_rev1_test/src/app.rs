@@ -32,7 +32,7 @@ use crate::imu::start_imu;
 #[cfg(all(feature = "wifi", feature = "usb"))]
 use crate::types::NodeId;
 #[cfg(feature = "usb")]
-use crate::usb::{MAX_USB_MESSAGE_SIZE, UsbError, UsbSerial, format_mac, serialize_forwarded_message, wait_for_usb_host};
+use crate::usb::{MAX_USB_MESSAGE_SIZE, UsbError, UsbSerial, format_mac, serialize_forwarded_message, wait_for_usb_host_timeout};
 
 /// Capacity of the sensor data channel
 /// Allows buffering sensor samples while ESP-NOW sends
@@ -122,8 +122,15 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
                             if let Some(usb_tx) = board.take_usb_serial_tx() {
                                 let usb_serial = UsbSerial::new(usb_tx);
                                 info!("[BRIDGE] Waiting for USB host before starting");
-                                wait_for_usb_host().await;
-                                info!("[BRIDGE] USB host detected - starting bridge task");
+                                let host_ready =
+                                    wait_for_usb_host_timeout(Duration::from_secs(3)).await;
+                                if host_ready {
+                                    info!("[BRIDGE] USB host detected - starting bridge task");
+                                } else {
+                                    warn!(
+                                        "[BRIDGE] USB host not detected - starting anyway"
+                                    );
+                                }
                                 spawner
                                     .spawn(espnow_bridge_task(
                                         transceiver,

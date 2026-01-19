@@ -252,6 +252,13 @@ async fn main(spawner: embassy_executor::Spawner) {
 
     let board = DevkitC::from_peripherals(peripherals);
 
+    // Wait for USB host to enumerate after reset/power cycle.
+    // Without this delay, the USB-JTAG peripheral may not be ready
+    // and writes will fail silently after a reset (but work after flash).
+    log::info!("Waiting for USB enumeration...");
+    embassy_time::Timer::after(embassy_time::Duration::from_millis(2000)).await;
+    log::info!("USB enumeration delay complete, starting app");
+
     app_run(spawner, board).await;
     loop {
         embassy_time::Timer::after_secs(1).await

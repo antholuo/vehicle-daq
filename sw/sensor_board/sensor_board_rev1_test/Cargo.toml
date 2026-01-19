@@ -56,7 +56,7 @@ esp-hal = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package 
 esp-rtos = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-rtos", features = ["esp32c6", "esp-alloc", "embassy", "esp-radio"] }
 esp-alloc = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-alloc" }
 esp-bootloader-esp-idf = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-bootloader-esp-idf", features = ["esp32c6"] }
-esp-println = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-println", features = ["esp32c6", "log-04"] }
+esp-println = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-println", default-features = false, features = ["esp32c6", "log-04", "jtag-serial", "colors", "critical-section"] }
 
 # ESP-NOW wireless communication
 esp-radio = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-radio", features = ["esp32c6", "esp-now", "unstable", "esp-alloc"] }
