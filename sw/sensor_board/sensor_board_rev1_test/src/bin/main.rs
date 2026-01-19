@@ -62,6 +62,6 @@ fn main() -> ! {
 }
 
 fn test_asm330<S: SpiBus<u8>>(imu_spi: &mut S) {
-    let _ = asm330::DeviceConfig::default();
+    // let whoamireader = asm330::WhoAmIReader::new(imu_spi);
     panic!("tests passed");
 }
