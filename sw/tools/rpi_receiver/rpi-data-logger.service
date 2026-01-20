@@ -4,14 +4,14 @@ After=network.target
 
 [Service]
 Type=simple
-User=pi
-Group=pi
+User=hardy
+Group=hardy
 
 # Working directory
 WorkingDirectory=/opt/rpi_receiver
 
-# Run the GPIO monitor script
-ExecStart=/usr/bin/python3 /opt/rpi_receiver/gpio_monitor.py
+# Run the GPIO monitor script using the virtual environment
+ExecStart=/opt/rpi_receiver/venv/bin/python /opt/rpi_receiver/gpio_monitor.py
 
 # Restart policy
 Restart=always

@@ -25,8 +25,16 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Detect the actual user (not root)
+if [ -n "$SUDO_USER" ]; then
+    ACTUAL_USER="$SUDO_USER"
+else
+    ACTUAL_USER=$(logname 2>/dev/null || echo "hardy")
+fi
+echo "Setting up for user: $ACTUAL_USER"
+
 # Get GPIO pin number
-GPIO_PIN=${1:-17}
+GPIO_PIN=${1:-11}
 echo "Using GPIO pin: $GPIO_PIN"
 
 # Step 1: Update system
@@ -41,24 +49,31 @@ echo "Step 2: Installing dependencies..."
 apt-get install -y \
     python3-pip \
     python3-dev \
+    python3-venv \
+    python3-full \
     gpiod \
-    python3-libgpiod
+    python3-libgpiod \
+    python3-lgpio
 
-# Step 3: Install Python packages
-echo ""
-echo "Step 3: Installing Python packages..."
-pip3 install --upgrade pip
-pip3 install pyserial cobs gpiozero
-
-# Step 4: Create service directory
+# Step 3: Create service directory
 SERVICE_DIR="/opt/rpi_receiver"
 echo ""
-echo "Step 4: Creating service directory: $SERVICE_DIR"
+echo "Step 3: Creating service directory: $SERVICE_DIR"
 mkdir -p "$SERVICE_DIR/data"
-chown pi:pi "$SERVICE_DIR"
-chown pi:pi "$SERVICE_DIR/data"
+chown "$ACTUAL_USER:$ACTUAL_USER" "$SERVICE_DIR"
+chown "$ACTUAL_USER:$ACTUAL_USER" "$SERVICE_DIR/data"
 chmod 755 "$SERVICE_DIR"
 chmod 755 "$SERVICE_DIR/data"
+
+# Step 4: Create virtual environment and install Python packages
+# Use --system-site-packages to access system lgpio (difficult to build from source)
+echo ""
+echo "Step 4: Creating virtual environment and installing Python packages..."
+rm -rf "$SERVICE_DIR/venv"  # Remove existing venv if any
+python3 -m venv --system-site-packages "$SERVICE_DIR/venv"
+"$SERVICE_DIR/venv/bin/pip" install --upgrade pip
+"$SERVICE_DIR/venv/bin/pip" install pyserial cobs gpiozero
+chown -R "$ACTUAL_USER:$ACTUAL_USER" "$SERVICE_DIR/venv"
 
 # Step 5: Copy scripts to service directory
 echo ""
@@ -78,14 +93,36 @@ if [ -f "gpio_monitor.py" ]; then
     chmod 755 "$SERVICE_DIR/gpio_monitor.py"
 fi
 
-chown -R pi:pi "$SERVICE_DIR"
+chown -R "$ACTUAL_USER:$ACTUAL_USER" "$SERVICE_DIR"
 
-# Step 6: Add pi user to gpio group
+# Step 6: Configure GPIO access
 echo ""
 echo "Step 6: Configuring GPIO access..."
-if ! getent group gpio | grep -q "\bpi\b"; then
-    usermod -a -G gpio pi
-    echo "Added pi user to gpio group"
+
+# Create gpio group if it doesn't exist
+if ! getent group gpio > /dev/null 2>&1; then
+    echo "Creating gpio group..."
+    groupadd gpio
+fi
+
+# Add user to gpio group
+if ! groups "$ACTUAL_USER" | grep -q "\bgpio\b"; then
+    usermod -a -G gpio "$ACTUAL_USER"
+    echo "Added $ACTUAL_USER to gpio group"
+fi
+
+# Set up udev rules for GPIO access (needed on Ubuntu)
+UDEV_RULE="/etc/udev/rules.d/99-gpio.rules"
+if [ ! -f "$UDEV_RULE" ]; then
+    echo "Creating udev rules for GPIO access..."
+    cat > "$UDEV_RULE" << 'EOF'
+# Allow gpio group to access GPIO chips
+SUBSYSTEM=="gpio", KERNEL=="gpiochip*", GROUP="gpio", MODE="0660"
+SUBSYSTEM=="gpio", KERNEL=="gpio*", GROUP="gpio", MODE="0660"
+EOF
+    udevadm control --reload-rules
+    udevadm trigger
+    echo "GPIO udev rules installed"
 fi
 
 # Step 7: Install systemd service
