@@ -15,6 +15,7 @@ import logging
 import subprocess
 import sys
 import time
+import re
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -91,6 +92,41 @@ def _get_line_event_enum():
     if hasattr(gpiod, "line") and hasattr(gpiod.line, "LineEvent"):
         return gpiod.line.LineEvent
     return None
+
+
+def _read_persisted_counter(counter_path: Path) -> int:
+    try:
+        if not counter_path.exists():
+            return 0
+        value = counter_path.read_text().strip()
+        return int(value) if value else 0
+    except Exception:
+        return 0
+
+
+def _write_persisted_counter(counter_path: Path, value: int) -> None:
+    try:
+        tmp_path = counter_path.with_suffix(".tmp")
+        tmp_path.write_text(str(value))
+        tmp_path.replace(counter_path)
+    except Exception:
+        pass
+
+
+def _scan_max_counter(output_dir: Path) -> int:
+    pattern = re.compile(r"^sensor_data_(\d+)\.csv$")
+    max_value = 0
+    try:
+        for entry in output_dir.iterdir():
+            match = pattern.match(entry.name)
+            if match:
+                try:
+                    max_value = max(max_value, int(match.group(1)))
+                except ValueError:
+                    continue
+    except Exception:
+        pass
+    return max_value
 
 
 def _resolve_bias_enum(bias_name: str):
@@ -183,7 +219,10 @@ class DataLoggerMonitor:
         self.logger_process: Optional[subprocess.Popen] = None
         self.script_dir = Path(__file__).parent
         self.main_script = self.script_dir / "main.py"
-        self.session_counter = 0  # Counter for log files (no NTP dependency)
+        self.counter_path = self.output_dir / "session_counter.txt"
+        persisted = _read_persisted_counter(self.counter_path)
+        scanned = _scan_max_counter(self.output_dir)
+        self.session_counter = max(persisted, scanned)  # No NTP dependency
         self.line_request = None
         self.api_version = None
 
@@ -228,6 +267,7 @@ class DataLoggerMonitor:
         # Generate output file with sequence number (no system time required)
         self.session_counter += 1
         output_file = self.output_dir / f"sensor_data_{self.session_counter:03d}.csv"
+        _write_persisted_counter(self.counter_path, self.session_counter)
 
         try:
             logger.info(f"Starting data logger: {self.main_script}")
