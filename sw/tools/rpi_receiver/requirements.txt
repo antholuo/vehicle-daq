@@ -1,3 +1,4 @@
 pyserial>=3.5
 cobs>=1.2.0
+gpiozero>=2.0.0
 
