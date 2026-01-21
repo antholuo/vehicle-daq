@@ -1,10 +1,7 @@
 /// app.rs
 /// responsible for starting the "app" and setting any necessary configs
 
-#[cfg(feature = "wifi")]
-use embassy_time::Duration;
-#[cfg(feature = "wifi")]
-use embassy_time::Instant;
+use embassy_time::{Duration, Timer, Instant};
 #[cfg(feature = "hmi")]
 use esp_hal::gpio::Output;
 
@@ -52,14 +49,44 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     crate::timebase::set_program_start();
 
     #[cfg(feature = "hmi")]
-    let user_led = board.take_user_led();
+    let mut user_led = board.take_user_led();
     #[cfg(feature = "hmi")]
     trace!("User Led initialized!");
 
     #[cfg(feature = "hmi")]
-    let neopixel = board.take_neopixel();
+    let mut neopixel = board.take_neopixel();
     #[cfg(feature = "hmi")]
     trace!("NeoPixel initialized!");
+
+    // Startup delay: show rainbow-ish cycle on NeoPixel while waiting
+    #[cfg(feature = "hmi")]
+    {
+        use crate::hmi::Color;
+        trace!("Startup delay: showing neopixel rainbow for 3s");
+        let startup_duration = Duration::from_secs(3);
+        let step = Duration::from_millis(80);
+        let steps = (startup_duration.as_millis() / step.as_millis()) as u32;
+        // wheel function
+        fn wheel(pos: u8) -> (u8, u8, u8) {
+            if pos < 85 {
+                (255 - pos * 3, pos * 3, 0)
+            } else if pos < 170 {
+                let pos = pos - 85;
+                (0, 255 - pos * 3, pos * 3)
+            } else {
+                let pos = pos - 170;
+                (pos * 3, 0, 255 - pos * 3)
+            }
+        }
+        for i in 0..=steps {
+            let pos = ((i * 256 / (steps.max(1))) % 256) as u8;
+            let (r, g, b) = wheel(pos);
+            neopixel
+                .set_color_with_brightness(Color::Custom(r, g, b), 50)
+                .await;
+            Timer::after(step).await;
+        }
+    }
 
     #[cfg(feature = "hmi")]
     let _disp_spi_device = board.take_disp_spi_device();
@@ -122,14 +149,47 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
                             if let Some(usb_tx) = board.take_usb_serial_tx() {
                                 let usb_serial = UsbSerial::new(usb_tx);
                                 info!("[BRIDGE] Waiting for USB host before starting");
-                                let host_ready =
-                                    wait_for_usb_host_timeout(Duration::from_secs(3)).await;
-                                if host_ready {
-                                    info!("[BRIDGE] USB host detected - starting bridge task");
-                                } else {
-                                    warn!(
-                                        "[BRIDGE] USB host not detected - starting anyway"
-                                    );
+                                // Wait for USB host with neopixel animation for visual feedback
+                                {
+                                    const USB_DEVICE_INT_RAW: *const u32 = 0x6000_f008 as *const u32;
+                                    const SOF_INT_MASK: u32 = 0b10;
+                                    let start = Instant::now();
+                                    let timeout = Duration::from_secs(3);
+                                    let step = Duration::from_millis(80);
+                                    let mut i: u32 = 0;
+                                    let mut host_ready = false;
+                                    // simple wheel fn
+                                    fn wheel(pos: u8) -> (u8, u8, u8) {
+                                        if pos < 85 {
+                                            (255 - pos * 3, pos * 3, 0)
+                                        } else if pos < 170 {
+                                            let pos = pos - 85;
+                                            (0, 255 - pos * 3, pos * 3)
+                                        } else {
+                                            let pos = pos - 170;
+                                            (pos * 3, 0, 255 - pos * 3)
+                                        }
+                                    }
+                                    let total_steps = (timeout.as_millis() / step.as_millis()) as u32;
+                                    while start.elapsed() < timeout {
+                                        let connected = unsafe { (USB_DEVICE_INT_RAW.read_volatile() & SOF_INT_MASK) != 0 };
+                                        if connected {
+                                            host_ready = true;
+                                            break;
+                                        }
+                                        let pos = ((i * 256 / (total_steps.max(1))) % 256) as u8;
+                                        let (r, g, b) = wheel(pos);
+                                        neopixel
+                                            .set_color_with_brightness(crate::hmi::Color::Custom(r, g, b), 50)
+                                            .await;
+                                        Timer::after(step).await;
+                                        i = i.wrapping_add(1);
+                                    }
+                                    if host_ready {
+                                        info!("[BRIDGE] USB host detected - starting bridge task");
+                                    } else {
+                                        warn!("[BRIDGE] USB host not detected - starting anyway");
+                                    }
                                 }
                                 spawner
                                     .spawn(espnow_bridge_task(
