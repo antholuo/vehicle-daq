@@ -179,6 +179,12 @@ where
                 continue;
             }
         };
+
+        if n > 0 {
+            let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+            hmi.last_gps_rx_timestamp = Some(Instant::now());
+        }
+
         let chunk = core::str::from_utf8(&buf[..n]).unwrap_or("");
 
         if incomplete_line_buffer.push_str(chunk).is_err() {
