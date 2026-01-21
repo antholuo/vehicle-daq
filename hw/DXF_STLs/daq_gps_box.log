@@ -1,0 +1,28 @@
+Solid Edge Translation to STL
+Date: Wednesday,January 21,2026 08:44AM
+Source File:C:\Code\vehicle-daq\hw\TestProjects\Asm_box.par
+Source System: SOLID EDGE
+
+Hardware:
+Processor: AMD Ryzen 7 6800HS with Radeon Graphics         
+Operating System: Windows 10
+Installed Memory: 15.24 GB
+
+Software Information:
+Parasolid Version: 37.0.118
+PSBodyshop Version: 37.0.94
+STL Adapter Version: 15.0.142
+Solid Edge Version: 225.00.01.004 x64
+
+STL Export Options:
+Output File Format:BINARY
+Export Displayed Parts:Off
+structureOption: Monolithic
+Export Units:Inch
+Export Tolerance Value:0.050000
+Export Tolerance Type:Custom
+Export Surface Plane Angle Value:0.523599
+
+Translation progress:
+Translation process completed
+Time required to translate:00 : 00 : 01
