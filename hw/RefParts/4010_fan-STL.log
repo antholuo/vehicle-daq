@@ -1,0 +1,26 @@
+STL translation to Solid Edge
+Date: Tuesday,January 20,2026 10:59PM
+Source File:C:\Code\vehicle-daq\hw\RefParts\4010_fan.stl
+Author: Unknown
+Organization: Unknown
+Source System: DEX
+
+Hardware:
+Processor: AMD Ryzen 7 6800HS with Radeon Graphics         
+Operating System: Windows 10
+Installed Memory: 15.24 GB
+
+Software Information:
+Parasolid Version: 37.0.118
+PSBodyshop Version: 37.0.94
+STL Adapter Version: 15.0.142
+Solid Edge Version: 225.00.01.004 x64
+
+STL Import Options
+Heal Mesh Faults:Off
+Make Base Feature:On
+Enable Logging:On
+
+Translation progress:
+Translation process completed
+Time required to translate:00 : 00 : 01
