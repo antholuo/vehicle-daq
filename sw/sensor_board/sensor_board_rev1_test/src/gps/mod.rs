@@ -8,6 +8,7 @@ use heapless::Vec;
 use log::{debug, error, info, trace, warn};
 
 use crate::types::{GpsData, GpsTime};
+use embassy_time::Instant;
 
 const NMEA_0183_MAX_LENGTH: usize = 83;
 const MAX_SENTENCE_LENGTH: usize = NMEA_0183_MAX_LENGTH + 2; // give ourselves buffer for newlines
@@ -233,6 +234,11 @@ where
                                 last_heading,
                                 last_time,
                             );
+
+                            // Update HMI state: GPS timestamp and fix flag
+                            let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+                            hmi.last_gps_timestamp = Some(Instant::now());
+                            hmi.gps_fix = true;
                         }
                         nmea_parser::ParsedMessage::Rmc(rmc) => {
                             if let Some(time) = rmc.timestamp {
