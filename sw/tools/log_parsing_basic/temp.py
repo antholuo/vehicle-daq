@@ -11,7 +11,8 @@ from pyproj import Geod
 
 def parse_log_file(path):
     imu_rows = []
-    gps_rows = []
+    gps_pos_rows = []
+    gps_vel_rows = []
 
     imu_re = re.compile(
         r"t=(?P<t>[0-9.]+)s.*?Accel: X=(?P<ax>[0-9.\-]+)g Y=(?P<ay>[0-9.\-]+)g Z=(?P<az>[0-9.\-]+)g "
@@ -23,12 +24,14 @@ def parse_log_file(path):
     )
 
     vtg_re = re.compile(
-        r"t=(?P<t>[0-9.]+)s.*?Speed=(?P<speed>[0-9.\-]+) knots.*Heading:\s*(?P<head>[0-9.\-]+)"
+        r"t=(?P<t>[0-9.]+)s.*?Speed=(?P<speed>[0-9.\-]+) knots.*?Heading:\s*(?P<head>[0-9.\-]+)"
     )
 
-    with open(path, "r") as f:
-        for line in f:
-            # IMU
+    with open(path, "r", errors="ignore") as f:
+        for raw in f:
+            # strip ANSI color codes if present
+            line = re.sub(r"\x1b\[[0-9;]*m", "", raw)
+
             m = imu_re.search(line)
             if m:
                 imu_rows.append({
@@ -36,17 +39,16 @@ def parse_log_file(path):
                     "ax": float(m.group("ax")) * 9.80665,
                     "ay": float(m.group("ay")) * 9.80665,
                     "az": float(m.group("az")) * 9.80665,
+
                     "gx": np.radians(float(m.group("gx"))),
                     "gy": np.radians(float(m.group("gy"))),
-
                     "gz": np.radians(float(m.group("gz")))
                 })
                 continue
 
-            # GPS GGA
             m = gga_re.search(line)
             if m:
-                gps_rows.append({
+                gps_pos_rows.append({
                     "timestamp": float(m.group("t")),
                     "lat": float(m.group("lat")),
                     "lon": float(m.group("lon")),
@@ -54,46 +56,58 @@ def parse_log_file(path):
                 })
                 continue
 
-            # GPS VTG
             m = vtg_re.search(line)
             if m:
-                gps_rows.append({
+                gps_vel_rows.append({
                     "timestamp": float(m.group("t")),
                     "speed": float(m.group("speed")) * 0.514444,
                     "heading": float(m.group("head"))
                 })
                 continue
 
-    imu_df = pd.DataFrame(imu_rows)
-    gps_df = pd.DataFrame(gps_rows)
+    imu_df = pd.DataFrame(imu_rows).sort_values("timestamp")
+    gps_pos_df = pd.DataFrame(gps_pos_rows).sort_values("timestamp")
+    gps_vel_df = pd.DataFrame(gps_vel_rows).sort_values("timestamp")
 
-    # Merge GPS rows (speed, heading, lat/lon may appear separately)
-    gps_df = gps_df.groupby("timestamp").agg("first").reset_index()
+    # Merge nearest position to IMU
+    if not gps_pos_df.empty:
+        imu_pos = pd.merge_asof(
+            imu_df, gps_pos_df,
+            on="timestamp",
+            direction="backward",
+            tolerance=1.0  # 1s tolerance for position
+        )
+        imu_pos[["lat", "lon", "accuracy"]] = imu_pos[["lat", "lon", "accuracy"]].bfill().ffill()
+    else:
+        imu_pos = imu_df.copy()
+        imu_pos["lat"] = np.nan
+        imu_pos["lon"] = np.nan
+        imu_pos["accuracy"] = 10.0
 
-    # Merge IMU + GPS on nearest timestamp
-    df = pd.merge_asof(
-        imu_df.sort_values("timestamp"),
-        gps_df.sort_values("timestamp"),
-        on="timestamp",
-        direction="nearest",
-        tolerance=0.2
-    )
+    # Merge nearest velocity to IMU
+    if not gps_vel_df.empty:
+        df = pd.merge_asof(
+            imu_pos, gps_vel_df,
+            on="timestamp",
+            direction="backward",
+            tolerance=1.0  # 1s tolerance for velocity
+        )
+        df["speed"] = df["speed"].fillna(0.0)
+        df["heading"] = df["heading"].fillna(0.0)
+    else:
+        df = imu_pos.copy()
+        df["speed"] = 0.0
+        df["heading"] = 0.0
 
-    # Fill missing GPS fields
-    df["lat"] = df["lat"].ffill()
-    df["lon"] = df["lon"].ffill()
-    df["accuracy"] = df["accuracy"].fillna(10)
-    df["speed"] = df["speed"].fillna(0)
-    df["heading"] = df["heading"].fillna(0)
-    df["alt"] = 0.0  # no altitude in your log snippet
-
+    df["alt"] = 0.0
     return df
+
+
 
 
 # ------------------------------------------------------------
 # 2. AHRS + POSITION FUSION
 # ------------------------------------------------------------
-
 def quat_to_rotation_matrix(q):
     w, x, y, z = q
     return np.array([
@@ -148,8 +162,11 @@ def run_ahrs_and_resample(df):
         d_north = vel[0] * dt
         d_east  = vel[1] * dt
 
-        lon_new, lat_new, _ = geod.fwd(last_lon, last_lat, heading_deg,
-                                       np.sqrt(d_north**2 + d_east**2))
+        lon_new, lat_new, _ = geod.fwd(
+            last_lon, last_lat,
+            heading_deg,
+            np.sqrt(d_north**2 + d_east**2)
+        )
 
         last_lat = lat_new
         last_lon = lon_new
@@ -172,9 +189,7 @@ def run_ahrs_and_resample(df):
         "xl_x","xl_y","xl_z"
     ])
 
-
     return out_df
-
 
 # ------------------------------------------------------------
 # 3. MAIN ENTRY POINT
