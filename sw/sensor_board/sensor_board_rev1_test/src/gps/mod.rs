@@ -226,14 +226,26 @@ where
                     Ok(parsed_data) => match parsed_data {
                         nmea_parser::ParsedMessage::Gga(gga) => {
                             let elapsed_s = crate::timebase::elapsed_seconds();
-                            info!(
-                                "t={:.3}s GPGGA FIX: Lat={}, Lon={}, HDOP={}, SATS={}",
-                                elapsed_s,
-                                gga.latitude.unwrap_or(0.0),
-                                gga.longitude.unwrap_or(0.0),
-                                gga.hdop.unwrap_or(0.0),
-                                gga.satellite_count.unwrap_or(0),
-                            );
+                            let has_fix = gga.latitude.is_some() && gga.longitude.is_some();
+                            let sat_count = gga.satellite_count.unwrap_or(0);
+                            
+                            if has_fix {
+                                info!(
+                                    "t={:.3}s GPGGA ✓ VALID FIX: Lat={}, Lon={}, HDOP={}, SATS={}",
+                                    elapsed_s,
+                                    gga.latitude.unwrap_or(0.0),
+                                    gga.longitude.unwrap_or(0.0),
+                                    gga.hdop.unwrap_or(0.0),
+                                    sat_count,
+                                );
+                            } else {
+                                warn!(
+                                    "t={:.3}s GPGGA ✗ NO FIX: SATS={}, HDOP={}",
+                                    elapsed_s,
+                                    sat_count,
+                                    gga.hdop.unwrap_or(99.99),
+                                );
+                            }
 
                             // Update cached values from GGA
                             if let Some(lat) = gga.latitude {
@@ -260,7 +272,8 @@ where
                             // Update HMI state: GPS timestamp and fix flag
                             let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
                             hmi.last_gps_timestamp = Some(Instant::now());
-                            hmi.gps_fix = true;
+                            // Only set fix=true if we have valid position data
+                            hmi.gps_fix = gga.latitude.is_some() && gga.longitude.is_some();
                         }
                         nmea_parser::ParsedMessage::Rmc(rmc) => {
                             if let Some(time) = rmc.timestamp {
