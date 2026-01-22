@@ -110,11 +110,27 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
 
     #[cfg(feature = "set_gps_high_baud")]
     {
-        // This sets baud to 460800
-        // default for M8 is 9600, default for F10 is 38400. Reset to default, set high baud, then set
-        // high baud. Theoretically we can reconfigure the uart on the fly by dropping and re-creating
-        // but that seems really difficult and I don't want to do that
-        send_nmea_command(&mut gps2_uart, "PUBX,41,1,3,3,460800,0", "SET BAUD 460800").await;
+        info!("Setting GPS Baud to 460800 (Persistent)...");
+        
+        // Key ID for CFG-UART1-BAUDRATE: 0x40520001
+        // Value for 460800: 0x00070800 (Little Endian: 0x00, 0x08, 0x07, 0x00)
+        const UBX_CFG_VALSET_BAUD_460800: [u8; 12] = [
+            0x00,       // Version 0
+            0x07,       // Layer: 7 = RAM + Flash + BBR (Persistent)
+            0x00, 0x00, // Reserved
+            0x01, 0x00, 0x52, 0x40, // Key ID: CFG-UART1-BAUDRATE
+            0x00, 0x08, 0x07, 0x00  // Value: 460800
+        ];
+
+        send_ubx_packet(
+            &mut gps2_uart,
+            0x06, // class: CFG
+            0x8A, // id: VALSET
+            &UBX_CFG_VALSET_BAUD_460800,
+            "CFG-UART1-BAUDRATE"
+        ).await;
+
+        info!("ESP32 UART switched to 460800 baud.");
     }
 
     #[cfg(feature = "set_gps_10hz")]

@@ -9,7 +9,7 @@ version      = "0.1.0"
 default-run  = "rev1_board"
 
 [features]
-default = ["hmi", "imu", "gps", "wifi"]
+default = ["hmi", "imu", "gps", "wifi", "set_gps_high_baud", "set_gps_10hz"]
 bridge  = ["hmi", "usb", "wifi"]
 hmi = []      # User LED, NeoPixel, Display
 imu = []      # IMU sensor (SPI)

@@ -68,29 +68,25 @@ pub async fn start_hmi(
                 .unwrap_or(false);
         drop(state);
 
-        let period_ms = period.as_millis().max(1) as u64;
-        let fast_pulse_ms = (period_ms / 4).max(1);
-        let fast_pulse = Duration::from_millis(fast_pulse_ms);
-        let fast_gap = fast_pulse;
-
         if gps_fix_recent {
             // GPS fix -> solid
             neopixel
                 .set_color_with_brightness(color, neopixel_brightness)
                 .await;
         } else if gps_rx_recent {
-            // GPS connected, no fix -> fast blink (double pulse)
+            // GPS connected, no fix -> fast double pulse (0.1s on, 0.1s off, 0.1s on, 0.7s off)
             neopixel
                 .set_color_with_brightness(color, neopixel_brightness)
                 .await;
-            Timer::after(fast_pulse).await;
+            Timer::after_millis(100).await;
             neopixel.clear().await;
-            Timer::after(fast_gap).await;
+            Timer::after_millis(100).await;
             neopixel
                 .set_color_with_brightness(color, neopixel_brightness)
                 .await;
-            Timer::after(fast_pulse).await;
+            Timer::after_millis(100).await;
             neopixel.clear().await;
+            Timer::after_millis(700).await;
         } else {
             // No GPS data -> slow blink
             slow_blink_on = !slow_blink_on;
