@@ -12,6 +12,7 @@ dependencies = [
  "log",
  "modular-bitfield",
  "thiserror-no-std",
+ "ux",
 ]
 
 [[package]]
@@ -1192,6 +1193,12 @@ name = "unsafe-libyaml"
 version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "673aac59facbab8a9007c7f6108d11f63b603f7cabff99fabf650fea5c32b861"
+
+[[package]]
+name = "ux"
+version = "0.1.6"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3b59fc5417e036e53226bbebd90196825d358624fd5577432c4e486c95b1b096"
 
 [[package]]
 name = "vcell"

@@ -62,6 +62,8 @@ fn main() -> ! {
 }
 
 fn test_asm330<S: SpiBus<u8>>(imu_spi: &mut S) {
-    asm330::test();
+    let mut device = asm330::Device::new(imu_spi);
+    let result = device.test_whoami().unwrap();
+    assert!(result);
     panic!("tests passed");
 }

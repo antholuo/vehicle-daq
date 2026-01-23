@@ -1,7 +1,7 @@
 //! Simple no-std NeoPixel/WS2812 driver for ESP32-C6
 
 use esp_hal::gpio::OutputPin;
-use esp_hal_smartled::{RmtSmartLeds, Ws2812Timing, buffer_size, color_order};
+use esp_hal_smartled::{buffer_size, color_order, RmtSmartLeds, Ws2812Timing};
 use smart_leds::{SmartLedsWrite, RGB8};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -62,12 +62,19 @@ impl Color {
 
 /// NeoPixel driver - wraps RmtSmartLeds for single LED control
 pub struct NeoPixel<'d> {
-    led: RmtSmartLeds<'d, { buffer_size::<RGB8>(1) }, esp_hal::Blocking, RGB8, color_order::Grb, Ws2812Timing>,
+    led: RmtSmartLeds<
+        'd,
+        { buffer_size::<RGB8>(1) },
+        esp_hal::Blocking,
+        RGB8,
+        color_order::Grb,
+        Ws2812Timing,
+    >,
 }
 
 impl<'d> NeoPixel<'d> {
     /// Create new NeoPixel driver using an RMT channel
-    /// 
+    ///
     /// # Example
     /// ```ignore
     /// let rmt = Rmt::new(peripherals.RMT, 80.MHz()).unwrap();
@@ -87,20 +94,20 @@ impl<'d> NeoPixel<'d> {
         let rgb = color.to_rgb8();
         let _ = self.led.write([rgb].iter().cloned());
     }
-    
+
     /// Set color with brightness scaling
-    /// 
+    ///
     /// # Arguments
     /// * `color` - The color to display
     /// * `brightness` - Brightness level from 0 (off) to 255 (full brightness)
     pub fn set_color_with_brightness(&mut self, color: Color, brightness: u8) {
         let (r, g, b) = color.to_rgb();
         let scale = brightness as u16;
-        
+
         let r_scaled = ((r as u16 * scale) / 255) as u8;
         let g_scaled = ((g as u16 * scale) / 255) as u8;
         let b_scaled = ((b as u16 * scale) / 255) as u8;
-        
+
         self.set_color(Color::Custom(r_scaled, g_scaled, b_scaled));
     }
 

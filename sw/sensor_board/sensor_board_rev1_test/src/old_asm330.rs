@@ -68,7 +68,7 @@ const ACCEL_FSR_MASK: u8 = 0b0000_1100; // bits [3:2] in CTRL1_XL
 const ACCEL_ODR_MASK: u8 = 0b1111_0000; // bits [7:4] in CTRL1_XL
 
 const TIMER_EN_MASK: u8 = 0b0010_000; // Bit 5 in CTRL10_C
-// TODO: Fix the way that our program communicates with the IMU lmao
+                                      // TODO: Fix the way that our program communicates with the IMU lmao
 
 const H_LACTIVE_MASK: u8 = 0b0010_0000; // Polarity: 0 = active high, 1 = active low
 const INT1_FIFO_TH_MASK: u8 = 0b0000_1000; // FIFO Watermark interrupt
