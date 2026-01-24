@@ -1,7 +1,6 @@
 /// app.rs
 /// responsible for starting the "app" and setting any necessary configs
-
-use embassy_time::{Duration, Timer, Instant};
+use embassy_time::{Duration, Instant, Timer};
 #[cfg(feature = "hmi")]
 use esp_hal::gpio::Output;
 
@@ -29,7 +28,10 @@ use crate::imu::start_imu;
 #[cfg(all(feature = "wifi", feature = "usb"))]
 use crate::types::NodeId;
 #[cfg(feature = "usb")]
-use crate::usb::{MAX_USB_MESSAGE_SIZE, UsbError, UsbSerial, format_mac, serialize_forwarded_message, wait_for_usb_host_timeout};
+use crate::usb::{
+    MAX_USB_MESSAGE_SIZE, UsbError, UsbSerial, format_mac, serialize_forwarded_message,
+    wait_for_usb_host_timeout,
+};
 
 /// Capacity of the sensor data channel
 /// Allows buffering sensor samples while ESP-NOW sends
@@ -151,7 +153,8 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
                                 info!("[BRIDGE] Waiting for USB host before starting");
                                 // Wait for USB host with neopixel animation for visual feedback
                                 {
-                                    const USB_DEVICE_INT_RAW: *const u32 = 0x6000_f008 as *const u32;
+                                    const USB_DEVICE_INT_RAW: *const u32 =
+                                        0x6000_f008 as *const u32;
                                     const SOF_INT_MASK: u32 = 0b10;
                                     let start = Instant::now();
                                     let timeout = Duration::from_secs(3);
@@ -170,9 +173,12 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
                                             (pos * 3, 0, 255 - pos * 3)
                                         }
                                     }
-                                    let total_steps = (timeout.as_millis() / step.as_millis()) as u32;
+                                    let total_steps =
+                                        (timeout.as_millis() / step.as_millis()) as u32;
                                     while start.elapsed() < timeout {
-                                        let connected = unsafe { (USB_DEVICE_INT_RAW.read_volatile() & SOF_INT_MASK) != 0 };
+                                        let connected = unsafe {
+                                            (USB_DEVICE_INT_RAW.read_volatile() & SOF_INT_MASK) != 0
+                                        };
                                         if connected {
                                             host_ready = true;
                                             break;
@@ -180,7 +186,10 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
                                         let pos = ((i * 256 / (total_steps.max(1))) % 256) as u8;
                                         let (r, g, b) = wheel(pos);
                                         neopixel
-                                            .set_color_with_brightness(crate::hmi::Color::Custom(r, g, b), 50)
+                                            .set_color_with_brightness(
+                                                crate::hmi::Color::Custom(r, g, b),
+                                                50,
+                                            )
                                             .await;
                                         Timer::after(step).await;
                                         i = i.wrapping_add(1);
@@ -383,11 +392,17 @@ async fn espnow_sender_task(
 
                 let result = match &payload {
                     SensorPayload::Imu(data) => {
-                        debug!("[ESP-NOW TX] Sending IMU data");
+                        info!(
+                            "[ESP-NOW TX] Sending IMU data, timestamp_us={}",
+                            timestamp_us
+                        );
                         transceiver.send_imu(timestamp_us, data, &BROADCAST).await
                     }
                     SensorPayload::Gps(data) => {
-                        debug!("[ESP-NOW TX] Sending GPS data");
+                        info!(
+                            "[ESP-NOW TX] Sending GPS data, timestamp_us={}",
+                            timestamp_us
+                        );
                         transceiver.send_gps(timestamp_us, data, &BROADCAST).await
                     }
                     SensorPayload::Heartbeat(data) => {
