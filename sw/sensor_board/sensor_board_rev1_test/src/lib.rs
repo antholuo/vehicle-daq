@@ -14,6 +14,8 @@ use esp_hal::usb_serial_jtag::UsbSerialJtagTx;
 
 #[cfg(feature = "wifi")]
 pub mod aircomm;
+#[cfg(feature = "wifi")]
+pub mod comms;
 pub mod app;
 pub mod asm330;
 pub mod timebase;

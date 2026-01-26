@@ -7,6 +7,8 @@ pub struct HmiStateData {
     pub gps_fix: bool,
     pub last_gps_timestamp: Option<Instant>,
     pub last_gps_rx_timestamp: Option<Instant>,
+    pub is_bridge: bool,
+    pub usb_host_connected: bool,
 }
 
 impl Default for HmiStateData {
@@ -16,6 +18,8 @@ impl Default for HmiStateData {
             gps_fix: false,
             last_gps_timestamp: None,
             last_gps_rx_timestamp: None,
+            is_bridge: false,
+            usb_host_connected: false,
         }
     }
 }
@@ -29,6 +33,8 @@ impl HmiState {
             gps_fix: false,
             last_gps_timestamp: None,
             last_gps_rx_timestamp: None,
+            is_bridge: false,
+            usb_host_connected: false,
         }))
     }
 }
