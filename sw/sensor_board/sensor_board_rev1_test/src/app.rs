@@ -1,6 +1,5 @@
-
 #[allow(unused_imports)]
-use embassy_time::Instant;
+use embassy_time::{Duration, Instant, Timer};
 #[cfg(feature = "hmi")]
 use esp_hal::gpio::Output;
 
@@ -10,13 +9,13 @@ use log::{debug, error, info, trace, warn};
 use crate::BoardPeripherals;
 #[cfg(feature = "imu")]
 use crate::SharedSpiDevice;
+use crate::comms;
 #[cfg(feature = "gps")]
 use crate::gps::{init_gps, start_gps};
 #[cfg(feature = "hmi")]
 use crate::hmi::{neopixel, start_hmi};
 #[cfg(feature = "imu")]
 use crate::imu::start_imu;
-use crate::comms;
 
 #[allow(unused_mut, unused_variables)]
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
@@ -31,10 +30,38 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     trace!("User Led initialized!");
 
     #[cfg(feature = "hmi")]
-    let neopixel = board.take_neopixel();
+    let mut neopixel = board.take_neopixel();
     #[cfg(feature = "hmi")]
     trace!("NeoPixel initialized!");
-    
+    // Startup delay: show rainbow-barf cycle on NeoPixel while waiting
+    #[cfg(feature = "hmi")]
+    {
+        use crate::hmi::Color;
+        trace!("Startup delay: showing neopixel rainbow for 3s");
+        let startup_duration = Duration::from_secs(3);
+        let step = Duration::from_millis(80);
+        let steps = (startup_duration.as_millis() / step.as_millis()) as u32;
+        // wheel function
+        fn wheel(pos: u8) -> (u8, u8, u8) {
+            if pos < 85 {
+                (255 - pos * 3, pos * 3, 0)
+            } else if pos < 170 {
+                let pos = pos - 85;
+                (0, 255 - pos * 3, pos * 3)
+            } else {
+                let pos = pos - 170;
+                (pos * 3, 0, 255 - pos * 3)
+            }
+        }
+        for i in 0..=steps {
+            let pos = ((i * 256 / (steps.max(1))) % 256) as u8;
+            let (r, g, b) = wheel(pos);
+            neopixel
+                .set_color_with_brightness(Color::Custom(r, g, b), 50)
+                .await;
+            Timer::after(step).await;
+        }
+    }
     #[cfg(feature = "hmi")]
     init_hmi_state(&board).await;
 
@@ -59,8 +86,9 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     spawner
         .spawn(start_hmi_task(user_led, neopixel))
         .expect("HMI task did not spawn");
-    
-    spawner.spawn(wait_for_board_init_task())
+
+    spawner
+        .spawn(wait_for_board_init_task())
         .expect("wait for board init task did not start");
 
     // Sensor tasks with callbacks for data
@@ -74,37 +102,39 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
         .spawn(start_gps_task(gps2_uart))
         .expect("GPS task did not spawn");
 
-                // WiFi/ESP-NOW tasks - spawn based on board's configured mode
-                #[cfg(feature = "wifi")]
-                {
-                    let espnow_mode = board.espnow_mode();
-                    let wifi_resources = board.take_wifi();
-                    
-                    #[cfg(feature = "usb")]
-                    {
-                        let usb_serial_tx = board.take_usb_serial_tx();
-                        spawner.spawn(crate::comms::start_comms_task(
-                            spawner,
-                            espnow_mode,
-                            wifi_resources,
-                            usb_serial_tx,
-                        ))
-                        .expect("comms task did not start");
-                    }
-                    #[cfg(not(feature = "usb"))]
-                    {
-                        spawner.spawn(crate::comms::start_comms_task(
-                            spawner,
-                            espnow_mode,
-                            wifi_resources,
-                        ))
-                        .expect("comms task did not start");
-                    }
-                }    
-        loop {
-            embassy_time::Timer::after_secs(1).await
+    // WiFi/ESP-NOW tasks - spawn based on board's configured mode
+    #[cfg(feature = "wifi")]
+    {
+        let espnow_mode = board.espnow_mode();
+        let wifi_resources = board.take_wifi();
+
+        #[cfg(feature = "usb")]
+        {
+            let usb_serial_tx = board.take_usb_serial_tx();
+            spawner
+                .spawn(crate::comms::start_comms_task(
+                    spawner,
+                    espnow_mode,
+                    wifi_resources,
+                    usb_serial_tx,
+                ))
+                .expect("comms task did not start");
+        }
+        #[cfg(not(feature = "usb"))]
+        {
+            spawner
+                .spawn(crate::comms::start_comms_task(
+                    spawner,
+                    espnow_mode,
+                    wifi_resources,
+                ))
+                .expect("comms task did not start");
         }
     }
+    loop {
+        embassy_time::Timer::after_secs(1).await
+    }
+}
 #[cfg(feature = "hmi")]
 #[embassy_executor::task]
 async fn start_hmi_task(user_led: Output<'static>, neopixel: neopixel::NeoPixel<'static>) {
@@ -123,7 +153,10 @@ async fn start_imu_task(imu_spi_device: SharedSpiDevice) {
     // Callback: send IMU data to channel for transmission
     #[cfg(feature = "wifi")]
     let on_imu_data = |data: crate::types::ImuData| {
-        if comms::SENSOR_CHANNEL.try_send(crate::aircomm::SensorPayload::Imu(data)).is_err() {
+        if comms::SENSOR_CHANNEL
+            .try_send(crate::aircomm::SensorPayload::Imu(data))
+            .is_err()
+        {
             warn!("[IMU] Channel full, dropping sample");
         } else {
             trace!("[IMU] Sent data to channel");
@@ -147,7 +180,10 @@ async fn start_gps_task(mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Asy
     // Callback: send GPS data to channel for transmission
     #[cfg(feature = "wifi")]
     let on_gps_data = |data: crate::types::GpsData| {
-        if comms::SENSOR_CHANNEL.try_send(crate::aircomm::SensorPayload::Gps(data)).is_err() {
+        if comms::SENSOR_CHANNEL
+            .try_send(crate::aircomm::SensorPayload::Gps(data))
+            .is_err()
+        {
             warn!("[GPS] Channel full, dropping sample");
         } else {
             trace!("[GPS] Sent data to channel");
@@ -213,4 +249,3 @@ async fn wait_for_board_init_task() {
         warn!("[INIT] Bridge mode but USB feature is not enabled. Skipping USB host detection.");
     }
 }
-

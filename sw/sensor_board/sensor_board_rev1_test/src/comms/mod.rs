@@ -15,8 +15,11 @@ const SENSOR_CHANNEL_CAPACITY: usize = 8;
 
 /// Sensor data channel for inter-task communication
 /// Sensors push data here, ESP-NOW sender task consumes and transmits
-pub(crate) static SENSOR_CHANNEL: Channel<CriticalSectionRawMutex, aircomm::SensorPayload, SENSOR_CHANNEL_CAPACITY> =
-    Channel::new();
+pub(crate) static SENSOR_CHANNEL: Channel<
+    CriticalSectionRawMutex,
+    aircomm::SensorPayload,
+    SENSOR_CHANNEL_CAPACITY,
+> = Channel::new();
 
 #[cfg(feature = "usb")]
 use esp_hal::Async;
@@ -28,8 +31,7 @@ pub async fn start_comms_task(
     spawner: embassy_executor::Spawner,
     espnow_mode: EspNowMode,
     wifi_resources: Option<crate::WifiResources>,
-    #[cfg(feature = "usb")]
-    usb_serial_tx: Option<UsbSerialJtagTx<'static, Async>>,
+    #[cfg(feature = "usb")] usb_serial_tx: Option<UsbSerialJtagTx<'static, Async>>,
 ) {
     let mode = espnow_mode;
     if let Some(wifi) = wifi_resources {
@@ -57,16 +59,10 @@ pub async fn start_comms_task(
                             let usb_serial = usb::UsbSerial::new(usb_tx);
                             info!("[BRIDGE] Waiting for USB host before starting");
                             spawner
-                                .spawn(espnow_bridge_task(
-                                    transceiver,
-                                    wifi.controller,
-                                    usb_serial,
-                                ))
+                                .spawn(espnow_bridge_task(transceiver, wifi.controller, usb_serial))
                                 .expect("ESP-NOW bridge task did not spawn");
                         } else {
-                            warn!(
-                                "USB Serial not available - falling back to transceiver mode"
-                            );
+                            warn!("USB Serial not available - falling back to transceiver mode");
                             spawner
                                 .spawn(espnow_transceiver_task(transceiver, wifi.controller))
                                 .expect("ESP-NOW transceiver task did not spawn");
@@ -88,8 +84,7 @@ pub async fn start_comms_task(
             }
         }
     }
-} 
-
+}
 
 // =============================================================================
 // ESP-NOW Tasks
@@ -186,14 +181,18 @@ async fn espnow_sender_task(
                             "[ESP-NOW TX] Sending IMU data, timestamp_us={}",
                             timestamp_us
                         );
-                        transceiver.send_imu(timestamp_us, data, &aircomm::BROADCAST).await
+                        transceiver
+                            .send_imu(timestamp_us, data, &aircomm::BROADCAST)
+                            .await
                     }
                     aircomm::SensorPayload::Gps(data) => {
                         info!(
                             "[ESP-NOW TX] Sending GPS data, timestamp_us={}",
                             timestamp_us
                         );
-                        transceiver.send_gps(timestamp_us, data, &aircomm::BROADCAST).await
+                        transceiver
+                            .send_gps(timestamp_us, data, &aircomm::BROADCAST)
+                            .await
                     }
                     aircomm::SensorPayload::Heartbeat(data) => {
                         debug!("[ESP-NOW TX] Sending Heartbeat");
