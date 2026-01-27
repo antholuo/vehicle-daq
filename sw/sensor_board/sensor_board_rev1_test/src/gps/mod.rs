@@ -111,15 +111,15 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
     #[cfg(feature = "set_gps_high_baud")]
     {
         info!("Setting GPS Baud to 460800 (Persistent)...");
-        
+
         // Key ID for CFG-UART1-BAUDRATE: 0x40520001
         // Value for 460800: 0x00070800 (Little Endian: 0x00, 0x08, 0x07, 0x00)
         const UBX_CFG_VALSET_BAUD_460800: [u8; 12] = [
-            0x00,       // Version 0
-            0x07,       // Layer: 7 = RAM + Flash + BBR (Persistent)
+            0x00, // Version 0
+            0x07, // Layer: 7 = RAM + Flash + BBR (Persistent)
             0x00, 0x00, // Reserved
             0x01, 0x00, 0x52, 0x40, // Key ID: CFG-UART1-BAUDRATE
-            0x00, 0x08, 0x07, 0x00  // Value: 460800
+            0x00, 0x08, 0x07, 0x00, // Value: 460800
         ];
 
         send_ubx_packet(
@@ -127,8 +127,9 @@ pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uar
             0x06, // class: CFG
             0x8A, // id: VALSET
             &UBX_CFG_VALSET_BAUD_460800,
-            "CFG-UART1-BAUDRATE"
-        ).await;
+            "CFG-UART1-BAUDRATE",
+        )
+        .await;
 
         info!("ESP32 UART switched to 460800 baud.");
     }
@@ -228,7 +229,7 @@ where
                             let elapsed_s = crate::timebase::elapsed_seconds();
                             let has_fix = gga.latitude.is_some() && gga.longitude.is_some();
                             let sat_count = gga.satellite_count.unwrap_or(0);
-                            
+
                             if has_fix {
                                 info!(
                                     "t={:.3}s GPGGA ✓ VALID FIX: Lat={}, Lon={}, HDOP={}, SATS={}",
@@ -278,7 +279,7 @@ where
                         nmea_parser::ParsedMessage::Rmc(rmc) => {
                             if let Some(time) = rmc.timestamp {
                                 let elapsed_s = crate::timebase::elapsed_seconds();
-                            info!("t={:.3}s GPS rmc time is: {}", elapsed_s, time);
+                                info!("t={:.3}s GPS rmc time is: {}", elapsed_s, time);
 
                                 // Update cached time from RMC
                                 last_time = Some(GpsTime {
