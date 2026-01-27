@@ -107,11 +107,6 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
 
     info!("all periphs taken");
 
-    #[cfg(feature = "hmi")]
-    spawner
-        .spawn(start_hmi_task(user_led, neopixel))
-        .expect("HMI task did not spawn");
-
     // Sensor tasks with callbacks for data
     #[cfg(feature = "imu")]
     spawner
@@ -235,6 +230,15 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
             warn!("WiFi not available - skipping wireless communication");
         }
     }
+
+
+    // FIXME: Moving this here so that esp-now can be handled within app.rs
+    // NOTE: this is not correct behaviour, but it'll be ok ish for now
+    #[cfg(feature = "hmi")]
+    spawner
+        .spawn(start_hmi_task(user_led, neopixel))
+        .expect("HMI task did not spawn");
+
 
     loop {
         embassy_time::Timer::after_secs(1).await
