@@ -3,8 +3,8 @@ mod old_asm330;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
-use embassy_time::{Duration, Timer, Instant};
 use crate::timebase;
+use embassy_time::{Duration, Instant, Timer};
 
 use crate::SharedSpiDevice;
 #[allow(unused_imports)]
@@ -79,7 +79,11 @@ where
                                 gyro_z: gyro_z_dps,
                             };
                             // Update HMI state timestamp for IMU and invoke callback
-                            crate::hmi::state::HMI_STATE.0.lock().await.last_imu_timestamp = Some(Instant::now());
+                            crate::hmi::state::HMI_STATE
+                                .0
+                                .lock()
+                                .await
+                                .last_imu_timestamp = Some(Instant::now());
                             on_data(imu_data);
                         }
                         Err(e) => {

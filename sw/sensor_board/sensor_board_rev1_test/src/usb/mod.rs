@@ -7,10 +7,10 @@
 /// reliable message delimiting over the serial connection.
 pub mod protocol;
 
-use esp_hal::Async;
 use embassy_time::{Duration, Instant, Timer};
-use nb::Error as NbError;
+use esp_hal::Async;
 use esp_hal::usb_serial_jtag::UsbSerialJtagTx;
+use nb::Error as NbError;
 
 pub use protocol::{ForwardError, MAX_USB_MESSAGE_SIZE, format_mac, serialize_forwarded_message};
 
