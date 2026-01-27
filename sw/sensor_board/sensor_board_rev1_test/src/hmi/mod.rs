@@ -1,5 +1,5 @@
-pub mod state;
 pub mod neopixel;
+pub mod state;
 
 use esp_hal::gpio::Output;
 /// hmi.rs
@@ -8,10 +8,10 @@ use esp_hal::gpio::Output;
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
 
-use embassy_time::{Duration, Timer, Instant};
+use crate::hmi::state::HmiState;
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use embassy_sync::mutex::Mutex;
-use crate::hmi::state::HmiState;
+use embassy_time::{Duration, Instant, Timer};
 pub use neopixel::{Color, NeoPixel};
 
 pub async fn start_hmi(
