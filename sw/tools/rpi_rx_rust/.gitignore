@@ -1,0 +1,35 @@
+# Rust
+#
+# Generally, you should bind to a specific version of Cargo (the Rust
+# package manager) in your `rust-toolchain.toml` file. This helps ensure
+# that your project produces consistent builds and passes tests even when
+# new versions of Rust are released. You also need to make sure that the
+# `rust-toolchain.toml` file is *not* ignored by Git.
+
+# Dependency directories
+target/
+
+# Normal Cargo artifacts
+Cargo.lock # Usually committed for applications, ignored for libraries
+
+# Generated file by rpi_rx_rust
+output.csv
+
+# Rust IDEs (e.g. VS Code with rust-analyzer)
+.rust-analyzer/
+.vscode/
+
+# Build artifacts
+*.d
+*.o
+
+# OS generated files
+.DS_Store
+.env
+.env.*
+.history
+
+# Test/profiling
+/test/
+/benches/
+/examples/
