@@ -1,13 +1,12 @@
-use std::io::{self, Read};
+use byteorder::{LittleEndian, ReadBytesExt};
 use cobs::decode;
 use csv::Writer;
-use serde::{Deserialize, Serialize};
-use byteorder::{LittleEndian, ReadBytesExt};
 use log::*;
+use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
+use std::io::{self, Read};
 use std::string::ToString; // Required for .to_string() on &str
 use std::time::Duration; // For serialport timeout
-
 
 /// Maximum size of the incoming COBS-encoded message (from the sender's perspective)
 /// Header (17 bytes) + Max Payload (GPS is largest at 35 bytes) = 52 bytes
@@ -194,8 +193,8 @@ fn format_mac_address(mac: &[u8; 6]) -> String {
 }
 
 mod mac_address_serializer {
-    use serde::{Serializer, Deserializer, Deserialize};
     use serde::de;
+    use serde::{Deserialize, Deserializer, Serializer};
 
     pub fn serialize<S>(mac: &[u8; 6], serializer: S) -> Result<S::Ok, S::Error>
     where
@@ -209,7 +208,8 @@ mod mac_address_serializer {
         D: Deserializer<'de>,
     {
         let s = String::deserialize(deserializer)?;
-        let parts: Result<Vec<u8>, _> = s.split(':')
+        let parts: Result<Vec<u8>, _> = s
+            .split(':')
             .map(|s_part| u8::from_str_radix(s_part, 16))
             .collect();
         let parts = parts.map_err(de::Error::custom)?;
@@ -222,7 +222,6 @@ mod mac_address_serializer {
         }
     }
 }
-
 
 // =============================================================================
 // Parsing Logic
@@ -313,7 +312,7 @@ fn parse_message(buffer: &[u8]) -> Result<DecodedMessage, ParserError> {
             decoded_msg.gyro_x = Some(payload_reader.read_f32::<LittleEndian>()?);
             decoded_msg.gyro_y = Some(payload_reader.read_f32::<LittleEndian>()?);
             decoded_msg.gyro_z = Some(payload_reader.read_f32::<LittleEndian>()?);
-        },
+        }
         MessageType::Gps => {
             if payload_data.len() < 35 {
                 return Err(ParserError::ParseError("GPS payload too short".to_string()));
@@ -331,14 +330,16 @@ fn parse_message(buffer: &[u8]) -> Result<DecodedMessage, ParserError> {
             decoded_msg.utc_time_minutes = Some(payload_reader.read_u8()?);
             decoded_msg.utc_time_seconds = Some(payload_reader.read_u8()?);
             decoded_msg.utc_time_millis = Some(payload_reader.read_u16::<LittleEndian>()?);
-        },
+        }
         MessageType::Heartbeat => {
             if payload_data.len() < 1 {
-                return Err(ParserError::ParseError("Heartbeat payload too short".to_string()));
+                return Err(ParserError::ParseError(
+                    "Heartbeat payload too short".to_string(),
+                ));
             }
             let mut payload_reader = io::Cursor::new(payload_data);
             decoded_msg.magic = Some(payload_reader.read_u8()?);
-        },
+        }
         MessageType::Unknown => {
             return Err(ParserError::InvalidMessageType(msg_type_byte));
         }
@@ -397,7 +398,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         if let Some(Ok(byte)) = input_bytes_iterator.next() {
             cobs_encoded_buffer.push_back(byte);
 
-            if byte == 0x00 { // COBS frame delimiter
+            if byte == 0x00 {
+                // COBS frame delimiter
                 debug!("Received COBS frame delimiter from {}", input_source);
 
                 let mut frame_buffer = Vec::with_capacity(cobs_encoded_buffer.len());
@@ -415,7 +417,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     Ok(decoded_len) => {
                         debug!(
                             "Successfully COBS decoded {} bytes from {} (raw length {}).",
-                            decoded_len, input_source, data_to_decode.len()
+                            decoded_len,
+                            input_source,
+                            data_to_decode.len()
                         );
                         let raw_message = &decoded_buffer[..decoded_len];
                         match parse_message(raw_message) {
@@ -442,9 +446,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                                     node_instance: 0,
                                     timestamp_us: 0,
                                     message_type: "Error".to_string(),
-                                    accel_x: None, accel_y: None, accel_z: None, gyro_x: None, gyro_y: None, gyro_z: None,
-                                    lat: None, lon: None, alt: None, speed_kts: None, heading: None,
-                                    utc_time_year: None, utc_time_month: None, utc_time_day: None, utc_time_hours: None, utc_time_minutes: None, utc_time_seconds: None, utc_time_millis: None,
+                                    accel_x: None,
+                                    accel_y: None,
+                                    accel_z: None,
+                                    gyro_x: None,
+                                    gyro_y: None,
+                                    gyro_z: None,
+                                    lat: None,
+                                    lon: None,
+                                    alt: None,
+                                    speed_kts: None,
+                                    heading: None,
+                                    utc_time_year: None,
+                                    utc_time_month: None,
+                                    utc_time_day: None,
+                                    utc_time_hours: None,
+                                    utc_time_minutes: None,
+                                    utc_time_seconds: None,
+                                    utc_time_millis: None,
                                     magic: None,
                                     error: Some(format!("Parsing error: {:?}", e)),
                                 };
@@ -461,9 +480,24 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             node_instance: 0,
                             timestamp_us: 0,
                             message_type: "COBS_Error".to_string(),
-                            accel_x: None, accel_y: None, accel_z: None, gyro_x: None, gyro_y: None, gyro_z: None,
-                            lat: None, lon: None, alt: None, speed_kts: None, heading: None,
-                            utc_time_year: None, utc_time_month: None, utc_time_day: None, utc_time_hours: None, utc_time_minutes: None, utc_time_seconds: None, utc_time_millis: None,
+                            accel_x: None,
+                            accel_y: None,
+                            accel_z: None,
+                            gyro_x: None,
+                            gyro_y: None,
+                            gyro_z: None,
+                            lat: None,
+                            lon: None,
+                            alt: None,
+                            speed_kts: None,
+                            heading: None,
+                            utc_time_year: None,
+                            utc_time_month: None,
+                            utc_time_day: None,
+                            utc_time_hours: None,
+                            utc_time_minutes: None,
+                            utc_time_seconds: None,
+                            utc_time_millis: None,
                             magic: None,
                             error: Some(format!("COBS decoding error: {:?}", e)),
                         };
