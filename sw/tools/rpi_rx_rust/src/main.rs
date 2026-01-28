@@ -7,6 +7,9 @@ use std::collections::VecDeque;
 use std::io::{self, Read};
 use std::string::ToString; // Required for .to_string() on &str
 use std::time::Duration; // For serialport timeout
+use chrono::Local;
+use std::fs;
+use std::path::PathBuf;
 
 /// Maximum size of the incoming COBS-encoded message (from the sender's perspective)
 /// Header (17 bytes) + Max Payload (GPS is largest at 35 bytes) = 52 bytes
@@ -200,7 +203,6 @@ mod mac_address_serializer {
     pub fn serialize<S>(mac: &[u8; 6], serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
-
     {
         serializer.serialize_str(&super::format_mac_address(mac))
     }
@@ -212,7 +214,6 @@ mod mac_address_serializer {
         let s = String::deserialize(deserializer)?;
         let parts: Result<Vec<u8>, _> = s
             .split(':')
-
             .map(|s_part| u8::from_str_radix(s_part, 16))
             .collect();
         let parts = parts.map_err(de::Error::custom)?;
@@ -238,7 +239,6 @@ enum ParserError {
     InvalidMessageType(u8),
     ParseError(String),
 }
-
 
 impl From<io::Error> for ParserError {
     fn from(err: io::Error) -> Self {
@@ -363,8 +363,27 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut cobs_encoded_buffer: VecDeque<u8> = VecDeque::new();
     let mut decoded_buffer = [0u8; COBS_DECODED_BUFFER_SIZE];
 
-    // Create a CSV writer, automatically writes header from DecodedMessage
-    let mut wtr = Writer::from_path("output.csv")?;
+    // --- Start: Dynamic Log Path Configuration ---
+    let now = Local::now();
+    let date_str = now.format("%Y-%m-%d").to_string();
+    let timestamp_str = now.format("%H-%M-%S").to_string();
+
+    // Expand ~ to the user's home directory
+    let mut log_dir = PathBuf::new();
+    if cfg!(windows) {
+        log_dir.push(std::env::var("USERPROFILE").expect("Failed to get USERPROFILE"));
+    } else {
+        log_dir.push(std::env::var("HOME").expect("Failed to get HOME directory"));
+    }
+    log_dir.push("daq/logs");
+    log_dir.push(&date_str);
+
+    fs::create_dir_all(&log_dir).expect("Failed to create log directory");
+
+    let log_file_path = log_dir.join(format!("{}.csv", timestamp_str));
+    // --- End: Dynamic Log Path Configuration ---
+
+    let mut wtr = Writer::from_path(log_file_path)?;
 
     // Attempt to open serial port
     let mut serial_port_reader: Option<Box<dyn Read>> = None;
