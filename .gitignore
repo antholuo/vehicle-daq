@@ -34,3 +34,5 @@ sw/sensor_board/sensor_board_rev0/build/
 sw/protos/pbtools_venv/
 
 sw/esp/esp32c6_test1_no_std_lpcore/target/
+
+sw/tools/rpi_rx_rust/target/

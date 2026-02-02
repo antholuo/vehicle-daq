@@ -1,0 +1,5 @@
+# Install the GPIO binary to the path used by rpi-rx-rust.service.
+# Run from project root: cargo install-service
+# (Create dir first if needed: sudo mkdir -p /opt/rpi_rx_rust && sudo chown $USER /opt/rpi_rx_rust)
+[alias]
+install-service = "install --path . --root /opt/rpi_rx_rust --bin rpi_rx_rust_gpio --features gpio"
