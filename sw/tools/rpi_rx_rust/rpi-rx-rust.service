@@ -1,0 +1,36 @@
+[Unit]
+Description=RPi RX Rust Data Logger (GPIO Controlled)
+Documentation=https://github.com/your-org/vehicle-daq
+After=network.target
+
+[Service]
+Type=simple
+# Run as your preferred user (e.g. hardy, pi). Must be in group 'gpio' for GPIO access.
+User=hardy
+Group=hardy
+
+# Working directory for relative paths (optional; output dir is configurable via env)
+WorkingDirectory=/opt/rpi_rx_rust
+
+# No CLI flags: GPIO controls start/stop. Build with: cargo build --release --features gpio
+ExecStart=/opt/rpi_rx_rust/bin/rpi_rx_rust_gpio
+
+# Logs go to ~/daq/logs/<date>/<time>_raw.csv and <time>_postprocess.csv (user's HOME when run as User=)
+# Optional: override serial port or log base directory
+# Environment="RPI_RX_SERIAL_PORT=/dev/ttyACM0"
+# Environment="RPI_RX_OUTPUT_DIR=/path/to/base"   # logs under <base>/logs/<date>/
+
+Restart=always
+RestartSec=10
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=rpi-rx-rust
+
+NoNewPrivileges=true
+
+# Required for GPIO (libgpiod) on Raspberry Pi
+SupplementaryGroups=gpio
+
+[Install]
+WantedBy=multi-user.target
