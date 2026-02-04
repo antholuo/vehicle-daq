@@ -494,12 +494,12 @@ async fn espnow_bridge_task(
                         // Store the assignment
                         match mac_to_node_id.insert(src_mac, assigned_node_id) {
                             Ok(_) => {
-                                info!(
-                                    "[BRIDGE] New node discovered: {} -> {}:{} (auto-assigned)",
-                                    format_mac(&src_mac),
-                                    position.as_str(),
-                                    instance
-                                );
+                                // info!(
+                                //     "[BRIDGE] New node discovered: {} -> {}:{} (auto-assigned)",
+                                //     format_mac(&src_mac),
+                                //     position.as_str(),
+                                //     instance
+                                // );
                                 
                                 // Increment instance counter for this position
                                 let _ = next_instance_per_position.insert(position, instance + 1);
