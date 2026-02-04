@@ -35,31 +35,35 @@ impl MessageType {
 
 /// Heartbeat message data structure
 ///
-/// Contains a magic byte for validation. Timestamp is at the SensorMessage level.
+/// Contains a magic byte for validation and the node's full identifier.
+/// Timestamp is at the SensorMessage level.
 #[derive(Debug, Clone, Copy)]
 pub struct HeartbeatData {
     /// Magic byte for validation (typically 0x42 or custom value)
     pub magic: u8,
+    /// Node identifier (position + instance)
+    pub node_id: crate::types::NodeId,
 }
 
 impl HeartbeatData {
     /// Size in bytes when serialized
-    pub const SERIALIZED_SIZE: usize = 1; // magic only
+    pub const SERIALIZED_SIZE: usize = 3; // magic(1) + position(1) + instance(1)
 
     /// Default magic byte value
     pub const DEFAULT_MAGIC: u8 = 0x42;
 
-    /// Create a new heartbeat with magic byte
+    /// Create a new heartbeat with magic byte and node ID
     ///
     /// # Arguments
     /// * `magic` - Magic byte for validation
-    pub fn new(magic: u8) -> Self {
-        Self { magic }
+    /// * `node_id` - Node identifier (position + instance)
+    pub fn new(magic: u8, node_id: crate::types::NodeId) -> Self {
+        Self { magic, node_id }
     }
 
-    /// Create a new heartbeat with default magic byte
+    /// Create a new heartbeat with default magic byte and default node ID
     pub fn default() -> Self {
-        Self::new(Self::DEFAULT_MAGIC)
+        Self::new(Self::DEFAULT_MAGIC, crate::types::NodeId::default())
     }
 }
 

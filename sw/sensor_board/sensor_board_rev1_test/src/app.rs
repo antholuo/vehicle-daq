@@ -455,10 +455,16 @@ async fn espnow_bridge_task(
     _wifi_controller: esp_radio::wifi::WifiController<'static>,
     mut usb_serial: UsbSerial,
 ) {
+    use heapless::index_map::FnvIndexMap;
+    use crate::types::CarPosition;
+
     info!("[BRIDGE] Bridge task started (ESP-NOW -> USB)");
 
     // Buffer for serializing messages
     let mut msg_buffer = [0u8; MAX_USB_MESSAGE_SIZE];
+
+    // MAC address to NodeId mapping (supports up to 16 sensor nodes)
+    let mut mac_to_node_id: FnvIndexMap<[u8; 6], NodeId, 16> = FnvIndexMap::new();
 
     // Statistics
     let mut messages_forwarded: u32 = 0;
@@ -471,9 +477,42 @@ async fn espnow_bridge_task(
                 let src_mac: [u8; 6] = msg.src_address;
                 let timestamp_us = msg.timestamp_us;
 
-                // For now, use a default NodeId - in production this would be
-                // looked up from a MAC -> NodeId mapping table
-                let node_id = NodeId::default();
+                // Update MAC -> NodeId mapping if this is a heartbeat
+                if let SensorPayload::Heartbeat(heartbeat_data) = &msg.payload {
+                    let new_node_id = heartbeat_data.node_id;
+                    
+                    // Check if this is a new node or NodeId changed
+                    let node_id_updated = match mac_to_node_id.get(&src_mac) {
+                        Some(old_id) if *old_id != new_node_id => true,
+                        None => true,
+                        _ => false,
+                    };
+
+                    if node_id_updated {
+                        match mac_to_node_id.insert(src_mac, new_node_id) {
+                            Ok(_) => {
+                                info!(
+                                    "[BRIDGE] Updated node mapping: {} -> {}:{}",
+                                    format_mac(&src_mac),
+                                    new_node_id.position.as_str(),
+                                    new_node_id.instance
+                                );
+                            }
+                            Err(_) => {
+                                warn!(
+                                    "[BRIDGE] Failed to store node ID for {} (map full)",
+                                    format_mac(&src_mac)
+                                );
+                            }
+                        }
+                    }
+                }
+
+                // Look up NodeId for this MAC, default to Custom:0 if not found
+                let node_id = mac_to_node_id
+                    .get(&src_mac)
+                    .copied()
+                    .unwrap_or_else(|| NodeId::new(CarPosition::Custom, 0));
 
                 // Serialize the message
                 match serialize_forwarded_message(
@@ -489,9 +528,11 @@ async fn espnow_bridge_task(
                             Ok(()) => {
                                 messages_forwarded += 1;
                                 trace!(
-                                    "[BRIDGE] Forwarded {:?} from {} (total: {})",
+                                    "[BRIDGE] Forwarded {:?} from {} ({}:{}) (total: {})",
                                     msg.payload.message_type(),
                                     format_mac(&src_mac),
+                                    node_id.position.as_str(),
+                                    node_id.instance,
                                     messages_forwarded
                                 );
                             }
@@ -555,8 +596,12 @@ fn handle_received_message(msg: &SensorMessage) {
     match &msg.payload {
         SensorPayload::Heartbeat(data) => {
             info!(
-                "[ESP-NOW RX] Heartbeat from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | magic=0x{:02X}, time={}us",
-                src[0], src[1], src[2], src[3], src[4], src[5], data.magic, timestamp
+                "[ESP-NOW RX] Heartbeat from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | node={}:{}, magic=0x{:02X}, time={}us",
+                src[0], src[1], src[2], src[3], src[4], src[5], 
+                data.node_id.position.as_str(),
+                data.node_id.instance,
+                data.magic, 
+                timestamp
             );
         }
         SensorPayload::Imu(data) => {
