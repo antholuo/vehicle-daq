@@ -18,7 +18,7 @@ pub const HEADER_SIZE: usize = 1 + 8; // message_type(1) + timestamp_us(8) = 9 b
 
 /// Serialize heartbeat data into a byte buffer
 ///
-/// Format: [MessageType:1][Timestamp:8][Magic:1]
+/// Format: [MessageType:1][Timestamp:8][Magic:1][Position:1][Instance:1]
 ///
 /// # Arguments
 /// * `timestamp_us` - Sender's timestamp in microseconds
@@ -49,6 +49,13 @@ pub fn serialize_heartbeat(
 
     // Write magic byte
     buffer[offset] = data.magic;
+    offset += 1;
+
+    // Write node ID (position + instance)
+    let node_id_bytes = data.node_id.to_bytes();
+    buffer[offset] = node_id_bytes[0]; // position
+    offset += 1;
+    buffer[offset] = node_id_bytes[1]; // instance
     offset += 1;
 
     Ok(offset)
@@ -316,5 +323,13 @@ fn deserialize_heartbeat(data: &[u8], payload_offset: usize) -> Result<SensorPay
     }
 
     let magic = data[payload_offset];
-    Ok(SensorPayload::Heartbeat(HeartbeatData { magic }))
+    
+    // Read NodeId (position + instance)
+    let node_id_bytes = [
+        data[payload_offset + 1], // position
+        data[payload_offset + 2], // instance
+    ];
+    let node_id = crate::types::NodeId::from_bytes(node_id_bytes);
+    
+    Ok(SensorPayload::Heartbeat(HeartbeatData { magic, node_id }))
 }
