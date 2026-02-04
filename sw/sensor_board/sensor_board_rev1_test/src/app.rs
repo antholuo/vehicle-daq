@@ -459,12 +459,16 @@ async fn espnow_bridge_task(
     use crate::types::CarPosition;
 
     info!("[BRIDGE] Bridge task started (ESP-NOW -> USB)");
+    info!("[BRIDGE] Auto-assigning instance numbers based on MAC discovery order");
 
     // Buffer for serializing messages
     let mut msg_buffer = [0u8; MAX_USB_MESSAGE_SIZE];
 
     // MAC address to NodeId mapping (supports up to 16 sensor nodes)
     let mut mac_to_node_id: FnvIndexMap<[u8; 6], NodeId, 16> = FnvIndexMap::new();
+    
+    // Track next available instance number for each position
+    let mut next_instance_per_position: FnvIndexMap<CarPosition, u8, 16> = FnvIndexMap::new();
 
     // Statistics
     let mut messages_forwarded: u32 = 0;
@@ -477,26 +481,28 @@ async fn espnow_bridge_task(
                 let src_mac: [u8; 6] = msg.src_address;
                 let timestamp_us = msg.timestamp_us;
 
-                // Update MAC -> NodeId mapping if this is a heartbeat
+                // Auto-assign instance numbers based on MAC discovery order
                 if let SensorPayload::Heartbeat(heartbeat_data) = &msg.payload {
-                    let new_node_id = heartbeat_data.node_id;
+                    let position = heartbeat_data.node_id.position;
                     
-                    // Check if this is a new node or NodeId changed
-                    let node_id_updated = match mac_to_node_id.get(&src_mac) {
-                        Some(old_id) if *old_id != new_node_id => true,
-                        None => true,
-                        _ => false,
-                    };
-
-                    if node_id_updated {
-                        match mac_to_node_id.insert(src_mac, new_node_id) {
+                    // Check if this MAC has been seen before
+                    if !mac_to_node_id.contains_key(&src_mac) {
+                        // New MAC discovered - assign next available instance for this position
+                        let instance = *next_instance_per_position.get(&position).unwrap_or(&0);
+                        let assigned_node_id = NodeId::new(position, instance);
+                        
+                        // Store the assignment
+                        match mac_to_node_id.insert(src_mac, assigned_node_id) {
                             Ok(_) => {
                                 info!(
-                                    "[BRIDGE] Updated node mapping: {} -> {}:{}",
+                                    "[BRIDGE] New node discovered: {} -> {}:{} (auto-assigned)",
                                     format_mac(&src_mac),
-                                    new_node_id.position.as_str(),
-                                    new_node_id.instance
+                                    position.as_str(),
+                                    instance
                                 );
+                                
+                                // Increment instance counter for this position
+                                let _ = next_instance_per_position.insert(position, instance + 1);
                             }
                             Err(_) => {
                                 warn!(
@@ -504,6 +510,30 @@ async fn espnow_bridge_task(
                                     format_mac(&src_mac)
                                 );
                             }
+                        }
+                    } else {
+                        // MAC already known - check if position changed
+                        let stored_node_id = *mac_to_node_id.get(&src_mac).unwrap(); // Copy the value
+                        if stored_node_id.position != position {
+                            // Position changed - assign new instance for new position
+                            let instance = *next_instance_per_position.get(&position).unwrap_or(&0);
+                            let new_node_id = NodeId::new(position, instance);
+                            
+                            // Copy old values before mutation
+                            let old_position = stored_node_id.position;
+                            let old_instance = stored_node_id.instance;
+                            
+                            let _ = mac_to_node_id.insert(src_mac, new_node_id);
+                            let _ = next_instance_per_position.insert(position, instance + 1);
+                            
+                            info!(
+                                "[BRIDGE] Node position changed: {} -> {}:{} (was {}:{})",
+                                format_mac(&src_mac),
+                                position.as_str(),
+                                instance,
+                                old_position.as_str(),
+                                old_instance
+                            );
                         }
                     }
                 }
