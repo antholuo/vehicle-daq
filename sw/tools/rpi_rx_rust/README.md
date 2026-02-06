@@ -47,14 +47,14 @@ Assumes the first 10 seconds of the log are at rest. Uses first GPS fix as origi
 ### rpi_rx_rust_gpio (service binary)
 
 - **GPIO #11 (BCM 11)**: Init — start raw logging and allow AHRS to initialize (vehicle assumed level and stationary).
-- **GPIO #5 (BCM 5)**: Postprocessed — when high, also log AHRS output at the default rate (10 Hz).
+- **GPIO #19 (BCM 19)**: Postprocessed — when high, also log AHRS output at the default rate (10 Hz).
 
 Logging runs while **either** GPIO is high. Logs **stop only when both GPIOs are low**. Temporary loss of serial data does not stop the session; only both GPIOs going low does.
 
 - **Build** (on Linux, with libgpiod):  
   `cargo build --release --features gpio`
 - **Install**: Copy the binary to e.g. `/opt/rpi_rx_rust/bin/rpi_rx_rust_gpio`.
-- **Log paths**: Same as CLI — `~/daq/logs/<date>/<time>_raw.csv` and `<time>_postprocess.csv` (when GPIO5 is high). Default is `$HOME/daq/logs/<date>/`; override with `RPI_RX_OUTPUT_DIR` (base path; logs go under `<RPI_RX_OUTPUT_DIR>/logs/<date>/`).
+- **Log paths**: Same as CLI — `~/daq/logs/<date>/<time>_raw.csv` and `<time>_postprocess.csv` (when GPIO19 is high). Default is `$HOME/daq/logs/<date>/`; override with `RPI_RX_OUTPUT_DIR` (base path; logs go under `<RPI_RX_OUTPUT_DIR>/logs/<date>/`).
 - **Environment** (optional):
   - `RPI_RX_OUTPUT_DIR`: base directory for logs (default: `$HOME`; then logs under `daq/logs/<date>/`).
   - `RPI_RX_SERIAL_PORT`: serial device (default: `/dev/ttyACM0`).
