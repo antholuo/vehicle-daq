@@ -1,7 +1,7 @@
 //! GPIO-controlled logging service: no CLI, for systemd.
 //!
 //! GPIO #11: init (start raw logging, AHRS init, assume vehicle level stationary).
-//! GPIO #5:  start logging including postprocessed AHRS at default rate (10 Hz).
+//! GPIO #19:  start logging including postprocessed AHRS at default rate (10 Hz).
 //! Logs stop only when **both** GPIOs go LOW. Temporary data gaps do not stop logging.
 //!
 //! Build on Linux with: `cargo build --release --features gpio`
@@ -17,7 +17,7 @@ use std::path::PathBuf;
 use std::time::Duration;
 
 const GPIO_INIT: u32 = 11;   // BCM 11: init / raw
-const GPIO_POST: u32 = 5;    // BCM 5: postprocessed logging
+const GPIO_POST: u32 = 19;   // BCM 19: postprocessed logging
 const DEFAULT_SERIAL_PORT: &str = "/dev/ttyACM0";
 const DEFAULT_BAUD_RATE: u32 = 115_200;
 const SERIAL_READ_TIMEOUT_MS: u64 = 200;
@@ -85,13 +85,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let _event = inputs.read_event()?;
         let values: [bool; 2] = inputs.get_values([false, false])?;
         let gpio11_high = values[0];
-        let gpio5_high = values[1];
-        let active = gpio11_high || gpio5_high;
+        let gpio19_high = values[1];
+        let active = gpio11_high || gpio19_high;
         if !active {
             continue;
         }
 
-        let with_ahrs = gpio5_high;
+        let with_ahrs = gpio19_high;
         let log_dir = log_dir_for_today();
         fs::create_dir_all(&log_dir)?;
         let time_str = Local::now().format("%H-%M-%S").to_string();
@@ -99,11 +99,11 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let postprocess_path = log_dir.join(format!("{}_postprocess.csv", time_str));
 
         info!(
-            "Starting session: raw={}, postprocess={} (GPIO11={}, GPIO5={})",
+            "Starting session: raw={}, postprocess={} (GPIO11={}, GPIO19={})",
             raw_path.display(),
             with_ahrs,
             gpio11_high,
-            gpio5_high
+            gpio19_high
         );
 
         let mut raw_wtr = Writer::from_path(&raw_path)?;
