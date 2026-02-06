@@ -149,6 +149,12 @@ where
                             raw_wtr.flush()?;
                         }
                     }
+                    
+                    // Check if we should stop after processing each complete frame
+                    if should_stop() {
+                        info!("Stop requested, ending session");
+                        break;
+                    }
                 }
             }
             Some(Err(e)) => return Err(e.into()),
