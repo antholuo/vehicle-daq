@@ -76,9 +76,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let chip = Chip::new("gpiochip0").or_else(|_| Chip::new(0))?;
     let opts = Options::input([GPIO_INIT, GPIO_POST])
         .edge(EdgeDetect::Both)
+        .bias(Bias::PullDown)
         .consumer("rpi_rx_rust_gpio");
     let mut inputs = chip.request_lines(opts)?;
-    info!("GPIO {} and {} requested (edge both)", GPIO_INIT, GPIO_POST);
+    info!("GPIO {} and {} requested (edge both, pull-down enabled)", GPIO_INIT, GPIO_POST);
+    
+    // Check initial state
+    let initial_values: [bool; 2] = inputs.get_values([false, false])?;
+    info!("Initial GPIO state: GPIO{}={}, GPIO{}={}", 
+          GPIO_INIT, initial_values[0], GPIO_POST, initial_values[1]);
 
     loop {
         // Idle: wait for an edge, then check if either GPIO is high
@@ -86,8 +92,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let values: [bool; 2] = inputs.get_values([false, false])?;
         let gpio11_high = values[0];
         let gpio19_high = values[1];
+        info!("GPIO edge detected: GPIO{}={}, GPIO{}={}", GPIO_INIT, gpio11_high, GPIO_POST, gpio19_high);
         let active = gpio11_high || gpio19_high;
         if !active {
+            info!("Both GPIOs low, staying idle");
             continue;
         }
 
