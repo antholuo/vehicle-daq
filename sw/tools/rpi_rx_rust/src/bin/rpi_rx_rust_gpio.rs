@@ -8,7 +8,7 @@
 
 use chrono::Local;
 use csv::Writer;
-use gpiod::{Chip, EdgeDetect, Options};
+use gpiod::{Chip, EdgeDetect, Options, Bias};
 use log::*;
 use rpi_rx_rust::session::{run_session, ByteSource};
 use std::fs;
