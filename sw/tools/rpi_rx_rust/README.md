@@ -9,7 +9,7 @@ Raspberry Pi receiver for the sensor_board COBS-over-serial stream. Decodes IMU,
 - **Real-time AHRS** (optional): Madgwick orientation filter plus velocity/position integration in NED. Uses the first IMU node as primary; first 10 seconds are treated as “at rest” for gyro bias and velocity zeroing. Outputs synthesized lat/lon/alt, vehicle heading, ground track, roll/pitch/yaw, and NED velocity at a fixed rate (default 10 Hz).
 - **Post-process AHRS**: The `ahrs_postprocess` binary runs AHRS on an existing raw log CSV (e.g. for re-runs with different parameters or when real-time AHRS was not used).
 - **Unified log layout**: All binaries write under `~/daq/logs/<date>/` with `<time>_raw.csv` and `<time>_postprocess.csv` (postprocess = AHRS output).
-- **GPIO-controlled service**: The `rpi_rx_rust_gpio` binary (Linux, `--features gpio`) uses two GPIOs to control logging with no CLI flags, suitable for a systemd service that starts on boot.
+- **GPIO-controlled service**: The `rpi_rx_rust_gpio` binary (Linux, `--features gpio`) uses GPIOs to control logging and video recording with no CLI flags, suitable for a systemd service that starts on boot.
 
 ## Binaries
 
@@ -48,8 +48,11 @@ Assumes the first 10 seconds of the log are at rest. Uses first GPS fix as origi
 
 - **GPIO #11 (BCM 11)**: Init — start raw logging and allow AHRS to initialize (vehicle assumed level and stationary).
 - **GPIO #19 (BCM 19)**: Postprocessed — when high, also log AHRS output at the default rate (10 Hz).
+- **GPIO #26 (BCM 26)**: Video recording — when high, start video recording via camera server; when low, stop recording.
 
-Logging runs while **either** GPIO is high. Logs **stop only when both GPIOs are low**. Temporary loss of serial data does not stop the session; only both GPIOs going low does.
+Data logging runs while **either** GPIO #11 or #19 is high. Logs **stop only when both GPIOs are low**. Temporary loss of serial data does not stop the session; only both GPIOs going low does.
+
+Video recording is controlled independently by GPIO #26. The service communicates with a camera server running on `localhost:8888` (e.g., the `record.py` server from `/home/hardy/daq/FYDP-CV-Piside/`).
 
 - **Build** (on Linux, with libgpiod):  
   `cargo build --release --features gpio`

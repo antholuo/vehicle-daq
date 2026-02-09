@@ -1,8 +1,9 @@
 //! GPIO-controlled logging service: no CLI, for systemd.
 //!
 //! GPIO #11: init (start raw logging, AHRS init, assume vehicle level stationary).
-//! GPIO #19:  start logging including postprocessed AHRS at default rate (10 Hz).
-//! Logs stop only when **both** GPIOs go LOW. Temporary data gaps do not stop logging.
+//! GPIO #19: start logging including postprocessed AHRS at default rate (10 Hz).
+//! GPIO #26: control video recording (high = start, low = stop).
+//! Logs stop only when **both** GPIOs #11 and #19 go LOW. Temporary data gaps do not stop logging.
 //!
 //! Build on Linux with: `cargo build --release --features gpio`
 
@@ -11,17 +12,21 @@ use csv::Writer;
 use gpiod::{Chip, EdgeDetect, Options, Bias};
 use log::*;
 use rpi_rx_rust::session::{run_session, ByteSource};
+use std::cell::Cell;
 use std::fs;
-use std::io::{self, Read};
+use std::io::{self, Read, Write};
+use std::net::TcpStream;
 use std::path::PathBuf;
 use std::time::Duration;
 
 const GPIO_INIT: u32 = 11;   // BCM 11: init / raw
 const GPIO_POST: u32 = 19;   // BCM 19: postprocessed logging
+const GPIO_VIDEO: u32 = 26;  // BCM 26: video recording control
 const DEFAULT_SERIAL_PORT: &str = "/dev/ttyACM0";
 const DEFAULT_BAUD_RATE: u32 = 115_200;
 const SERIAL_READ_TIMEOUT_MS: u64 = 200;
 const DEFAULT_AHRS_HZ: u32 = 10;
+const CAMERA_SERVER_ADDR: &str = "127.0.0.1:8888";
 
 /// Byte source that reads one byte from serial with timeout; returns None on timeout.
 struct SerialTimeoutByteSource {
@@ -66,33 +71,76 @@ fn serial_port() -> String {
     std::env::var("RPI_RX_SERIAL_PORT").unwrap_or_else(|_| DEFAULT_SERIAL_PORT.to_string())
 }
 
+/// Send command to the camera server (record.py)
+fn send_camera_command(command: &str) -> Result<String, Box<dyn std::error::Error>> {
+    let mut stream = TcpStream::connect(CAMERA_SERVER_ADDR)?;
+    stream.set_write_timeout(Some(Duration::from_secs(2)))?;
+    stream.set_read_timeout(Some(Duration::from_secs(5)))?;
+    
+    stream.write_all(command.as_bytes())?;
+    stream.flush()?;
+    
+    let mut response = String::new();
+    stream.read_to_string(&mut response)?;
+    
+    Ok(response.trim().to_string())
+}
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::Builder::from_default_env()
         .filter_level(log::LevelFilter::Info)
         .init();
 
-    info!("rpi_rx_rust_gpio: GPIO {} (init), GPIO {} (post); logs under ~/daq/logs/<date>/", GPIO_INIT, GPIO_POST);
+    info!("rpi_rx_rust_gpio: GPIO {} (init), GPIO {} (post), GPIO {} (video); logs under ~/daq/logs/<date>/", GPIO_INIT, GPIO_POST, GPIO_VIDEO);
 
     let chip = Chip::new("gpiochip0").or_else(|_| Chip::new(0))?;
-    let opts = Options::input([GPIO_INIT, GPIO_POST])
+    let opts = Options::input([GPIO_INIT, GPIO_POST, GPIO_VIDEO])
         .edge(EdgeDetect::Both)
         .bias(Bias::PullDown)
         .consumer("rpi_rx_rust_gpio");
     let mut inputs = chip.request_lines(opts)?;
-    info!("GPIO {} and {} requested (edge both, pull-down enabled)", GPIO_INIT, GPIO_POST);
+    info!("GPIO {}, {}, and {} requested (edge both, pull-down enabled)", GPIO_INIT, GPIO_POST, GPIO_VIDEO);
     
     // Check initial state
-    let initial_values: [bool; 2] = inputs.get_values([false, false])?;
-    info!("Initial GPIO state: GPIO{}={}, GPIO{}={}", 
-          GPIO_INIT, initial_values[0], GPIO_POST, initial_values[1]);
+    let initial_values: [bool; 3] = inputs.get_values([false, false, false])?;
+    info!("Initial GPIO state: GPIO{}={}, GPIO{}={}, GPIO{}={}", 
+          GPIO_INIT, initial_values[0], GPIO_POST, initial_values[1], GPIO_VIDEO, initial_values[2]);
+    
+    // Track video recording state (using Cell for interior mutability in closure)
+    let video_recording = Cell::new(false);
 
     loop {
-        // Idle: wait for an edge, then check if either GPIO is high
+        // Idle: wait for an edge, then check GPIO states
         let _event = inputs.read_event()?;
-        let values: [bool; 2] = inputs.get_values([false, false])?;
+        let values: [bool; 3] = inputs.get_values([false, false, false])?;
         let gpio11_high = values[0];
         let gpio19_high = values[1];
-        info!("GPIO edge detected: GPIO{}={}, GPIO{}={}", GPIO_INIT, gpio11_high, GPIO_POST, gpio19_high);
+        let gpio26_high = values[2];
+        info!("GPIO edge detected: GPIO{}={}, GPIO{}={}, GPIO{}={}", 
+              GPIO_INIT, gpio11_high, GPIO_POST, gpio19_high, GPIO_VIDEO, gpio26_high);
+        
+        // Handle video recording control (GPIO 26)
+        if gpio26_high && !video_recording.get() {
+            info!("GPIO {} high: starting video recording", GPIO_VIDEO);
+            match send_camera_command("start") {
+                Ok(response) => {
+                    info!("Camera server response: {}", response);
+                    video_recording.set(true);
+                }
+                Err(e) => error!("Failed to start video recording: {}", e),
+            }
+        } else if !gpio26_high && video_recording.get() {
+            info!("GPIO {} low: stopping video recording", GPIO_VIDEO);
+            match send_camera_command("stop") {
+                Ok(response) => {
+                    info!("Camera server response: {}", response);
+                    video_recording.set(false);
+                }
+                Err(e) => error!("Failed to stop video recording: {}", e),
+            }
+        }
+        
+        // Check if data logging should be active (GPIO 11 or 19)
         let active = gpio11_high || gpio19_high;
         if !active {
             info!("Both GPIOs low, staying idle");
@@ -134,11 +182,30 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let mut byte_source = SerialTimeoutByteSource::new(port);
         let mut should_stop = || {
-            let values: [bool; 2] = match inputs.get_values([false, false]) {
+            let values: [bool; 3] = match inputs.get_values([false, false, false]) {
                 Ok(v) => v,
                 Err(_) => return true,
             };
-            let active = values[0] || values[1];
+            let gpio11 = values[0];
+            let gpio19 = values[1];
+            let gpio26 = values[2];
+            
+            // Handle video recording control (check periodically during session)
+            if gpio26 && !video_recording.get() {
+                info!("GPIO {} high: starting video recording (during session)", GPIO_VIDEO);
+                if let Ok(response) = send_camera_command("start") {
+                    info!("Camera server response: {}", response);
+                    video_recording.set(true);
+                }
+            } else if !gpio26 && video_recording.get() {
+                info!("GPIO {} low: stopping video recording (during session)", GPIO_VIDEO);
+                if let Ok(response) = send_camera_command("stop") {
+                    info!("Camera server response: {}", response);
+                    video_recording.set(false);
+                }
+            }
+            
+            let active = gpio11 || gpio19;
             !active
         };
 
