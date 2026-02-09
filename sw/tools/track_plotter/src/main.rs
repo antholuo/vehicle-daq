@@ -36,6 +36,10 @@ struct Args {
     /// Zoom level override (0-19). If unset, auto-fit bounds.
     #[arg(long)]
     zoom: Option<u8>,
+
+    /// Draw red lines indicating GPS heading at every 10th point (requires gps_heading_deg in input)
+    #[arg(long)]
+    plot_heading: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -45,6 +49,8 @@ struct AhrsRow {
     lon_synth: f64,
     v_north_mps: f64,
     v_east_mps: f64,
+    #[serde(default)]
+    gps_heading_deg: Option<u16>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -162,36 +168,44 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         return Ok(());
     }
 
-    let latlon_points: Vec<Point> = rows
+    // Track points with optional GPS heading (degrees) for each point.
+    let latlon_track: Vec<(Point, Option<u16>)> = rows
         .iter()
         .filter(|row| !(row.lat_synth == 0.0 && row.lon_synth == 0.0))
-        .map(|row| Point {
-            x: row.lon_synth,
-            y: row.lat_synth,
+        .map(|row| {
+            (
+                Point {
+                    x: row.lon_synth,
+                    y: row.lat_synth,
+                },
+                row.gps_heading_deg,
+            )
         })
         .collect();
 
     // Use satellite (or other tile) map whenever we have any valid lat/lon; overlay track on it.
-    let use_map = !latlon_points.is_empty();
+    let use_map = !latlon_track.is_empty();
 
-    let points: Vec<Point> = if latlon_points.len() >= 2 {
-        latlon_points
+    let track_points: Vec<(Point, Option<u16>)> = if latlon_track.len() >= 2 {
+        latlon_track
     } else {
-        let mut points: Vec<Point> = Vec::with_capacity(rows.len());
+        let mut pts: Vec<(Point, Option<u16>)> = Vec::with_capacity(rows.len());
         let mut last_ts = rows[0].timestamp_us;
         let mut p_north = 0.0f64;
         let mut p_east = 0.0f64;
-        points.push(Point { x: p_east, y: p_north });
+        pts.push((Point { x: p_east, y: p_north }, None));
         for row in rows.iter().skip(1) {
             let dt = (row.timestamp_us.saturating_sub(last_ts)) as f64 / 1_000_000.0;
             last_ts = row.timestamp_us;
             let dt = if dt <= 0.0 || dt > 10.0 { 0.0 } else { dt };
             p_north += row.v_north_mps * dt;
             p_east += row.v_east_mps * dt;
-            points.push(Point { x: p_east, y: p_north });
+            pts.push((Point { x: p_east, y: p_north }, None));
         }
-        points
+        pts
     };
+
+    let points: Vec<Point> = track_points.iter().map(|(p, _)| *p).collect();
 
     let (mut min_x, mut max_x) = (points[0].x, points[0].x);
     let (mut min_y, mut max_y) = (points[0].y, points[0].y);
@@ -299,6 +313,28 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         let (x, y) = last;
         if x >= 0 && y >= 0 && (x as u32) < width && (y as u32) < height {
             img.put_pixel(x as u32, y as u32, track_color);
+        }
+    }
+
+    // Draw GPS heading indicators every 10 points when --plot-heading
+    if args.plot_heading {
+        const HEADING_LINE_LEN: f64 = 25.0;
+        let heading_color = Rgba([220, 53, 69, 255]); // red
+        for (i, (point, heading_deg)) in track_points.iter().enumerate() {
+            if i % 10 == 0 {
+                if let Some(h) = heading_deg {
+                    // GPS: 0°=North, 90°=East. Screen: North=-y, East=+x.
+                    let rad = (*h as f64).to_radians();
+                    let dx = rad.sin();
+                    let dy = -rad.cos();
+                    let start = to_pixel(*point);
+                    let end = (
+                        start.0 + (dx * HEADING_LINE_LEN).round() as i32,
+                        start.1 + (dy * HEADING_LINE_LEN).round() as i32,
+                    );
+                    draw_line(&mut img, start, end, heading_color);
+                }
+            }
         }
     }
 
