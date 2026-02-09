@@ -17,6 +17,10 @@ name = "ahrs_postprocess"
 path = "src/bin/ahrs_postprocess.rs"
 
 [[bin]]
+name = "gps_extract"
+path = "src/bin/gps_extract.rs"
+
+[[bin]]
 name = "rpi_rx_rust_gpio"
 path = "src/bin/rpi_rx_rust_gpio.rs"
 required-features = ["gpio"]
