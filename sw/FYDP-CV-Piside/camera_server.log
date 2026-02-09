@@ -1,0 +1,501 @@
+2026-02-05 20:40:50,307 - INFO - ==================================================
+2026-02-05 20:40:50,307 - INFO - Pi Camera Controller Server Starting
+2026-02-05 20:40:50,307 - INFO - ==================================================
+2026-02-05 20:40:50,307 - INFO - Scanning for cameras (0 to 3)...
+2026-02-05 20:40:50,950 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-05 20:40:51,072 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-05 20:40:51,556 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-05 20:40:51,660 - INFO - Found 2 camera(s): [0, 2]
+2026-02-05 20:40:51,660 - INFO - Initial camera detection: 2 camera(s) found
+2026-02-05 20:40:51,660 - INFO - Server is running. Press Ctrl+C to stop.
+2026-02-05 20:40:51,660 - INFO - Command server listening on 0.0.0.0:8888
+2026-02-05 20:40:51,661 - INFO - Available commands: start, stop, status, detect, help
+2026-02-05 20:41:15,405 - INFO - Connection from ('192.168.2.154', 54816)
+2026-02-05 20:41:15,406 - INFO - Received command: start
+2026-02-05 20:41:15,406 - INFO - Scanning for cameras (0 to 3)...
+2026-02-05 20:41:16,021 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-05 20:41:16,137 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-05 20:41:16,615 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-05 20:41:16,721 - INFO - Found 2 camera(s): [0, 2]
+2026-02-05 20:41:16,721 - INFO - Starting recording from cameras: [0, 2]
+2026-02-05 20:41:16,722 - INFO - Camera 0 directory: images/camera_0
+2026-02-05 20:41:16,722 - INFO - Camera 2 directory: images/camera_2
+2026-02-05 20:41:16,722 - INFO - Starting capture loop for camera 0
+2026-02-05 20:41:16,722 - INFO - Started thread for camera 0
+2026-02-05 20:41:16,722 - INFO - Starting capture loop for camera 2
+2026-02-05 20:41:16,722 - INFO - Started thread for camera 2
+2026-02-05 20:41:16,723 - INFO - Recording started with 2 camera(s)
+2026-02-05 20:41:16,723 - INFO - Sent response: OK: Recording started with 2 camera(s)
+2026-02-05 20:41:19,619 - INFO - Connection from ('192.168.2.154', 54820)
+2026-02-05 20:41:19,619 - INFO - Received command: stop
+2026-02-05 20:41:19,619 - INFO - Stopping recording...
+2026-02-05 20:41:20,292 - INFO - Stopping capture loop for camera 2
+2026-02-05 20:41:20,299 - INFO - Stopping capture loop for camera 0
+2026-02-05 20:41:20,371 - INFO - Camera 2 released
+2026-02-05 20:41:20,406 - INFO - Camera 0 released
+2026-02-05 20:41:20,407 - INFO - Recording stopped
+2026-02-05 20:41:20,407 - INFO - Sent response: OK: Recording stopped
+2026-02-05 22:08:32,484 - INFO - ==================================================
+2026-02-05 22:08:32,484 - INFO - Pi Camera Controller Server Starting
+2026-02-05 22:08:32,484 - INFO - ==================================================
+2026-02-05 22:08:32,484 - INFO - Scanning for cameras (0 to 3)...
+2026-02-05 22:08:33,099 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-05 22:08:33,212 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-05 22:08:33,690 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-05 22:08:33,844 - INFO - Found 2 camera(s): [0, 2]
+2026-02-05 22:08:33,844 - INFO - Initial camera detection: 2 camera(s) found
+2026-02-05 22:08:33,844 - INFO - Server is running. Press Ctrl+C to stop.
+2026-02-05 22:08:33,845 - INFO - Command server listening on 0.0.0.0:8888
+2026-02-05 22:08:33,845 - INFO - Available commands: start, stop, status, detect, help
+2026-02-05 22:08:41,827 - INFO - Connection from ('192.168.2.154', 54836)
+2026-02-05 22:08:41,827 - INFO - Received command: start
+2026-02-05 22:08:41,827 - INFO - Scanning for cameras (0 to 3)...
+2026-02-05 22:08:42,441 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-05 22:08:42,557 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-05 22:08:43,067 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-05 22:08:43,239 - INFO - Found 2 camera(s): [0, 2]
+2026-02-05 22:08:43,239 - INFO - Starting recording from cameras: [0, 2]
+2026-02-05 22:08:43,239 - INFO - Camera 0 directory: images/20260205_220843/camera_0
+2026-02-05 22:08:43,240 - INFO - Camera 2 directory: images/20260205_220843/camera_2
+2026-02-05 22:08:43,241 - INFO - Created session directory: images/20260205_220843
+2026-02-05 22:08:43,241 - INFO - Starting capture loop for camera 0 in session 20260205_220843
+2026-02-05 22:08:43,241 - INFO - Started thread for camera 0 in session 20260205_220843
+2026-02-05 22:08:43,242 - INFO - Starting capture loop for camera 2 in session 20260205_220843
+2026-02-05 22:08:43,242 - INFO - Started thread for camera 2 in session 20260205_220843
+2026-02-05 22:08:43,242 - INFO - Recording started with 2 camera(s) in session 20260205_220843
+2026-02-05 22:08:43,242 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260205_220843
+2026-02-05 22:08:50,938 - INFO - Connection from ('192.168.2.154', 54870)
+2026-02-05 22:08:50,938 - INFO - Received command: stop
+2026-02-05 22:08:50,938 - INFO - Stopping recording (session: 20260205_220843)...
+2026-02-05 22:08:51,717 - INFO - Stopping capture loop for camera 2 (session: 20260205_220843)
+2026-02-05 22:08:51,840 - INFO - Stopping capture loop for camera 0 (session: 20260205_220843)
+2026-02-05 22:08:51,873 - INFO - Camera 2 released
+2026-02-05 22:08:51,938 - INFO - Camera 0 released
+2026-02-05 22:08:51,939 - INFO - Updated session info for 20260205_220843
+2026-02-05 22:08:51,939 - INFO - Recording stopped
+2026-02-05 22:08:51,939 - INFO - Sent response: OK: Recording stopped (session: )
+2026-02-05 22:15:00,095 - INFO - Connection from ('192.168.2.154', 60848)
+2026-02-05 22:15:00,095 - INFO - Received command: start
+2026-02-05 22:15:00,095 - INFO - Scanning for cameras (0 to 3)...
+2026-02-05 22:15:00,710 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-05 22:15:00,826 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-05 22:15:01,324 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-05 22:15:01,445 - INFO - Found 2 camera(s): [0, 2]
+2026-02-05 22:15:01,445 - INFO - Starting recording from cameras: [0, 2]
+2026-02-05 22:15:01,445 - INFO - Camera 0 directory: images/20260205_221501/camera_0
+2026-02-05 22:15:01,446 - INFO - Camera 2 directory: images/20260205_221501/camera_2
+2026-02-05 22:15:01,446 - INFO - Created session directory: images/20260205_221501
+2026-02-05 22:15:01,446 - INFO - Starting capture loop for camera 0 in session 20260205_221501
+2026-02-05 22:15:01,446 - INFO - Started thread for camera 0 in session 20260205_221501
+2026-02-05 22:15:01,447 - INFO - Starting capture loop for camera 2 in session 20260205_221501
+2026-02-05 22:15:01,447 - INFO - Started thread for camera 2 in session 20260205_221501
+2026-02-05 22:15:01,447 - INFO - Recording started with 2 camera(s) in session 20260205_221501
+2026-02-05 22:15:01,447 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260205_221501
+2026-02-05 22:15:08,917 - INFO - Connection from ('192.168.2.154', 54839)
+2026-02-05 22:15:08,917 - INFO - Received command: stop
+2026-02-05 22:15:08,918 - INFO - Stopping recording (session: 20260205_221501)...
+2026-02-05 22:15:09,075 - INFO - Stopping capture loop for camera 0 (session: 20260205_221501)
+2026-02-05 22:15:09,159 - INFO - Camera 0 released
+2026-02-05 22:15:09,902 - INFO - Stopping capture loop for camera 2 (session: 20260205_221501)
+2026-02-05 22:15:09,993 - INFO - Camera 2 released
+2026-02-05 22:15:09,993 - INFO - Updated session info for 20260205_221501
+2026-02-05 22:15:09,994 - INFO - Recording stopped
+2026-02-05 22:15:09,994 - INFO - Sent response: OK: Recording stopped (session: )
+2026-02-05 23:09:10,996 - INFO - Connection from ('192.168.2.154', 54874)
+2026-02-05 23:09:10,996 - INFO - Received command: start
+2026-02-05 23:09:10,996 - INFO - Scanning for cameras (0 to 3)...
+2026-02-05 23:09:11,608 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-05 23:09:11,723 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-05 23:09:12,206 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-05 23:09:12,309 - INFO - Found 2 camera(s): [0, 2]
+2026-02-05 23:09:12,309 - INFO - Starting recording from cameras: [0, 2]
+2026-02-05 23:09:12,310 - INFO - Camera 0 directory: images/20260205_230912/camera_0
+2026-02-05 23:09:12,310 - INFO - Camera 2 directory: images/20260205_230912/camera_2
+2026-02-05 23:09:12,310 - INFO - Created session directory: images/20260205_230912
+2026-02-05 23:09:12,310 - INFO - Starting capture loop for camera 0 in session 20260205_230912
+2026-02-05 23:09:12,311 - INFO - Started thread for camera 0 in session 20260205_230912
+2026-02-05 23:09:12,311 - INFO - Starting capture loop for camera 2 in session 20260205_230912
+2026-02-05 23:09:12,311 - INFO - Started thread for camera 2 in session 20260205_230912
+2026-02-05 23:09:12,311 - INFO - Recording started with 2 camera(s) in session 20260205_230912
+2026-02-05 23:09:12,311 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260205_230912
+2026-02-05 23:09:21,789 - INFO - Camera 2: Saved 10 images to session 20260205_230912
+2026-02-05 23:09:21,923 - INFO - Camera 0: Saved 10 images to session 20260205_230912
+2026-02-05 23:09:30,058 - INFO - Connection from ('192.168.2.154', 60830)
+2026-02-05 23:09:30,058 - INFO - Received command: stop
+2026-02-05 23:09:30,059 - INFO - Stopping recording (session: 20260205_230912)...
+2026-02-05 23:09:30,839 - INFO - Stopping capture loop for camera 2 (session: 20260205_230912)
+2026-02-05 23:09:30,940 - INFO - Camera 2 released
+2026-02-05 23:09:30,966 - INFO - Stopping capture loop for camera 0 (session: 20260205_230912)
+2026-02-05 23:09:31,077 - INFO - Camera 0 released
+2026-02-05 23:09:31,078 - INFO - Updated session info for 20260205_230912
+2026-02-05 23:09:31,078 - INFO - Recording stopped
+2026-02-05 23:09:31,078 - INFO - Sent response: OK: Recording stopped (session: )
+2026-02-05 23:22:13,904 - INFO - Connection from ('192.168.2.154', 60910)
+2026-02-05 23:22:13,905 - INFO - Received command: start
+2026-02-05 23:22:13,905 - INFO - Scanning for cameras (0 to 3)...
+2026-02-05 23:22:14,516 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-05 23:22:14,631 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-05 23:22:15,114 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-05 23:22:15,217 - INFO - Found 2 camera(s): [0, 2]
+2026-02-05 23:22:15,217 - INFO - Starting recording from cameras: [0, 2]
+2026-02-05 23:22:15,217 - INFO - Camera 0 directory: images/20260205_232215/camera_0
+2026-02-05 23:22:15,218 - INFO - Camera 2 directory: images/20260205_232215/camera_2
+2026-02-05 23:22:15,218 - INFO - Created session directory: images/20260205_232215
+2026-02-05 23:22:15,218 - INFO - Starting capture loop for camera 0 in session 20260205_232215
+2026-02-05 23:22:15,218 - INFO - Started thread for camera 0 in session 20260205_232215
+2026-02-05 23:22:15,219 - INFO - Starting capture loop for camera 2 in session 20260205_232215
+2026-02-05 23:22:15,219 - INFO - Started thread for camera 2 in session 20260205_232215
+2026-02-05 23:22:15,219 - INFO - Recording started with 2 camera(s) in session 20260205_232215
+2026-02-05 23:22:15,219 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260205_232215
+2026-02-05 23:22:24,701 - INFO - Camera 2: Saved 10 images to session 20260205_232215
+2026-02-05 23:22:24,828 - INFO - Camera 0: Saved 10 images to session 20260205_232215
+2026-02-05 23:22:34,767 - INFO - Camera 2: Saved 20 images to session 20260205_232215
+2026-02-05 23:22:34,878 - INFO - Camera 0: Saved 20 images to session 20260205_232215
+2026-02-05 23:22:44,823 - INFO - Camera 2: Saved 30 images to session 20260205_232215
+2026-02-05 23:22:44,928 - INFO - Camera 0: Saved 30 images to session 20260205_232215
+2026-02-05 23:22:54,683 - INFO - Connection from ('192.168.2.154', 54866)
+2026-02-05 23:22:54,683 - INFO - Received command: stop
+2026-02-05 23:22:54,683 - INFO - Stopping recording (session: 20260205_232215)...
+2026-02-05 23:22:54,875 - INFO - Stopping capture loop for camera 2 (session: 20260205_232215)
+2026-02-05 23:22:54,966 - INFO - Camera 2 released
+2026-02-05 23:22:54,971 - INFO - Stopping capture loop for camera 0 (session: 20260205_232215)
+2026-02-05 23:22:55,069 - INFO - Camera 0 released
+2026-02-05 23:22:55,070 - INFO - Updated session info for 20260205_232215
+2026-02-05 23:22:55,070 - INFO - Recording stopped
+2026-02-05 23:22:55,071 - INFO - Sent response: OK: Recording stopped (session: )
+2026-02-05 23:24:36,081 - INFO - Connection from ('192.168.2.154', 60912)
+2026-02-05 23:24:36,082 - INFO - Received command: start
+2026-02-05 23:24:36,082 - INFO - Scanning for cameras (0 to 3)...
+2026-02-05 23:24:36,697 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-05 23:24:36,811 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-05 23:24:37,294 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-05 23:24:37,397 - INFO - Found 2 camera(s): [0, 2]
+2026-02-05 23:24:37,397 - INFO - Starting recording from cameras: [0, 2]
+2026-02-05 23:24:37,397 - INFO - Camera 0 directory: images/20260205_232437/camera_0
+2026-02-05 23:24:37,397 - INFO - Camera 2 directory: images/20260205_232437/camera_2
+2026-02-05 23:24:37,398 - INFO - Created session directory: images/20260205_232437
+2026-02-05 23:24:37,398 - INFO - Starting capture loop for camera 0 in session 20260205_232437
+2026-02-05 23:24:37,398 - INFO - Started thread for camera 0 in session 20260205_232437
+2026-02-05 23:24:37,398 - INFO - Starting capture loop for camera 2 in session 20260205_232437
+2026-02-05 23:24:37,398 - INFO - Started thread for camera 2 in session 20260205_232437
+2026-02-05 23:24:37,399 - INFO - Recording started with 2 camera(s) in session 20260205_232437
+2026-02-05 23:24:37,399 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260205_232437
+2026-02-05 23:24:46,887 - INFO - Camera 2: Saved 10 images to session 20260205_232437
+2026-02-05 23:24:47,004 - INFO - Camera 0: Saved 10 images to session 20260205_232437
+2026-02-05 23:24:56,949 - INFO - Camera 2: Saved 20 images to session 20260205_232437
+2026-02-05 23:24:57,058 - INFO - Camera 0: Saved 20 images to session 20260205_232437
+2026-02-05 23:25:07,012 - INFO - Camera 2: Saved 30 images to session 20260205_232437
+2026-02-05 23:25:07,112 - INFO - Camera 0: Saved 30 images to session 20260205_232437
+2026-02-05 23:25:11,395 - INFO - Connection from ('192.168.2.154', 60730)
+2026-02-05 23:25:11,395 - INFO - Received command: stop
+2026-02-05 23:25:11,395 - INFO - Stopping recording (session: 20260205_232437)...
+2026-02-05 23:25:12,029 - INFO - Stopping capture loop for camera 2 (session: 20260205_232437)
+2026-02-05 23:25:12,129 - INFO - Camera 2 released
+2026-02-05 23:25:12,129 - INFO - Stopping capture loop for camera 0 (session: 20260205_232437)
+2026-02-05 23:25:12,228 - INFO - Camera 0 released
+2026-02-05 23:25:12,229 - INFO - Updated session info for 20260205_232437
+2026-02-05 23:25:12,229 - INFO - Recording stopped
+2026-02-05 23:25:12,229 - INFO - Sent response: OK: Recording stopped (session: )
+2026-02-05 23:51:14,636 - INFO - Connection from ('192.168.2.154', 60756)
+2026-02-05 23:51:14,637 - INFO - Received command: start
+2026-02-05 23:51:14,637 - INFO - Scanning for cameras (0 to 3)...
+2026-02-05 23:51:15,248 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-05 23:51:15,364 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-05 23:51:15,843 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-05 23:51:15,946 - INFO - Found 2 camera(s): [0, 2]
+2026-02-05 23:51:15,946 - INFO - Starting recording from cameras: [0, 2]
+2026-02-05 23:51:15,946 - INFO - Camera 0 directory: images/20260205_235115/camera_0
+2026-02-05 23:51:15,947 - INFO - Camera 2 directory: images/20260205_235115/camera_2
+2026-02-05 23:51:15,947 - INFO - Created session directory: images/20260205_235115
+2026-02-05 23:51:15,947 - INFO - Starting capture loop for camera 0 in session 20260205_235115
+2026-02-05 23:51:15,947 - INFO - Started thread for camera 0 in session 20260205_235115
+2026-02-05 23:51:15,948 - INFO - Starting capture loop for camera 2 in session 20260205_235115
+2026-02-05 23:51:15,948 - INFO - Started thread for camera 2 in session 20260205_235115
+2026-02-05 23:51:15,948 - INFO - Recording started with 2 camera(s) in session 20260205_235115
+2026-02-05 23:51:15,948 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260205_235115
+2026-02-05 23:51:25,428 - INFO - Camera 2: Saved 10 images to session 20260205_235115
+2026-02-05 23:51:25,559 - INFO - Camera 0: Saved 10 images to session 20260205_235115
+2026-02-05 23:51:35,484 - INFO - Camera 2: Saved 20 images to session 20260205_235115
+2026-02-05 23:51:35,611 - INFO - Camera 0: Saved 20 images to session 20260205_235115
+2026-02-05 23:51:38,869 - INFO - Connection from ('192.168.2.154', 60771)
+2026-02-05 23:51:38,869 - INFO - Received command: stop
+2026-02-05 23:51:38,869 - INFO - Stopping recording (session: 20260205_235115)...
+2026-02-05 23:51:39,501 - INFO - Stopping capture loop for camera 2 (session: 20260205_235115)
+2026-02-05 23:51:39,594 - INFO - Camera 2 released
+2026-02-05 23:51:39,626 - INFO - Stopping capture loop for camera 0 (session: 20260205_235115)
+2026-02-05 23:51:39,730 - INFO - Camera 0 released
+2026-02-05 23:51:39,731 - INFO - Updated session info for 20260205_235115
+2026-02-05 23:51:39,731 - INFO - Recording stopped
+2026-02-05 23:51:39,732 - INFO - Sent response: OK: Recording stopped (session: )
+2026-02-06 03:01:40,127 - INFO - ==================================================
+2026-02-06 03:01:40,128 - INFO - Pi Camera Controller Server Starting
+2026-02-06 03:01:40,128 - INFO - ==================================================
+2026-02-06 03:01:40,128 - INFO - Scanning for cameras (0 to 3)...
+2026-02-06 03:01:40,759 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-06 03:01:40,860 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-06 03:01:41,342 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-06 03:01:41,445 - INFO - Found 2 camera(s): [0, 2]
+2026-02-06 03:01:41,446 - INFO - Initial camera detection: 2 camera(s) found
+2026-02-06 03:01:41,446 - INFO - Server is running. Press Ctrl+C to stop.
+2026-02-06 03:01:41,446 - INFO - Command server listening on 0.0.0.0:8888
+2026-02-06 03:01:41,446 - INFO - Available commands: start, stop, status, detect, help
+2026-02-06 03:01:48,106 - INFO - Connection from ('192.168.2.50', 51333)
+2026-02-06 03:01:48,106 - INFO - Received command: start
+2026-02-06 03:01:48,106 - INFO - Scanning for cameras (0 to 3)...
+2026-02-06 03:01:48,800 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-06 03:01:48,932 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-06 03:01:49,414 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-06 03:01:49,534 - INFO - Found 2 camera(s): [0, 2]
+2026-02-06 03:01:49,535 - INFO - Starting recording from cameras: [0, 2]
+2026-02-06 03:01:49,535 - INFO - Camera 0 directory: images/20260206_030149/camera_0
+2026-02-06 03:01:49,535 - INFO - Camera 2 directory: images/20260206_030149/camera_2
+2026-02-06 03:01:49,535 - INFO - Created session directory: images/20260206_030149
+2026-02-06 03:01:49,536 - INFO - Starting capture loop for camera 0 in session 20260206_030149
+2026-02-06 03:01:49,536 - INFO - Started thread for camera 0 in session 20260206_030149
+2026-02-06 03:01:49,536 - INFO - Starting capture loop for camera 2 in session 20260206_030149
+2026-02-06 03:01:49,536 - INFO - Started thread for camera 2 in session 20260206_030149
+2026-02-06 03:01:49,536 - INFO - Recording started with 2 camera(s) in session 20260206_030149
+2026-02-06 03:01:49,537 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260206_030149
+2026-02-06 03:01:56,741 - INFO - Connection from ('192.168.2.50', 51562)
+2026-02-06 03:01:56,742 - INFO - Received command: stop
+2026-02-06 03:01:56,742 - INFO - Stopping recording (session: 20260206_030149)...
+2026-02-06 03:01:57,118 - INFO - Stopping capture loop for camera 2 (session: 20260206_030149)
+2026-02-06 03:01:57,198 - INFO - Camera 2 released
+2026-02-06 03:01:57,224 - INFO - Stopping capture loop for camera 0 (session: 20260206_030149)
+2026-02-06 03:01:57,333 - INFO - Camera 0 released
+2026-02-06 03:01:57,334 - INFO - Updated session info for 20260206_030149
+2026-02-06 03:01:57,334 - INFO - Recording stopped
+2026-02-06 03:01:57,334 - INFO - Sent response: OK: Recording stopped (session: )
+2026-02-06 16:02:24,319 - INFO - ==================================================
+2026-02-06 16:02:24,320 - INFO - Pi Camera Controller Server Starting
+2026-02-06 16:02:24,320 - INFO - ==================================================
+2026-02-06 16:02:24,320 - WARNING - 
+        OpenCV is not installed. Camera functionality will not work.
+        Install with: sudo apt-get install python3-opencv
+        Or: pip3 install opencv-python
+        
+2026-02-06 16:02:24,320 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:02:24,320 - INFO - Initial camera detection: 0 camera(s) found
+2026-02-06 16:02:24,321 - INFO - Server is running. Press Ctrl+C to stop.
+2026-02-06 16:02:24,321 - INFO - Command server listening on 0.0.0.0:8888
+2026-02-06 16:02:24,321 - INFO - Available commands: start, stop, status, detect, help
+2026-02-06 16:02:37,835 - INFO - Connection from ('10.161.175.184', 62911)
+2026-02-06 16:02:37,835 - INFO - Received command: start
+2026-02-06 16:02:37,835 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:02:37,835 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:02:49,637 - INFO - Connection from ('10.161.175.184', 57330)
+2026-02-06 16:02:49,637 - INFO - Received command: start
+2026-02-06 16:02:49,637 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:02:49,637 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:02:49,953 - INFO - Connection from ('10.161.175.184', 57338)
+2026-02-06 16:02:49,953 - INFO - Received command: start
+2026-02-06 16:02:49,953 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:02:49,953 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:02:50,124 - INFO - Connection from ('10.161.175.184', 57352)
+2026-02-06 16:02:50,124 - INFO - Received command: start
+2026-02-06 16:02:50,124 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:02:50,124 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:02:50,493 - INFO - Connection from ('10.161.175.184', 57354)
+2026-02-06 16:02:50,494 - INFO - Received command: start
+2026-02-06 16:02:50,494 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:02:50,494 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:02:50,672 - INFO - Connection from ('10.161.175.184', 57368)
+2026-02-06 16:02:50,672 - INFO - Received command: start
+2026-02-06 16:02:50,672 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:02:50,673 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:02:50,864 - INFO - Connection from ('10.161.175.184', 57380)
+2026-02-06 16:02:50,864 - INFO - Received command: start
+2026-02-06 16:02:50,864 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:02:50,864 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:02:51,089 - INFO - Connection from ('10.161.175.184', 57386)
+2026-02-06 16:02:51,089 - INFO - Received command: start
+2026-02-06 16:02:51,089 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:02:51,089 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:05:56,933 - INFO - Connection from ('10.161.175.184', 57337)
+2026-02-06 16:05:56,933 - INFO - Received command: start
+2026-02-06 16:05:56,933 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:05:56,934 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:06:01,148 - INFO - Connection from ('10.161.175.184', 57357)
+2026-02-06 16:06:01,148 - INFO - Received command: start
+2026-02-06 16:06:01,148 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:06:01,148 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:06:01,418 - INFO - Connection from ('10.161.175.184', 57361)
+2026-02-06 16:06:01,418 - INFO - Received command: start
+2026-02-06 16:06:01,418 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:06:01,418 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:06:01,619 - INFO - Connection from ('10.161.175.184', 57363)
+2026-02-06 16:06:01,620 - INFO - Received command: start
+2026-02-06 16:06:01,620 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:06:01,620 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:06:01,853 - INFO - Connection from ('10.161.175.184', 57365)
+2026-02-06 16:06:01,853 - INFO - Received command: start
+2026-02-06 16:06:01,853 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:06:01,853 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:06:02,005 - INFO - Connection from ('10.161.175.184', 57369)
+2026-02-06 16:06:02,005 - INFO - Received command: start
+2026-02-06 16:06:02,005 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:06:02,005 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:06:02,906 - INFO - Connection from ('10.161.175.184', 57375)
+2026-02-06 16:06:02,906 - INFO - Received command: start
+2026-02-06 16:06:02,906 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:06:02,906 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:06:03,353 - INFO - Connection from ('10.161.175.184', 57377)
+2026-02-06 16:06:03,353 - INFO - Received command: start
+2026-02-06 16:06:03,353 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:06:03,353 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:06:24,899 - INFO - 
+Shutting down...
+2026-02-06 16:06:24,899 - INFO - Cleaning up...
+2026-02-06 16:06:24,899 - INFO - Cleanup complete
+2026-02-06 16:06:24,899 - INFO - Server stopped.
+2026-02-06 16:09:33,580 - INFO - ==================================================
+2026-02-06 16:09:33,581 - INFO - Pi Camera Controller Server Starting
+2026-02-06 16:09:33,581 - INFO - ==================================================
+2026-02-06 16:09:33,581 - WARNING - 
+        OpenCV is not installed. Camera functionality will not work.
+        Install with: sudo apt-get install python3-opencv
+        Or: pip3 install opencv-python
+        
+2026-02-06 16:09:33,581 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:09:33,581 - INFO - Initial camera detection: 0 camera(s) found
+2026-02-06 16:09:33,581 - INFO - Server is running. Press Ctrl+C to stop.
+2026-02-06 16:09:33,582 - INFO - Command server listening on 0.0.0.0:8888
+2026-02-06 16:09:33,582 - INFO - Available commands: start, stop, status, detect, help
+2026-02-06 16:09:44,255 - INFO - Connection from ('10.161.175.184', 64528)
+2026-02-06 16:09:44,256 - INFO - Received command: start
+2026-02-06 16:09:44,256 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:09:44,256 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:09:48,697 - INFO - Connection from ('10.161.175.184', 57344)
+2026-02-06 16:09:48,697 - INFO - Received command: start
+2026-02-06 16:09:48,697 - ERROR - OpenCV not available. Cannot detect cameras.
+2026-02-06 16:09:48,697 - INFO - Sent response: ERROR: No cameras detected
+2026-02-06 16:10:11,910 - INFO - 
+Shutting down...
+2026-02-06 16:10:11,911 - INFO - Cleaning up...
+2026-02-06 16:10:11,911 - INFO - Cleanup complete
+2026-02-06 16:10:11,911 - INFO - Server stopped.
+2026-02-06 16:13:25,768 - INFO - ==================================================
+2026-02-06 16:13:25,768 - INFO - Pi Camera Controller Server Starting
+2026-02-06 16:13:25,768 - INFO - ==================================================
+2026-02-06 16:13:25,768 - INFO - Scanning for cameras (0 to 3)...
+2026-02-06 16:13:26,378 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-06 16:13:26,491 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-06 16:13:26,964 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-06 16:13:27,067 - INFO - Found 2 camera(s): [0, 2]
+2026-02-06 16:13:27,067 - INFO - Initial camera detection: 2 camera(s) found
+2026-02-06 16:13:27,067 - INFO - Server is running. Press Ctrl+C to stop.
+2026-02-06 16:13:27,068 - INFO - Command server listening on 0.0.0.0:8888
+2026-02-06 16:13:27,068 - INFO - Available commands: start, stop, status, detect, help
+2026-02-06 16:13:57,625 - INFO - Connection from ('10.161.175.184', 57388)
+2026-02-06 16:13:57,625 - INFO - Received command: start
+2026-02-06 16:13:57,625 - INFO - Scanning for cameras (0 to 3)...
+2026-02-06 16:13:58,232 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-06 16:13:58,349 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-06 16:13:58,822 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-06 16:13:58,925 - INFO - Found 2 camera(s): [0, 2]
+2026-02-06 16:13:58,925 - INFO - Starting recording from cameras: [0, 2]
+2026-02-06 16:13:58,925 - INFO - Camera 0 directory: images/20260206_161358/camera_0
+2026-02-06 16:13:58,925 - INFO - Camera 2 directory: images/20260206_161358/camera_2
+2026-02-06 16:13:58,926 - INFO - Created session directory: images/20260206_161358
+2026-02-06 16:13:58,926 - INFO - Starting capture loop for camera 0 in session 20260206_161358
+2026-02-06 16:13:58,926 - INFO - Started thread for camera 0 in session 20260206_161358
+2026-02-06 16:13:58,927 - INFO - Starting capture loop for camera 2 in session 20260206_161358
+2026-02-06 16:13:58,927 - INFO - Started thread for camera 2 in session 20260206_161358
+2026-02-06 16:13:58,927 - INFO - Recording started with 2 camera(s) in session 20260206_161358
+2026-02-06 16:13:58,927 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260206_161358
+2026-02-06 16:14:08,449 - INFO - Camera 2: Saved 10 images to session 20260206_161358
+2026-02-06 16:14:08,557 - INFO - Camera 0: Saved 10 images to session 20260206_161358
+2026-02-06 16:14:13,403 - INFO - Connection from ('10.161.175.184', 57347)
+2026-02-06 16:14:13,403 - INFO - Received command: stop
+2026-02-06 16:14:13,403 - INFO - Stopping recording (session: 20260206_161358)...
+2026-02-06 16:14:13,473 - INFO - Stopping capture loop for camera 2 (session: 20260206_161358)
+2026-02-06 16:14:13,564 - INFO - Camera 2 released
+2026-02-06 16:14:13,582 - INFO - Stopping capture loop for camera 0 (session: 20260206_161358)
+2026-02-06 16:14:13,663 - INFO - Camera 0 released
+2026-02-06 16:14:13,664 - INFO - Updated session info for 20260206_161358
+2026-02-06 16:14:13,664 - INFO - Recording stopped
+2026-02-06 16:14:13,664 - INFO - Sent response: OK: Recording stopped (session: )
+2026-02-06 16:15:02,662 - INFO - Connection from ('10.161.175.184', 64590)
+2026-02-06 16:15:02,662 - INFO - Received command: start
+2026-02-06 16:15:02,662 - INFO - Scanning for cameras (0 to 3)...
+2026-02-06 16:15:03,267 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-06 16:15:03,385 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-06 16:15:03,853 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-06 16:15:03,961 - INFO - Found 2 camera(s): [0, 2]
+2026-02-06 16:15:03,961 - INFO - Starting recording from cameras: [0, 2]
+2026-02-06 16:15:03,962 - INFO - Camera 0 directory: images/20260206_161503/camera_0
+2026-02-06 16:15:03,962 - INFO - Camera 2 directory: images/20260206_161503/camera_2
+2026-02-06 16:15:03,963 - INFO - Created session directory: images/20260206_161503
+2026-02-06 16:15:03,964 - INFO - Starting capture loop for camera 0 in session 20260206_161503
+2026-02-06 16:15:03,964 - INFO - Started thread for camera 0 in session 20260206_161503
+2026-02-06 16:15:03,965 - INFO - Starting capture loop for camera 2 in session 20260206_161503
+2026-02-06 16:15:03,965 - INFO - Started thread for camera 2 in session 20260206_161503
+2026-02-06 16:15:03,966 - INFO - Recording started with 2 camera(s) in session 20260206_161503
+2026-02-06 16:15:03,966 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260206_161503
+2026-02-06 16:15:13,455 - INFO - Camera 2: Saved 10 images to session 20260206_161503
+2026-02-06 16:15:13,591 - INFO - Camera 0: Saved 10 images to session 20260206_161503
+2026-02-06 16:15:23,516 - INFO - Camera 2: Saved 20 images to session 20260206_161503
+2026-02-06 16:15:23,650 - INFO - Camera 0: Saved 20 images to session 20260206_161503
+2026-02-06 16:15:30,776 - INFO - Connection from ('10.161.175.184', 62833)
+2026-02-06 16:15:30,776 - INFO - Received command: stop
+2026-02-06 16:15:30,776 - INFO - Stopping recording (session: 20260206_161503)...
+2026-02-06 16:15:31,559 - INFO - Stopping capture loop for camera 2 (session: 20260206_161503)
+2026-02-06 16:15:31,650 - INFO - Camera 2 released
+2026-02-06 16:15:31,692 - INFO - Stopping capture loop for camera 0 (session: 20260206_161503)
+2026-02-06 16:15:31,783 - INFO - Camera 0 released
+2026-02-06 16:15:31,785 - INFO - Updated session info for 20260206_161503
+2026-02-06 16:15:31,785 - INFO - Recording stopped
+2026-02-06 16:15:31,785 - INFO - Sent response: OK: Recording stopped (session: )
+2026-02-06 16:23:00,930 - INFO - ==================================================
+2026-02-06 16:23:00,930 - INFO - Pi Camera Controller Server Starting
+2026-02-06 16:23:00,930 - INFO - ==================================================
+2026-02-06 16:23:00,930 - INFO - Scanning for cameras (0 to 3)...
+2026-02-06 16:23:01,539 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-06 16:23:01,652 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-06 16:23:02,124 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-06 16:23:02,227 - INFO - Found 2 camera(s): [0, 2]
+2026-02-06 16:23:02,227 - INFO - Initial camera detection: 2 camera(s) found
+2026-02-06 16:23:02,228 - INFO - Server is running. Press Ctrl+C to stop.
+2026-02-06 16:23:02,228 - INFO - Command server listening on 0.0.0.0:8888
+2026-02-06 16:23:02,228 - INFO - Available commands: start, stop, status, detect, help
+2026-02-06 16:23:08,405 - INFO - Connection from ('10.161.175.184', 64562)
+2026-02-06 16:23:08,405 - INFO - Received command: start
+2026-02-06 16:23:08,405 - INFO - Scanning for cameras (0 to 3)...
+2026-02-06 16:23:09,011 - INFO - Camera 0 detected: 640x480 @ 30.0fps
+2026-02-06 16:23:09,128 - INFO -   Set Pi Camera to 1920x1080 if available
+2026-02-06 16:23:09,601 - INFO - Camera 2 detected: 640x480 @ 30.0fps
+2026-02-06 16:23:09,703 - INFO - Found 2 camera(s): [0, 2]
+2026-02-06 16:23:09,703 - INFO - Starting recording from cameras: [0, 2]
+2026-02-06 16:23:09,704 - INFO - Camera 0 directory: images/20260206_162309/camera_0
+2026-02-06 16:23:09,704 - INFO - Camera 2 directory: images/20260206_162309/camera_2
+2026-02-06 16:23:09,704 - INFO - Created session directory: images/20260206_162309
+2026-02-06 16:23:09,705 - INFO - Starting capture loop for camera 0 in session 20260206_162309
+2026-02-06 16:23:09,705 - INFO - Started thread for camera 0 in session 20260206_162309
+2026-02-06 16:23:09,705 - INFO - Starting capture loop for camera 2 in session 20260206_162309
+2026-02-06 16:23:09,705 - INFO - Started thread for camera 2 in session 20260206_162309
+2026-02-06 16:23:09,706 - INFO - Recording started with 2 camera(s) in session 20260206_162309
+2026-02-06 16:23:09,706 - INFO - Sent response: OK: Recording started with 2 camera(s) in session 20260206_162309
+2026-02-06 16:23:11,107 - INFO - Camera 2: Saved 10 images to session 20260206_162309
+2026-02-06 16:23:11,233 - INFO - Camera 0: Saved 10 images to session 20260206_162309
+2026-02-06 16:23:12,174 - INFO - Camera 2: Saved 20 images to session 20260206_162309
+2026-02-06 16:23:12,300 - INFO - Camera 0: Saved 20 images to session 20260206_162309
+2026-02-06 16:23:13,245 - INFO - Camera 2: Saved 30 images to session 20260206_162309
+2026-02-06 16:23:13,366 - INFO - Camera 0: Saved 30 images to session 20260206_162309
+2026-02-06 16:23:14,317 - INFO - Camera 2: Saved 40 images to session 20260206_162309
+2026-02-06 16:23:14,433 - INFO - Camera 0: Saved 40 images to session 20260206_162309
+2026-02-06 16:23:15,393 - INFO - Camera 2: Saved 50 images to session 20260206_162309
+2026-02-06 16:23:15,497 - INFO - Camera 0: Saved 50 images to session 20260206_162309
+2026-02-06 16:23:16,460 - INFO - Camera 2: Saved 60 images to session 20260206_162309
+2026-02-06 16:23:16,562 - INFO - Camera 0: Saved 60 images to session 20260206_162309
+2026-02-06 16:23:17,526 - INFO - Camera 2: Saved 70 images to session 20260206_162309
+2026-02-06 16:23:17,628 - INFO - Camera 0: Saved 70 images to session 20260206_162309
+2026-02-06 16:23:17,636 - INFO - Connection from ('10.161.175.184', 62870)
+2026-02-06 16:23:17,636 - INFO - Received command: stop
+2026-02-06 16:23:17,637 - INFO - Stopping recording (session: 20260206_162309)...
+2026-02-06 16:23:17,729 - INFO - Stopping capture loop for camera 0 (session: 20260206_162309)
+2026-02-06 16:23:17,733 - INFO - Stopping capture loop for camera 2 (session: 20260206_162309)
+2026-02-06 16:23:17,828 - INFO - Camera 0 released
+2026-02-06 16:23:17,830 - INFO - Camera 2 released
+2026-02-06 16:23:17,831 - INFO - Updated session info for 20260206_162309
+2026-02-06 16:23:17,831 - INFO - Recording stopped
+2026-02-06 16:23:17,831 - INFO - Sent response: OK: Recording stopped (session: )
