@@ -1,5 +1,5 @@
 //! Extract GPS-only rows from a raw log CSV (no AHRS).
-//! Output format matches track_plotter input: timestamp_us, lat_synth, lon_synth, v_north_mps, v_east_mps.
+//! Output format matches track_plotter input: timestamp_us, lat_synth, lon_synth, v_north_mps, v_east_mps, gps_heading_deg.
 //! Output: <input_stem>_gps_only.csv
 
 use clap::Parser;
@@ -28,6 +28,8 @@ struct RawCsvRow {
     message_type: String,
     lat: Option<f64>,
     lon: Option<f64>,
+    #[serde(default)]
+    heading: Option<u16>,
 }
 
 /// One row of GPS-only output (track_plotter-compatible).
@@ -38,6 +40,8 @@ struct GpsOnlyRow {
     lon_synth: f64,
     v_north_mps: f64,
     v_east_mps: f64,
+    /// GPS heading in degrees [0, 360) from raw NMEA/GPS data
+    gps_heading_deg: Option<u16>,
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -64,6 +68,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                     lon_synth: lon,
                     v_north_mps: 0.0,
                     v_east_mps: 0.0,
+                    gps_heading_deg: row.heading,
                 })?;
                 count += 1;
             }
