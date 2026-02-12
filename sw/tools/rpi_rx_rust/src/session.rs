@@ -8,7 +8,7 @@ use log::*;
 use std::collections::VecDeque;
 use std::io;
 
-const COBS_DECODED_BUFFER_SIZE: usize = 52;
+const COBS_DECODED_BUFFER_SIZE: usize = 128;
 const AHRS_SAMPLE_PERIOD_S: f64 = 1.0 / 400.0;
 const AHRS_BETA: f64 = 0.1;
 
@@ -148,6 +148,12 @@ where
                             raw_wtr.serialize(&err_msg)?;
                             raw_wtr.flush()?;
                         }
+                    }
+                    
+                    // Check if we should stop after processing each complete frame
+                    if should_stop() {
+                        info!("Stop requested, ending session");
+                        break;
                     }
                 }
             }
