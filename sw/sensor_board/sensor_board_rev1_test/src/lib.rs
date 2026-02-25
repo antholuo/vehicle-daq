@@ -10,7 +10,7 @@ use esp_hal::gpio::Output;
 use esp_hal::spi::master::Spi;
 #[cfg(feature = "gps")]
 use esp_hal::uart::Uart;
-use esp_hal::usb_serial_jtag::UsbSerialJtagTx;
+use esp_hal::usb_serial_jtag::{UsbSerialJtagRx, UsbSerialJtagTx};
 
 #[cfg(feature = "wifi")]
 pub mod aircomm;
@@ -81,6 +81,12 @@ pub trait BoardPeripherals {
     /// Take the USB Serial TX interface for host communication
     /// Returns None if USB is not available or not configured for this board
     fn take_usb_serial_tx(&mut self) -> Option<UsbSerialJtagTx<'static, Async>> {
-        None // Default: USB not available
+        None
+    }
+
+    /// Take the USB Serial RX interface for receiving commands from host
+    /// Returns None if USB RX is not available or not configured for this board
+    fn take_usb_serial_rx(&mut self) -> Option<UsbSerialJtagRx<'static, Async>> {
+        None
     }
 }

@@ -9,10 +9,13 @@ pub mod protocol;
 
 use embassy_time::{Duration, Instant, Timer};
 use esp_hal::Async;
-use esp_hal::usb_serial_jtag::UsbSerialJtagTx;
+use esp_hal::usb_serial_jtag::{UsbSerialJtagRx, UsbSerialJtagTx};
 use nb::Error as NbError;
 
-pub use protocol::{ForwardError, MAX_USB_MESSAGE_SIZE, format_mac, serialize_forwarded_message};
+pub use protocol::{
+    ForwardError, MAX_USB_MESSAGE_SIZE, UsbCommand, format_mac, parse_usb_command,
+    serialize_forwarded_message,
+};
 
 #[allow(unused_imports)]
 use log::{debug, error, info, trace, warn};
@@ -119,6 +122,69 @@ impl UsbSerial {
                     Timer::after(USB_WRITE_RETRY_DELAY).await;
                 }
                 Err(NbError::Other(_)) => return Err(UsbError::NotReady),
+            }
+        }
+    }
+}
+
+// =========================================================================
+// USB Serial RX (RPi -> Bridge commands)
+// =========================================================================
+
+/// COBS-decoded buffer size for incoming commands (largest command is 9 bytes)
+const USB_RX_DECODED_BUF_SIZE: usize = 32;
+/// Max COBS-encoded frame we'll accumulate before discarding
+const USB_RX_FRAME_MAX: usize = 64;
+
+/// USB Serial reader that accumulates COBS-framed commands from the host.
+pub struct UsbSerialRx {
+    rx: UsbSerialJtagRx<'static, Async>,
+    frame_buf: [u8; USB_RX_FRAME_MAX],
+    frame_len: usize,
+}
+
+impl UsbSerialRx {
+    pub fn new(rx: UsbSerialJtagRx<'static, Async>) -> Self {
+        Self {
+            rx,
+            frame_buf: [0u8; USB_RX_FRAME_MAX],
+            frame_len: 0,
+        }
+    }
+
+    /// Non-blocking poll: read any available bytes and try to decode a
+    /// complete COBS frame.  Returns `Some(cmd)` when a full command has
+    /// been received, `None` otherwise (no data or incomplete frame).
+    pub fn poll_command(&mut self) -> Option<UsbCommand> {
+        loop {
+            match self.rx.read_byte() {
+                Ok(0x00) => {
+                    // COBS delimiter -- decode the accumulated frame
+                    if self.frame_len == 0 {
+                        continue;
+                    }
+                    let mut decoded = [0u8; USB_RX_DECODED_BUF_SIZE];
+                    let result =
+                        cobs::decode(&self.frame_buf[..self.frame_len], &mut decoded);
+                    self.frame_len = 0;
+                    if let Ok(decoded_len) = result {
+                        if let Ok(cmd) = parse_usb_command(&decoded[..decoded_len]) {
+                            return Some(cmd);
+                        }
+                    }
+                    // Malformed frame -- discard and keep going
+                }
+                Ok(byte) => {
+                    if self.frame_len < USB_RX_FRAME_MAX {
+                        self.frame_buf[self.frame_len] = byte;
+                        self.frame_len += 1;
+                    } else {
+                        // Overflow -- discard frame
+                        self.frame_len = 0;
+                    }
+                }
+                Err(NbError::WouldBlock) => return None,
+                Err(NbError::Other(_)) => return None,
             }
         }
     }

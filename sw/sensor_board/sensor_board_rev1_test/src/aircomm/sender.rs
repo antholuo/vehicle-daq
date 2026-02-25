@@ -5,7 +5,9 @@
 
 use super::error::Result;
 use super::message::*;
-use super::protocol::{MAX_PAYLOAD_SIZE, serialize_gps, serialize_heartbeat, serialize_imu};
+use super::protocol::{
+    MAX_PAYLOAD_SIZE, serialize_gps, serialize_heartbeat, serialize_imu, serialize_timesync,
+};
 use esp_radio::esp_now::EspNow;
 
 /// Broadcast MAC address for sending to all peers
@@ -50,6 +52,21 @@ pub(crate) async fn send_gps(
 ) -> Result<()> {
     let mut buffer = [0u8; MAX_PAYLOAD_SIZE];
     let size = serialize_gps(timestamp_us, data, &mut buffer)?;
+
+    esp_now.send_async(peer_addr, &buffer[..size]).await?;
+
+    Ok(())
+}
+
+/// Send time sync data asynchronously (bridge -> data nodes)
+pub(crate) async fn send_timesync(
+    esp_now: &mut EspNow<'_>,
+    timestamp_us: u64,
+    data: &TimeSyncData,
+    peer_addr: &[u8; 6],
+) -> Result<()> {
+    let mut buffer = [0u8; MAX_PAYLOAD_SIZE];
+    let size = serialize_timesync(timestamp_us, data, &mut buffer)?;
 
     esp_now.send_async(peer_addr, &buffer[..size]).await?;
 

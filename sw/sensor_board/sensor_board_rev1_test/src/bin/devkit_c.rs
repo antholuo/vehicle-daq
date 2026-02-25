@@ -64,6 +64,8 @@ pub struct DevkitC {
     pub wifi: Option<WifiResources>,
     /// USB Serial TX for host communication (bridge mode)
     pub usb_serial_tx: Option<esp_hal::usb_serial_jtag::UsbSerialJtagTx<'static, esp_hal::Async>>,
+    /// USB Serial RX for receiving commands from host (bridge mode)
+    pub usb_serial_rx: Option<esp_hal::usb_serial_jtag::UsbSerialJtagRx<'static, esp_hal::Async>>,
 }
 
 impl DevkitC {
@@ -167,8 +169,8 @@ impl DevkitC {
         // and doesn't need explicit GPIO configuration
         let usb_serial =
             esp_hal::usb_serial_jtag::UsbSerialJtag::new(peripherals.USB_DEVICE).into_async();
-        let (_, usb_serial_tx) = usb_serial.split();
-        info!("USB Serial/JTAG initialized for bridge mode");
+        let (usb_serial_rx, usb_serial_tx) = usb_serial.split();
+        info!("USB Serial/JTAG initialized for bridge mode (TX + RX)");
 
         Self {
             #[cfg(feature = "hmi")]
@@ -184,6 +186,7 @@ impl DevkitC {
             #[cfg(feature = "wifi")]
             wifi,
             usb_serial_tx: Some(usb_serial_tx),
+            usb_serial_rx: Some(usb_serial_rx),
         }
     }
 }
@@ -238,6 +241,13 @@ impl BoardPeripherals for DevkitC {
     ) -> Option<esp_hal::usb_serial_jtag::UsbSerialJtagTx<'static, esp_hal::Async>> {
         trace!("usb_serial_tx take called");
         self.usb_serial_tx.take()
+    }
+
+    fn take_usb_serial_rx(
+        &mut self,
+    ) -> Option<esp_hal::usb_serial_jtag::UsbSerialJtagRx<'static, esp_hal::Async>> {
+        trace!("usb_serial_rx take called");
+        self.usb_serial_rx.take()
     }
 }
 

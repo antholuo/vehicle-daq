@@ -118,6 +118,10 @@ pub fn serialize_forwarded_message(
             buffer[offset] = hb.magic;
             offset += 1;
         }
+        SensorPayload::TimeSync(_) => {
+            // TimeSync is not forwarded to USB host; bridge handles it internally
+            return Err(ForwardError::UnsupportedPayload);
+        }
     }
 
     Ok(offset)
@@ -140,4 +144,43 @@ pub fn format_mac(mac: &[u8; 6]) -> heapless::String<18> {
 pub enum ForwardError {
     /// Output buffer is too small
     BufferTooSmall,
+    /// Payload type cannot be forwarded over USB
+    UnsupportedPayload,
+}
+
+// =========================================================================
+// USB RX command protocol  (RPi -> Bridge)
+//
+// Commands are COBS-framed, same as the TX direction.
+// Format: [CommandType: 1B][Payload: variable]
+// =========================================================================
+
+/// USB command type byte values (RPi -> Bridge)
+pub const CMD_TIME_SYNC: u8 = 0x01;
+
+/// Parsed USB command from the RPi host
+#[derive(Debug, Clone, Copy)]
+pub enum UsbCommand {
+    /// TimeSync: RPi sends its session-elapsed time (microseconds)
+    TimeSync { session_time_us: u64 },
+}
+
+/// Parse a COBS-decoded command buffer into a `UsbCommand`.
+///
+/// Minimum size: 1 (command type) + 8 (payload for TimeSync) = 9 bytes.
+pub fn parse_usb_command(buffer: &[u8]) -> Result<UsbCommand, ForwardError> {
+    if buffer.is_empty() {
+        return Err(ForwardError::BufferTooSmall);
+    }
+
+    match buffer[0] {
+        CMD_TIME_SYNC => {
+            if buffer.len() < 9 {
+                return Err(ForwardError::BufferTooSmall);
+            }
+            let session_time_us = LittleEndian::read_u64(&buffer[1..]);
+            Ok(UsbCommand::TimeSync { session_time_us })
+        }
+        _ => Err(ForwardError::UnsupportedPayload),
+    }
 }
