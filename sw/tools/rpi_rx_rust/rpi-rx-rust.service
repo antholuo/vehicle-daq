@@ -1,7 +1,9 @@
 [Unit]
-Description=RPi RX Rust Data Logger (GPIO Controlled)
+Description=RPi RX Rust Data Logger (GPIO Controlled with Video Recording)
 Documentation=https://github.com/your-org/vehicle-daq
 After=network.target
+# Note: This service controls video recording via GPIO 26.
+# Ensure the camera server (record.py) is running on port 8888.
 
 [Service]
 Type=simple
@@ -13,6 +15,9 @@ Group=hardy
 WorkingDirectory=/opt/rpi_rx_rust
 
 # No CLI flags: GPIO controls start/stop. Build with: cargo build --release --features gpio
+# GPIO 11: Start raw data logging
+# GPIO 5:  Start postprocessed AHRS logging
+# GPIO 26: Control video recording (high=start, low=stop via camera server on port 8888)
 ExecStart=/opt/rpi_rx_rust/bin/rpi_rx_rust_gpio
 
 # Logs go to ~/daq/logs/<date>/<time>_raw.csv and <time>_postprocess.csv (user's HOME when run as User=)
