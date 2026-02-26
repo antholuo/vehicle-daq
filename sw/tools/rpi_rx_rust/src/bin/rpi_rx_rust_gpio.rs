@@ -18,6 +18,7 @@ use std::fs;
 use std::io::{self, Read, Write};
 use std::net::TcpStream;
 use std::path::PathBuf;
+use std::thread;
 use std::time::{Duration, Instant};
 
 const GPIO_INIT: u32 = 11;   // BCM 11: init / raw
@@ -260,6 +261,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         let timesync_sender = TimeSyncSender::start(write_port, session_start);
         info!("TimeSyncSender started for session");
+
+        // Wait for the first TimeSync to propagate through the bridge to sensor nodes,
+        // then flush stale pre-sync data from the serial input buffer.
+        thread::sleep(Duration::from_millis(150));
+        if let Err(e) = read_port.clear(serialport::ClearBuffer::Input) {
+            warn!("Failed to clear serial input buffer: {}", e);
+        }
+        info!("Flushed serial input buffer after TimeSync propagation delay");
 
         let mut byte_source = SerialTimeoutByteSource::new(read_port);
         let mut should_stop = || {
