@@ -97,6 +97,22 @@ fn send_camera_command(command: &str) -> Result<String, Box<dyn std::error::Erro
     Ok(response.trim().to_string())
 }
 
+/// Query elapsed session time from camera server while it is recording.
+/// Expected response: `ELAPSED_US:<u64>` or `IDLE`.
+fn query_video_elapsed_us() -> Result<Option<u64>, Box<dyn std::error::Error>> {
+    let response = send_camera_command("status_us")?;
+    if response.eq_ignore_ascii_case("IDLE") {
+        return Ok(None);
+    }
+
+    if let Some(v) = response.strip_prefix("ELAPSED_US:") {
+        let us = v.trim().parse::<u64>()?;
+        return Ok(Some(us));
+    }
+
+    Err(format!("unexpected status_us response: {}", response).into())
+}
+
 /// Start video recording with a session-relative timestamp for post-processing correlation.
 /// Sends `start:<elapsed_us>` to the camera server.
 fn start_video_recording(session_start: &Instant) -> bool {
@@ -210,7 +226,38 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
         };
 
-        let session_start = Instant::now();
+        // Session epoch defaults to now, but if video was already running first,
+        // adopt its elapsed monotonic offset so both systems share one epoch.
+        let mut session_start = Instant::now();
+        if video_recording.get() {
+            match query_video_elapsed_us() {
+                Ok(Some(video_elapsed_us)) => {
+                    let now = Instant::now();
+                    if let Some(adjusted_start) = now.checked_sub(Duration::from_micros(video_elapsed_us)) {
+                        session_start = adjusted_start;
+                        info!(
+                            "Adopted video session epoch: video_elapsed_us={} (data logger anchored to video clock)",
+                            video_elapsed_us
+                        );
+                    } else {
+                        warn!(
+                            "Video elapsed too large to back-calculate session start ({}us); keeping local epoch",
+                            video_elapsed_us
+                        );
+                    }
+                }
+                Ok(None) => {
+                    info!("Video status_us reported IDLE at session start; keeping local epoch");
+                }
+                Err(e) => {
+                    warn!(
+                        "Failed to query video status_us at session start ({}); keeping local epoch",
+                        e
+                    );
+                }
+            }
+        }
+
         let timesync_sender = TimeSyncSender::start(write_port, session_start);
         info!("TimeSyncSender started for session");
 
