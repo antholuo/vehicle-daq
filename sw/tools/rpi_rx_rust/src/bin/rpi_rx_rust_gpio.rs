@@ -12,12 +12,13 @@ use csv::Writer;
 use gpiod::{Chip, EdgeDetect, Options, Bias};
 use log::*;
 use rpi_rx_rust::session::{run_session, ByteSource};
+use rpi_rx_rust::TimeSyncSender;
 use std::cell::Cell;
 use std::fs;
 use std::io::{self, Read, Write};
 use std::net::TcpStream;
 use std::path::PathBuf;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
 const GPIO_INIT: u32 = 11;   // BCM 11: init / raw
 const GPIO_POST: u32 = 19;   // BCM 19: postprocessed logging
@@ -67,8 +68,18 @@ fn log_dir_for_today() -> PathBuf {
     }
 }
 
-fn serial_port() -> String {
+fn serial_port_name() -> String {
     std::env::var("RPI_RX_SERIAL_PORT").unwrap_or_else(|_| DEFAULT_SERIAL_PORT.to_string())
+}
+
+/// Open the serial port and clone it for bidirectional use.
+/// Returns `(read_port, write_port)` or an error.
+fn open_serial_bidirectional() -> Result<(Box<dyn serialport::SerialPort>, Box<dyn serialport::SerialPort>), serialport::Error> {
+    let port = serialport::new(serial_port_name(), DEFAULT_BAUD_RATE)
+        .timeout(Duration::from_millis(SERIAL_READ_TIMEOUT_MS))
+        .open()?;
+    let write_port = port.try_clone()?;
+    Ok((port, write_port))
 }
 
 /// Send command to the camera server (record.py)
@@ -76,14 +87,47 @@ fn send_camera_command(command: &str) -> Result<String, Box<dyn std::error::Erro
     let mut stream = TcpStream::connect(CAMERA_SERVER_ADDR)?;
     stream.set_write_timeout(Some(Duration::from_secs(2)))?;
     stream.set_read_timeout(Some(Duration::from_secs(5)))?;
-    
+
     stream.write_all(command.as_bytes())?;
     stream.flush()?;
-    
+
     let mut response = String::new();
     stream.read_to_string(&mut response)?;
-    
+
     Ok(response.trim().to_string())
+}
+
+/// Start video recording with a session-relative timestamp for post-processing correlation.
+/// Sends `start:<elapsed_us>` to the camera server.
+fn start_video_recording(session_start: &Instant) -> bool {
+    let elapsed_us = session_start.elapsed().as_micros();
+    let cmd = format!("start:{}", elapsed_us);
+    info!("Starting video recording (session offset {}us)", elapsed_us);
+    match send_camera_command(&cmd) {
+        Ok(response) => {
+            info!("Camera server response: {}", response);
+            true
+        }
+        Err(e) => {
+            error!("Failed to start video recording: {}", e);
+            false
+        }
+    }
+}
+
+/// Stop video recording.
+fn stop_video_recording() -> bool {
+    info!("Stopping video recording");
+    match send_camera_command("stop") {
+        Ok(response) => {
+            info!("Camera server response: {}", response);
+            true
+        }
+        Err(e) => {
+            error!("Failed to stop video recording: {}", e);
+            false
+        }
+    }
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -100,28 +144,25 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .consumer("rpi_rx_rust_gpio");
     let mut inputs = chip.request_lines(opts)?;
     info!("GPIO {}, {}, and {} requested (edge both, pull-down enabled)", GPIO_INIT, GPIO_POST, GPIO_VIDEO);
-    
-    // Check initial state
+
     let initial_values: [bool; 3] = inputs.get_values([false, false, false])?;
-    info!("Initial GPIO state: GPIO{}={}, GPIO{}={}, GPIO{}={}", 
+    info!("Initial GPIO state: GPIO{}={}, GPIO{}={}, GPIO{}={}",
           GPIO_INIT, initial_values[0], GPIO_POST, initial_values[1], GPIO_VIDEO, initial_values[2]);
-    
-    // Track video recording state (using Cell for interior mutability in closure)
+
     let video_recording = Cell::new(false);
 
     loop {
-        // Idle: wait for an edge, then check GPIO states
         let _event = inputs.read_event()?;
         let values: [bool; 3] = inputs.get_values([false, false, false])?;
         let gpio11_high = values[0];
         let gpio19_high = values[1];
         let gpio26_high = values[2];
-        info!("GPIO edge detected: GPIO{}={}, GPIO{}={}, GPIO{}={}", 
+        info!("GPIO edge detected: GPIO{}={}, GPIO{}={}, GPIO{}={}",
               GPIO_INIT, gpio11_high, GPIO_POST, gpio19_high, GPIO_VIDEO, gpio26_high);
-        
-        // Handle video recording control (GPIO 26)
+
+        // Handle video recording control (GPIO 26) — outside session, no timestamp yet
         if gpio26_high && !video_recording.get() {
-            info!("GPIO {} high: starting video recording", GPIO_VIDEO);
+            info!("GPIO {} high: starting video recording (no active session)", GPIO_VIDEO);
             match send_camera_command("start") {
                 Ok(response) => {
                     info!("Camera server response: {}", response);
@@ -130,17 +171,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 Err(e) => error!("Failed to start video recording: {}", e),
             }
         } else if !gpio26_high && video_recording.get() {
-            info!("GPIO {} low: stopping video recording", GPIO_VIDEO);
-            match send_camera_command("stop") {
-                Ok(response) => {
-                    info!("Camera server response: {}", response);
-                    video_recording.set(false);
-                }
-                Err(e) => error!("Failed to stop video recording: {}", e),
-            }
+            video_recording.set(!stop_video_recording());
         }
-        
-        // Check if data logging should be active (GPIO 11 or 19)
+
         let active = gpio11_high || gpio19_high;
         if !active {
             info!("Both GPIOs low, staying idle");
@@ -169,18 +202,19 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             None
         };
 
-        let port = match serialport::new(serial_port(), DEFAULT_BAUD_RATE)
-            .timeout(Duration::from_millis(SERIAL_READ_TIMEOUT_MS))
-            .open()
-        {
-            Ok(p) => p,
+        let (read_port, write_port) = match open_serial_bidirectional() {
+            Ok(ports) => ports,
             Err(e) => {
-                error!("Failed to open serial {}: {}", serial_port(), e);
+                error!("Failed to open serial {}: {}", serial_port_name(), e);
                 continue;
             }
         };
 
-        let mut byte_source = SerialTimeoutByteSource::new(port);
+        let session_start = Instant::now();
+        let timesync_sender = TimeSyncSender::start(write_port, session_start);
+        info!("TimeSyncSender started for session");
+
+        let mut byte_source = SerialTimeoutByteSource::new(read_port);
         let mut should_stop = || {
             let values: [bool; 3] = match inputs.get_values([false, false, false]) {
                 Ok(v) => v,
@@ -189,22 +223,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             let gpio11 = values[0];
             let gpio19 = values[1];
             let gpio26 = values[2];
-            
-            // Handle video recording control (check periodically during session)
+
             if gpio26 && !video_recording.get() {
-                info!("GPIO {} high: starting video recording (during session)", GPIO_VIDEO);
-                if let Ok(response) = send_camera_command("start") {
-                    info!("Camera server response: {}", response);
-                    video_recording.set(true);
-                }
+                video_recording.set(start_video_recording(&session_start));
             } else if !gpio26 && video_recording.get() {
-                info!("GPIO {} low: stopping video recording (during session)", GPIO_VIDEO);
-                if let Ok(response) = send_camera_command("stop") {
-                    info!("Camera server response: {}", response);
-                    video_recording.set(false);
-                }
+                video_recording.set(!stop_video_recording());
             }
-            
+
             let active = gpio11 || gpio19;
             !active
         };
@@ -218,6 +243,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         ) {
             error!("Session error: {}", e);
         }
+
+        timesync_sender.stop();
+        info!("TimeSyncSender stopped");
 
         drop(ahrs_wtr);
         drop(raw_wtr);
