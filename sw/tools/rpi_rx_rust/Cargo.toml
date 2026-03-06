@@ -37,7 +37,7 @@ byteorder = "1.5"
 clap = { version = "4", features = ["derive"] }
 
 # AHRS (--with-ahrs and ahrs_postprocess binary)
-ahrs = "0.7"
+ahrs = { version = "0.7", features = ["field_access"] }
 nalgebra = "0.33"
 
 # GPIO-controlled service (Linux, libgpiod)

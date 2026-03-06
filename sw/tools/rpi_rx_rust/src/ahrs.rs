@@ -6,12 +6,20 @@ use ahrs::{Ahrs, Madgwick};
 use nalgebra::{UnitQuaternion, Vector3};
 use serde::Serialize;
 
-const REST_PERIOD_US: u64 = 10 * 1_000_000; // 10 seconds
+const REST_PERIOD_US: u64 = 2 * 1_000_000; // 2 seconds (steady state for calibration)
 const GRAVITY_MPS2: f64 = 9.80665;
 const DEG2RAD: f64 = std::f64::consts::PI / 180.0;
 const RAD2DEG: f64 = 180.0 / std::f64::consts::PI;
 /// Meters per degree latitude (approximate at mid-latitudes)
 const M_PER_DEG_LAT: f64 = 111_320.0;
+
+/// Transform from sensor frame to NED body frame (X forward, Y right, Z down).
+/// ASM330LHH on flat PCB: Z often points out of board (up). NED has Z down.
+/// Negating Z aligns sensor with NED body frame.
+#[inline]
+fn sensor_to_ned_body(vx: f64, vy: f64, vz: f64) -> (f64, f64, f64) {
+    (vx, vy, -vz)
+}
 
 /// One row of AHRS output CSV: synthesized GPS, vehicle heading, ground track, orientation, velocity.
 #[derive(Debug, Clone, Serialize)]
@@ -111,7 +119,46 @@ impl AhrsFilter {
         self.origin_set = true;
     }
 
-    /// Update with one IMU sample. Accel in g, gyro in deg/s. Returns true if state was updated.
+    /// Update with one IMU sample. Accel in g, gyro in deg/s.
+    /// If `data_in_vehicle_frame` is true, accel/gyro are already in NED body frame (e.g. after
+    /// board-to-vehicle calibration). Otherwise, applies sensor_to_ned_body (Z-up PCB fix).
+    pub fn update_imu_with_frame(
+        &mut self,
+        timestamp_us: u64,
+        accel_x_g: f32,
+        accel_y_g: f32,
+        accel_z_g: f32,
+        gyro_x_dps: f32,
+        gyro_y_dps: f32,
+        gyro_z_dps: f32,
+        data_in_vehicle_frame: bool,
+    ) -> bool {
+        let (ax_s, ay_s, az_s, gx_s, gy_s, gz_s) = if data_in_vehicle_frame {
+            (
+                accel_x_g as f64,
+                accel_y_g as f64,
+                accel_z_g as f64,
+                gyro_x_dps as f64,
+                gyro_y_dps as f64,
+                gyro_z_dps as f64,
+            )
+        } else {
+            let (ax, ay, az) = sensor_to_ned_body(
+                accel_x_g as f64,
+                accel_y_g as f64,
+                accel_z_g as f64,
+            );
+            let (gx, gy, gz) = sensor_to_ned_body(
+                gyro_x_dps as f64,
+                gyro_y_dps as f64,
+                gyro_z_dps as f64,
+            );
+            (ax, ay, az, gx, gy, gz)
+        };
+        self.update_imu_internal(timestamp_us, ax_s, ay_s, az_s, gx_s, gy_s, gz_s)
+    }
+
+    /// Update with one IMU sample (raw sensor data, applies Z-up PCB fix).
     pub fn update_imu(
         &mut self,
         timestamp_us: u64,
@@ -121,6 +168,28 @@ impl AhrsFilter {
         gyro_x_dps: f32,
         gyro_y_dps: f32,
         gyro_z_dps: f32,
+    ) -> bool {
+        self.update_imu_with_frame(
+            timestamp_us,
+            accel_x_g,
+            accel_y_g,
+            accel_z_g,
+            gyro_x_dps,
+            gyro_y_dps,
+            gyro_z_dps,
+            false,
+        )
+    }
+
+    fn update_imu_internal(
+        &mut self,
+        timestamp_us: u64,
+        ax_s: f64,
+        ay_s: f64,
+        az_s: f64,
+        gx_s: f64,
+        gy_s: f64,
+        gz_s: f64,
     ) -> bool {
         if self.first_ts_us.is_none() {
             self.first_ts_us = Some(timestamp_us);
@@ -138,10 +207,9 @@ impl AhrsFilter {
 
         let in_rest = timestamp_us < first_ts + REST_PERIOD_US;
 
-        // Gyro: deg/s -> rad/s, subtract bias after rest period
-        let mut gx = gyro_x_dps as f64 * DEG2RAD;
-        let mut gy = gyro_y_dps as f64 * DEG2RAD;
-        let mut gz = gyro_z_dps as f64 * DEG2RAD;
+        let mut gx = gx_s * DEG2RAD;
+        let mut gy = gy_s * DEG2RAD;
+        let mut gz = gz_s * DEG2RAD;
         if in_rest {
             self.gyro_bias_sum[0] += gx;
             self.gyro_bias_sum[1] += gy;
@@ -157,10 +225,8 @@ impl AhrsFilter {
         }
 
         let gyro = Vector3::new(gx, gy, gz);
-        // Accel: normalize to unit vector for Madgwick (direction only)
-        let ax = accel_x_g as f64;
-        let ay = accel_y_g as f64;
-        let az = accel_z_g as f64;
+        // Accel: normalize to unit vector for Madgwick (direction only), use NED body frame
+        let (ax, ay, az) = (ax_s, ay_s, az_s);
         let norm = (ax * ax + ay * ay + az * az).sqrt();
         let (ax, ay, az) = if norm > 1e-6 {
             (ax / norm, ay / norm, az / norm)
@@ -169,13 +235,15 @@ impl AhrsFilter {
         };
         let accel = Vector3::new(ax, ay, az);
 
+        // Use actual dt for integration - IMU rate varies (multi-node, ~10-50 Hz per node)
+        *self.madgwick.sample_period_mut() = dt_s;
         if self.madgwick.update_imu(&gyro, &accel).is_err() {
             return false;
         }
 
         let q = &self.madgwick.quat;
-        // Body accel in g -> NED accel in m/s^2 (body: typically X forward, Y right, Z down)
-        let ab = Vector3::new(accel_x_g as f64, accel_y_g as f64, accel_z_g as f64);
+        // Body accel in g (NED body frame) -> m/s^2
+        let ab = Vector3::new(ax_s, ay_s, az_s);
         let a_body_mps2 = ab * GRAVITY_MPS2;
         // Body to NED: a_ned = q * a_body (Madgwick q is body w.r.t. NED)
         let a_ned_measured = q.transform_vector(&a_body_mps2);
@@ -251,6 +319,38 @@ impl AhrsFilter {
     /// Whether we have set an origin (so lat_synth/lon_synth are meaningful).
     pub fn has_origin(&self) -> bool {
         self.origin_set
+    }
+
+    /// Vehicle heading (yaw) in degrees [0, 360) from orientation only.
+    /// Use for IMU-derived heading (e.g. for slide detection vs GPS heading).
+    pub fn get_vehicle_heading_deg(&self) -> f32 {
+        let (_, _, yaw_deg) = quat_to_euler_deg(&self.madgwick.quat);
+        wrap_deg_360(yaw_deg)
+    }
+
+    /// Correct position and velocity from a GPS fix to prevent inertial drift.
+    /// Resets p_ned and v_ned to match GPS. Requires origin to be set.
+    pub fn correct_from_gps(
+        &mut self,
+        lat: f64,
+        lon: f64,
+        alt: f64,
+        speed_kts: f32,
+        heading_deg: f32,
+    ) {
+        if !self.origin_set {
+            return;
+        }
+        let lat_rad = self.origin_lat * DEG2RAD;
+        let m_per_deg_lon = M_PER_DEG_LAT * lat_rad.cos();
+        self.p_ned[0] = (lat - self.origin_lat) * M_PER_DEG_LAT;
+        self.p_ned[1] = (lon - self.origin_lon) * m_per_deg_lon;
+        self.p_ned[2] = self.origin_alt - alt;
+
+        let speed_mps = speed_kts as f64 * 0.514444;
+        let h_rad = heading_deg as f64 * DEG2RAD;
+        self.v_ned[0] = speed_mps * h_rad.cos();
+        self.v_ned[1] = speed_mps * h_rad.sin();
     }
 
     /// Whether we're past the rest period (velocity integration active).

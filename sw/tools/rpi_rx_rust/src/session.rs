@@ -84,6 +84,18 @@ where
                                             if let (Some(lat), Some(lon), Some(alt)) =
                                                 (msg.lat, msg.lon, msg.alt)
                                             {
+                                                if primary_node_mac.is_none() {
+                                                    primary_node_mac = Some(msg.src_mac);
+                                                    ahrs_filter =
+                                                        Some(AhrsFilter::new(
+                                                            AHRS_SAMPLE_PERIOD_S,
+                                                            AHRS_BETA,
+                                                        ));
+                                                    info!(
+                                                        "AHRS using IMU from GPS node {}",
+                                                        format_mac_address(&msg.src_mac)
+                                                    );
+                                                }
                                                 if let Some(ref mut filter) = ahrs_filter {
                                                     if !filter.has_origin() {
                                                         filter.set_origin(lat, lon, alt as f64);
@@ -105,6 +117,7 @@ where
                                                 ));
                                                 last_ahrs_emit_ts_us = ts;
                                             }
+                                            // Use IMU from primary node (prefer GPS node when set)
                                             if primary_node_mac == Some(msg.src_mac) {
                                                 if let (Some(ax), Some(ay), Some(az), Some(gx), Some(gy), Some(gz)) = (
                                                     msg.accel_x,

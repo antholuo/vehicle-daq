@@ -1,6 +1,7 @@
 //! Library for rpi_rx_rust: shared AHRS logic, types, and session.
 
 pub mod ahrs;
+pub mod board_calib;
 pub mod session;
 pub mod types;
 
