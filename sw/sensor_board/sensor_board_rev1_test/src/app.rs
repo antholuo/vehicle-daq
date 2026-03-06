@@ -19,6 +19,8 @@ use crate::EspNowMode;
 use crate::SharedSpiDevice;
 #[cfg(feature = "wifi")]
 use crate::aircomm::{AirCommTransceiver, BROADCAST, HeartbeatData, SensorMessage, SensorPayload};
+#[cfg(all(feature = "wifi", feature = "usb"))]
+use crate::aircomm::TimeSyncData;
 #[cfg(feature = "gps")]
 use crate::gps::{init_gps, start_gps};
 #[cfg(feature = "hmi")]
@@ -29,8 +31,8 @@ use crate::imu::start_imu;
 use crate::types::NodeId;
 #[cfg(feature = "usb")]
 use crate::usb::{
-    MAX_USB_MESSAGE_SIZE, UsbError, UsbSerial, format_mac, serialize_forwarded_message,
-    wait_for_usb_host_timeout,
+    MAX_USB_MESSAGE_SIZE, UsbCommand, UsbError, UsbSerial, UsbSerialRx, format_mac,
+    serialize_forwarded_message,
 };
 
 /// Capacity of the sensor data channel
@@ -145,6 +147,9 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
                             info!("ESP-NOW mode: Bridge (receive + forward to USB)");
                             if let Some(usb_tx) = board.take_usb_serial_tx() {
                                 let usb_serial = UsbSerial::new(usb_tx);
+                                let usb_rx = board
+                                    .take_usb_serial_rx()
+                                    .map(UsbSerialRx::new);
                                 info!("[BRIDGE] Waiting for USB host before starting");
                                 // Wait for USB host with neopixel animation for visual feedback
                                 {
@@ -200,6 +205,7 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
                                         transceiver,
                                         wifi.controller,
                                         usb_serial,
+                                        usb_rx,
                                     ))
                                     .expect("ESP-NOW bridge task did not spawn");
                             } else {
@@ -310,7 +316,7 @@ async fn start_gps_task(mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Asy
 /// ESP-NOW transceiver task
 ///
 /// Handles both receiving ESP-NOW messages and sending periodic heartbeats.
-/// Used by bridge/receiver nodes (e.g., DevKit-C) for testing or forwarding data.
+/// Applies TimeSync when received from bridge.
 ///
 /// Note: `_wifi_controller` must be kept alive for ESP-NOW to function properly.
 #[cfg(feature = "wifi")]
@@ -319,7 +325,7 @@ async fn espnow_transceiver_task(
     mut transceiver: AirCommTransceiver<'static>,
     _wifi_controller: esp_radio::wifi::WifiController<'static>,
 ) {
-    info!("[ESP-NOW] Transceiver task started (RX + TX heartbeats)");
+    info!("[ESP-NOW] Transceiver task started (RX + TX heartbeats, TimeSync)");
 
     const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(1);
 
@@ -336,19 +342,22 @@ async fn espnow_transceiver_task(
             HEARTBEAT_INTERVAL - elapsed
         };
 
-        // Try to receive with timeout
         match embassy_time::with_timeout(timeout, transceiver.receive()).await {
             Ok(Ok(msg)) => {
-                // Successfully received a message
-                handle_received_message(&msg);
+                if let SensorPayload::TimeSync(ts_data) = &msg.payload {
+                    crate::timebase::apply_sync(ts_data.session_time_us);
+                    info!(
+                        "[ESP-NOW RX] TimeSync applied: session={}us",
+                        ts_data.session_time_us
+                    );
+                } else {
+                    handle_received_message(&msg);
+                }
             }
             Ok(Err(e)) => {
-                // Receive error
                 warn!("[ESP-NOW RX] Error: {:?}", e);
             }
-            Err(_) => {
-                // Timeout - no message received, that's fine
-            }
+            Err(_) => {}
         }
 
         // Check if it's time to send heartbeat
@@ -362,7 +371,7 @@ async fn espnow_transceiver_task(
 /// ESP-NOW sender task (default)
 ///
 /// Receives sensor data from the channel and transmits via ESP-NOW.
-/// Also sends periodic heartbeats to indicate the node is alive.
+/// Also sends periodic heartbeats and polls for incoming TimeSync messages.
 ///
 /// Note: `_wifi_controller` must be kept alive for ESP-NOW to function properly.
 #[cfg(feature = "wifi")]
@@ -371,9 +380,10 @@ async fn espnow_sender_task(
     mut transceiver: AirCommTransceiver<'static>,
     _wifi_controller: esp_radio::wifi::WifiController<'static>,
 ) {
-    info!("[ESP-NOW] Sender task started");
+    info!("[ESP-NOW] Sender task started (with TimeSync RX)");
 
     const HEARTBEAT_INTERVAL: Duration = Duration::from_secs(1);
+    const TIMESYNC_RX_POLL: Duration = Duration::from_millis(1);
 
     // Send first heartbeat immediately
     send_heartbeat(&mut transceiver).await;
@@ -391,8 +401,7 @@ async fn espnow_sender_task(
         // Try to receive sensor data from channel with timeout
         match embassy_time::with_timeout(timeout, SENSOR_CHANNEL.receive()).await {
             Ok(payload) => {
-                // Got sensor data, transmit it
-                let timestamp_us = Instant::now().as_micros();
+                let timestamp_us = crate::timebase::synced_timestamp_us();
 
                 let result = match &payload {
                     SensorPayload::Imu(data) => {
@@ -415,6 +424,10 @@ async fn espnow_sender_task(
                             .send_heartbeat(timestamp_us, data, &BROADCAST)
                             .await
                     }
+                    SensorPayload::TimeSync(_) => {
+                        // TimeSync payloads are not sent from data nodes
+                        Ok(())
+                    }
                 };
 
                 match result {
@@ -431,7 +444,26 @@ async fn espnow_sender_task(
             }
         }
 
-        // Check if it's time to send heartbeat
+        // Poll for incoming ESP-NOW TimeSync from bridge (very short timeout)
+        match embassy_time::with_timeout(TIMESYNC_RX_POLL, transceiver.receive()).await {
+            Ok(Ok(msg)) => {
+                if let SensorPayload::TimeSync(ts_data) = &msg.payload {
+                    crate::timebase::apply_sync(ts_data.session_time_us);
+                    info!(
+                        "[ESP-NOW RX] TimeSync applied: session={}us",
+                        ts_data.session_time_us
+                    );
+                }
+                // Other message types received here are from other nodes; ignore
+            }
+            Ok(Err(e)) => {
+                warn!("[ESP-NOW RX] Error during TimeSync poll: {:?}", e);
+            }
+            Err(_) => {
+                // No incoming message -- expected
+            }
+        }
+
         if last_heartbeat.elapsed() >= HEARTBEAT_INTERVAL {
             send_heartbeat(&mut transceiver).await;
             last_heartbeat = Instant::now();
@@ -454,55 +486,70 @@ async fn espnow_bridge_task(
     mut transceiver: AirCommTransceiver<'static>,
     _wifi_controller: esp_radio::wifi::WifiController<'static>,
     mut usb_serial: UsbSerial,
+    mut usb_rx: Option<UsbSerialRx>,
 ) {
     use heapless::index_map::FnvIndexMap;
     use crate::types::CarPosition;
 
-    info!("[BRIDGE] Bridge task started (ESP-NOW -> USB)");
+    info!("[BRIDGE] Bridge task started (ESP-NOW <-> USB, TimeSync enabled)");
     info!("[BRIDGE] Auto-assigning instance numbers based on MAC discovery order");
 
-    // Buffer for serializing messages
-    let mut msg_buffer = [0u8; MAX_USB_MESSAGE_SIZE];
+    const ESPNOW_RX_TIMEOUT: Duration = Duration::from_millis(50);
 
-    // MAC address to NodeId mapping (supports up to 16 sensor nodes)
+    let mut msg_buffer = [0u8; MAX_USB_MESSAGE_SIZE];
     let mut mac_to_node_id: FnvIndexMap<[u8; 6], NodeId, 16> = FnvIndexMap::new();
-    
-    // Track next available instance number for each position
     let mut next_instance_per_position: FnvIndexMap<CarPosition, u8, 16> = FnvIndexMap::new();
 
-    // Statistics
     let mut messages_forwarded: u32 = 0;
     let mut errors: u32 = 0;
+    let mut timesync_count: u32 = 0;
 
     loop {
-        // Wait for incoming ESP-NOW message
-        match transceiver.receive().await {
-            Ok(msg) => {
+        // --- Poll USB RX for commands from RPi (non-blocking) ---
+        if let Some(ref mut rx) = usb_rx {
+            while let Some(cmd) = rx.poll_command() {
+                match cmd {
+                    UsbCommand::TimeSync { session_time_us } => {
+                        timesync_count += 1;
+                        crate::timebase::apply_sync(session_time_us);
+
+                        // Broadcast TimeSync to all data nodes
+                        let ts = crate::timebase::synced_timestamp_us();
+                        let data = TimeSyncData::new(session_time_us);
+                        if let Err(e) = transceiver.send_timesync(ts, &data, &BROADCAST).await {
+                            warn!("[BRIDGE] TimeSync broadcast failed: {:?}", e);
+                        } else {
+                            info!(
+                                "[BRIDGE] TimeSync #{}: session={}us, broadcast OK",
+                                timesync_count, session_time_us
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        // --- Receive ESP-NOW with timeout so we regularly poll USB RX ---
+        match embassy_time::with_timeout(ESPNOW_RX_TIMEOUT, transceiver.receive()).await {
+            Ok(Ok(msg)) => {
                 let src_mac: [u8; 6] = msg.src_address;
-                let timestamp_us = msg.timestamp_us;
+
+                // Use synced bridge-receive timestamp for forwarded messages
+                let timestamp_us = crate::timebase::synced_timestamp_us();
 
                 // Auto-assign instance numbers based on MAC discovery order
                 if let SensorPayload::Heartbeat(heartbeat_data) = &msg.payload {
                     let position = heartbeat_data.node_id.position;
-                    
-                    // Check if this MAC has been seen before
+
                     if !mac_to_node_id.contains_key(&src_mac) {
-                        // New MAC discovered - assign next available instance for this position
-                        let instance = *next_instance_per_position.get(&position).unwrap_or(&0);
+                        let instance =
+                            *next_instance_per_position.get(&position).unwrap_or(&0);
                         let assigned_node_id = NodeId::new(position, instance);
-                        
-                        // Store the assignment
+
                         match mac_to_node_id.insert(src_mac, assigned_node_id) {
                             Ok(_) => {
-                                // info!(
-                                //     "[BRIDGE] New node discovered: {} -> {}:{} (auto-assigned)",
-                                //     format_mac(&src_mac),
-                                //     position.as_str(),
-                                //     instance
-                                // );
-                                
-                                // Increment instance counter for this position
-                                let _ = next_instance_per_position.insert(position, instance + 1);
+                                let _ = next_instance_per_position
+                                    .insert(position, instance + 1);
                             }
                             Err(_) => {
                                 warn!(
@@ -512,20 +559,19 @@ async fn espnow_bridge_task(
                             }
                         }
                     } else {
-                        // MAC already known - check if position changed
-                        let stored_node_id = *mac_to_node_id.get(&src_mac).unwrap(); // Copy the value
+                        let stored_node_id = *mac_to_node_id.get(&src_mac).unwrap();
                         if stored_node_id.position != position {
-                            // Position changed - assign new instance for new position
-                            let instance = *next_instance_per_position.get(&position).unwrap_or(&0);
+                            let instance =
+                                *next_instance_per_position.get(&position).unwrap_or(&0);
                             let new_node_id = NodeId::new(position, instance);
-                            
-                            // Copy old values before mutation
+
                             let old_position = stored_node_id.position;
                             let old_instance = stored_node_id.instance;
-                            
+
                             let _ = mac_to_node_id.insert(src_mac, new_node_id);
-                            let _ = next_instance_per_position.insert(position, instance + 1);
-                            
+                            let _ =
+                                next_instance_per_position.insert(position, instance + 1);
+
                             info!(
                                 "[BRIDGE] Node position changed: {} -> {}:{} (was {}:{})",
                                 format_mac(&src_mac),
@@ -566,9 +612,7 @@ async fn espnow_bridge_task(
                                     messages_forwarded
                                 );
                             }
-                            Err(UsbError::NotReady) => {
-                                // Drop silently when USB host is not ready.
-                            }
+                            Err(UsbError::NotReady) => {}
                             Err(e) => {
                                 errors += 1;
                                 warn!("[BRIDGE] USB write error: {:?}", e);
@@ -584,13 +628,16 @@ async fn espnow_bridge_task(
                 // Log periodically
                 if messages_forwarded % 100 == 0 && messages_forwarded > 0 {
                     info!(
-                        "[BRIDGE] Stats: {} forwarded, {} errors",
-                        messages_forwarded, errors
+                        "[BRIDGE] Stats: {} forwarded, {} errors, {} timesyncs",
+                        messages_forwarded, errors, timesync_count
                     );
                 }
             }
-            Err(e) => {
+            Ok(Err(e)) => {
                 warn!("[BRIDGE] Receive error: {:?}", e);
+            }
+            Err(_) => {
+                // Timeout -- loop back to poll USB RX
             }
         }
     }
@@ -602,7 +649,7 @@ async fn espnow_bridge_task(
 
 #[cfg(feature = "wifi")]
 async fn send_heartbeat(transceiver: &mut AirCommTransceiver<'static>) {
-    let timestamp_us = Instant::now().as_micros();
+    let timestamp_us = crate::timebase::synced_timestamp_us();
     let heartbeat = HeartbeatData::default();
 
     match transceiver
@@ -653,6 +700,12 @@ fn handle_received_message(msg: &SensorMessage) {
             info!(
                 "[ESP-NOW RX] GPS from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | time={}us, lat={:.6}, lon={:.6}",
                 src[0], src[1], src[2], src[3], src[4], src[5], timestamp, data.lat, data.lon
+            );
+        }
+        SensorPayload::TimeSync(data) => {
+            info!(
+                "[ESP-NOW RX] TimeSync from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | session={}us",
+                src[0], src[1], src[2], src[3], src[4], src[5], data.session_time_us
             );
         }
     }

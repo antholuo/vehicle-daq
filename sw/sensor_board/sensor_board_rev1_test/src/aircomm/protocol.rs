@@ -179,6 +179,41 @@ pub fn serialize_gps(timestamp_us: u64, data: &GpsData, buffer: &mut [u8]) -> Re
     Ok(offset)
 }
 
+/// Serialize time sync data into a byte buffer
+///
+/// Format: [MessageType:1][Timestamp:8][session_time_us:8]
+///
+/// # Arguments
+/// * `timestamp_us` - Sender's local timestamp in microseconds
+/// * `data` - Time sync data containing the RPi session elapsed time
+/// * `buffer` - Output buffer (must be at least HEADER_SIZE + TimeSyncData::SERIALIZED_SIZE)
+///
+/// # Returns
+/// Number of bytes written
+pub fn serialize_timesync(
+    timestamp_us: u64,
+    data: &TimeSyncData,
+    buffer: &mut [u8],
+) -> Result<usize> {
+    let required_size = HEADER_SIZE + TimeSyncData::SERIALIZED_SIZE;
+    if buffer.len() < required_size {
+        return Err(AirCommError::BufferTooSmall);
+    }
+
+    let mut offset = 0;
+
+    buffer[offset] = MessageType::TimeSync.to_u8();
+    offset += 1;
+
+    LittleEndian::write_u64(&mut buffer[offset..], timestamp_us);
+    offset += 8;
+
+    LittleEndian::write_u64(&mut buffer[offset..], data.session_time_us);
+    offset += 8;
+
+    Ok(offset)
+}
+
 /// Deserialize received data into a sensor message
 ///
 /// Reads the message type header, timestamp, and deserializes the appropriate payload
@@ -204,6 +239,7 @@ pub fn deserialize(data: &[u8], src_address: [u8; 6]) -> Result<SensorMessage> {
         MessageType::Imu => deserialize_imu(data, payload_offset)?,
         MessageType::Gps => deserialize_gps(data, payload_offset)?,
         MessageType::Heartbeat => deserialize_heartbeat(data, payload_offset)?,
+        MessageType::TimeSync => deserialize_timesync(data, payload_offset)?,
     };
 
     Ok(SensorMessage {
@@ -332,4 +368,16 @@ fn deserialize_heartbeat(data: &[u8], payload_offset: usize) -> Result<SensorPay
     let node_id = crate::types::NodeId::from_bytes(node_id_bytes);
     
     Ok(SensorPayload::Heartbeat(HeartbeatData { magic, node_id }))
+}
+
+/// Deserialize TimeSync payload from buffer
+fn deserialize_timesync(data: &[u8], payload_offset: usize) -> Result<SensorPayload> {
+    let required_size = HEADER_SIZE + TimeSyncData::SERIALIZED_SIZE;
+    if data.len() < required_size {
+        return Err(AirCommError::InvalidMessage);
+    }
+
+    let session_time_us = LittleEndian::read_u64(&data[payload_offset..]);
+
+    Ok(SensorPayload::TimeSync(TimeSyncData { session_time_us }))
 }

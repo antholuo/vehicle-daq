@@ -14,6 +14,8 @@ pub enum MessageType {
     Imu = 0x01,
     /// GPS sensor data
     Gps = 0x02,
+    /// Time synchronization from bridge/RPi
+    TimeSync = 0xFE,
     /// Heartbeat/keep-alive message
     Heartbeat = 0xFF,
 }
@@ -23,6 +25,7 @@ impl MessageType {
         match value {
             0x01 => Some(MessageType::Imu),
             0x02 => Some(MessageType::Gps),
+            0xFE => Some(MessageType::TimeSync),
             0xFF => Some(MessageType::Heartbeat),
             _ => None,
         }
@@ -67,6 +70,24 @@ impl HeartbeatData {
     }
 }
 
+/// Time synchronization data from RPi (via bridge) to all nodes.
+///
+/// Contains the session-elapsed time from the RPi time master.
+/// Nodes use this to compute their local offset for synchronized timestamps.
+#[derive(Debug, Clone, Copy)]
+pub struct TimeSyncData {
+    /// Session elapsed time in microseconds (from RPi monotonic clock)
+    pub session_time_us: u64,
+}
+
+impl TimeSyncData {
+    pub const SERIALIZED_SIZE: usize = 8; // session_time_us(8)
+
+    pub fn new(session_time_us: u64) -> Self {
+        Self { session_time_us }
+    }
+}
+
 // Serialization sizes for aircomm protocol (payload only, excluding header)
 // Header is always: message_type(1) + timestamp(8) = 9 bytes
 // HeartbeatData: magic(1) = 1 byte (timestamp moved to message level)
@@ -96,6 +117,7 @@ pub enum SensorPayload {
     Imu(ImuData),
     Gps(GpsData),
     Heartbeat(HeartbeatData),
+    TimeSync(TimeSyncData),
 }
 
 impl SensorPayload {
@@ -104,6 +126,7 @@ impl SensorPayload {
             SensorPayload::Imu(_) => MessageType::Imu,
             SensorPayload::Gps(_) => MessageType::Gps,
             SensorPayload::Heartbeat(_) => MessageType::Heartbeat,
+            SensorPayload::TimeSync(_) => MessageType::TimeSync,
         }
     }
 }

@@ -13,7 +13,9 @@ pub mod message;
 pub mod protocol;
 
 pub use error::{AirCommError, Result};
-pub use message::{GpsData, HeartbeatData, ImuData, MessageType, SensorMessage, SensorPayload};
+pub use message::{
+    GpsData, HeartbeatData, ImuData, MessageType, SensorMessage, SensorPayload, TimeSyncData,
+};
 pub use sender::BROADCAST;
 
 use esp_radio::esp_now::{EspNow, EspNowWifiInterface, PeerInfo};
@@ -60,6 +62,16 @@ impl<'a> AirCommTransceiver<'a> {
         peer_addr: &[u8; 6],
     ) -> Result<()> {
         sender::send_gps(&mut self.esp_now, timestamp_us, data, peer_addr).await
+    }
+
+    /// Broadcast time sync data to all peers (bridge -> data nodes)
+    pub async fn send_timesync(
+        &mut self,
+        timestamp_us: u64,
+        data: &TimeSyncData,
+        peer_addr: &[u8; 6],
+    ) -> Result<()> {
+        sender::send_timesync(&mut self.esp_now, timestamp_us, data, peer_addr).await
     }
 
     /// Receive sensor data (suspends until data arrives)
