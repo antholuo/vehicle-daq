@@ -10,7 +10,7 @@ Raspberry Pi receiver for the sensor_board COBS-over-serial stream. Decodes IMU,
 - **Post-process AHRS**: The `ahrs_postprocess` binary runs AHRS on an existing raw log CSV (e.g. for re-runs with different parameters or when real-time AHRS was not used).
 - **Unified log layout**: Logs under `~/daq/logs/<date>/` with `<time>_raw.csv` and `<time>_postprocess.csv` (postprocess = AHRS output). Track capture CSVs under `~/daq/tracks/<date>/`.
 - **GPIO-controlled service**: The `rpi_rx_rust_gpio` binary (Linux, `--features gpio`) uses GPIOs to control logging, video recording, and track capture with no CLI, suitable for systemd.
-- **Track capture**: Request 5-sample averaged GPS from a floating sensor node; log cone/waypoint positions to CSV (GPIO or interactive `rpi_rx_rust_track_test`).
+- **Track capture**: Request 5-sample averaged GPS from a floating sensor node; log cone/waypoint positions to CSV (GPIO or interactive `rpi_rx_rust_track_test`). When armed, the Pi relies on a **track-capture heartbeat** (message type 0xFE) from the bridge every 500 ms; if no heartbeat for 3 s the Pi auto-ends track capture. If the Pi stops sending (e.g. crash), the bridge auto-ends after 2 s and other nodes resume.
 
 ## Building all binaries
 
@@ -104,12 +104,14 @@ No GPIO; all interaction is by typing commands (bridge must be on serial, defaul
 
 | Command | Action |
 |---------|--------|
-| `arm track capture` | Create a new track file and arm; next “take location” will append to it. |
+| `arm track capture` | Create a new track file and arm; bridge sends track-capture heartbeats (0xFE) every 500 ms so the Pi knows it’s alive. |
 | `take location` | Send RequestFloatingGps to bridge; receive 5 GPS samples, average, append one row (Cone #, Lat, Lon, Alt). |
-| `end track capture` | Close the current track file. |
+| `end track capture` | Close the current track file and tell the bridge to end. |
 | `quit` | Exit. |
 
-Track files are written under `~/daq/tracks/<date>/<time>.csv` (or under `RPI_RX_OUTPUT_DIR` if set). Override serial port with `RPI_RX_SERIAL_PORT` (e.g. `/dev/ttyACM0` for bridge when it’s on ACM0).
+- **Heartbeat**: Only the bridge’s **track-capture heartbeat** (type 0xFE) updates the “last activity” time. If no heartbeat for **3 s** (e.g. bridge unplugged), the Pi auto-ends track capture and closes the file.
+- **Logs**: Only messages from node `"Floating"` are printed to the console; other nodes are still received and forwarded but not logged here.
+- Track files: `~/daq/tracks/<date>/<time>.csv` (or `RPI_RX_OUTPUT_DIR`/tracks). Override serial port with `RPI_RX_SERIAL_PORT`.
 
 ### rpi_rx_rust (CLI) — no physical HMI
 
