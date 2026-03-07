@@ -159,6 +159,14 @@ pub enum ForwardError {
 pub const CMD_TIME_SYNC: u8 = 0x01;
 /// Request floating GPS capture: bridge broadcasts RequestGpsCapture, collects 5 GPS, forwards to RPi
 pub const CMD_REQUEST_FLOATING_GPS: u8 = 0x02;
+/// Arm track capture: bridge shows double blink until end
+pub const CMD_ARM_TRACK: u8 = 0x03;
+/// End track capture: bridge back to normal blink
+pub const CMD_END_TRACK: u8 = 0x04;
+/// Capture succeeded (RPi got 5 GPS): bridge shows solid blue 0.5s
+pub const CMD_CAPTURE_SUCCESS: u8 = 0x05;
+/// Capture timed out (RPi did not get 5 GPS): bridge shows rainbow 1s
+pub const CMD_CAPTURE_TIMEOUT: u8 = 0x06;
 
 /// Parsed USB command from the RPi host
 #[derive(Debug, Clone, Copy)]
@@ -167,6 +175,14 @@ pub enum UsbCommand {
     TimeSync { session_time_us: u64 },
     /// Request floating GPS: broadcast to floating node, collect 5 GPS samples, forward to RPi
     RequestFloatingGps,
+    /// Arm track capture (bridge doubles blink rate)
+    ArmTrack,
+    /// End track capture (bridge normal blink)
+    EndTrack,
+    /// Capture success (bridge shows solid blue 0.5s)
+    CaptureSuccess,
+    /// Capture timeout (bridge shows rainbow 1s)
+    CaptureTimeout,
 }
 
 /// Parse a COBS-decoded command buffer into a `UsbCommand`.
@@ -186,6 +202,10 @@ pub fn parse_usb_command(buffer: &[u8]) -> Result<UsbCommand, ForwardError> {
             Ok(UsbCommand::TimeSync { session_time_us })
         }
         CMD_REQUEST_FLOATING_GPS => Ok(UsbCommand::RequestFloatingGps),
+        CMD_ARM_TRACK => Ok(UsbCommand::ArmTrack),
+        CMD_END_TRACK => Ok(UsbCommand::EndTrack),
+        CMD_CAPTURE_SUCCESS => Ok(UsbCommand::CaptureSuccess),
+        CMD_CAPTURE_TIMEOUT => Ok(UsbCommand::CaptureTimeout),
         _ => Err(ForwardError::UnsupportedPayload),
     }
 }

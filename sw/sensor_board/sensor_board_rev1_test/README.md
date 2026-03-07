@@ -28,9 +28,39 @@ cargo build --bin rev1_board --features pos_center
 
 ### Bridge (USB forwarder for RPi)
 
+By default, both **flashing/debug log** and **RPi communication** use the same USB (USB-JTAG):
+
 ```bash
 cargo build --bin devkit_c --no-default-features --features bridge
 ```
+
+If the devkit has a **separate serial port** (UART), you can send log output there and keep USB **only** for RPi/bridge traffic (flashing still over USB):
+
+```bash
+cargo build --bin devkit_c --no-default-features --features bridge_uart_log
+```
+
+- **`bridge`**: Log and RPi COBS both on USB. Use for a single USB connection.
+- **`bridge_uart_log`**: Log on UART (ROM default, typically UART0); RPi on USB. Connect a serial adapter to the UART port for `info!`/`warn!` etc., and plug USB to the RPi for clean COBS.
+
+**Viewing UART debug on Linux** (when using `bridge_uart_log`): the ROM UART console is usually **115200 8N1**. Find the serial device (e.g. `/dev/ttyUSB0` for an FTDI adapter, or the second port if the board exposes two):
+
+```bash
+# List serial ports (plug in the UART adapter, then run)
+ls /dev/ttyUSB* /dev/ttyACM* 2>/dev/null
+
+# Connect with picocom (Ctrl+A Ctrl+X to exit)
+picocom -b 115200 /dev/ttyUSB0
+
+# Or with screen
+screen /dev/ttyUSB0 115200
+# Detach: Ctrl+A then K, then Y
+
+# Or with minicom
+minicom -D /dev/ttyUSB0 -b 115200
+```
+
+Use the device that corresponds to the **UART/serial** connector (not the USB-JTAG port used for RPi or flashing).
 
 ### Floating node (GPS-only, track capture)
 
@@ -66,7 +96,8 @@ cargo build --bin rev1_board --features set_gps_high_baud,set_gps_10hz
 | `gps` | GPS over UART (NMEA). |
 | `wifi` | WiFi + ESP-NOW. |
 | `usb` | USB Serial/JTAG for bridge → host. |
-| `bridge` | Shorthand: `hmi`, `usb`, `wifi` (for devkit_c). |
+| `bridge` | Shorthand: `hmi`, `usb`, `wifi`, `jtag-log` (devkit_c; log + RPi on USB). |
+| `bridge_uart_log` | Like bridge but log on UART, RPi on USB only (for devkit with separate serial port). |
 | `floating` | Shorthand: `hmi`, `gps`, `wifi`, `set_gps_10hz` (for sensorboard_floating). |
 | `pos_*` | Car position for node ID (pick one). |
 

@@ -14,6 +14,23 @@ const CMD_REQUEST_FLOATING_GPS: u8 = 0x02;
 const COBS_DECODED_BUFFER_SIZE: usize = 128;
 const NUM_GPS_SAMPLES: usize = 5;
 
+/// Bridge HMI commands (RPi -> Bridge over USB). Same values as bridge firmware CMD_*.
+pub const CMD_ARM_TRACK: u8 = 0x03;
+pub const CMD_END_TRACK: u8 = 0x04;
+pub const CMD_CAPTURE_SUCCESS: u8 = 0x05;
+pub const CMD_CAPTURE_TIMEOUT: u8 = 0x06;
+
+/// Encode and return COBS-framed 1-byte bridge HMI command (e.g. arm/end/success/timeout).
+pub fn encode_bridge_hmi_command(cmd: u8) -> Vec<u8> {
+    let raw = [cmd];
+    let max_encoded = cobs::max_encoding_length(1);
+    let mut encoded = vec![0u8; max_encoded + 1];
+    let n = cobs::encode(&raw, &mut encoded);
+    encoded.truncate(n + 1);
+    encoded[n] = 0x00;
+    encoded
+}
+
 /// Encode and return COBS-framed RequestFloatingGps command (1 byte payload + delimiter).
 pub fn encode_request_floating_gps_command() -> Vec<u8> {
     let raw = [CMD_REQUEST_FLOATING_GPS];

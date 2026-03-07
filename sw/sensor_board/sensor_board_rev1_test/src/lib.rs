@@ -69,6 +69,12 @@ pub trait BoardPeripherals {
     #[cfg(feature = "gps")]
     fn take_gps2_uart(&mut self) -> Uart<'static, Async>;
 
+    /// If Some, the board provides a blocking UART for GPS baud detection (floating only). After detection, use the returned async UART.
+    #[cfg(all(feature = "gps", feature = "floating"))]
+    fn take_gps2_uart_blocking(&mut self) -> Option<Uart<'static, esp_hal::Blocking>> {
+        None
+    }
+
     // WIRELESS
     #[cfg(feature = "wifi")]
     fn take_wifi(&mut self) -> Option<WifiResources>;

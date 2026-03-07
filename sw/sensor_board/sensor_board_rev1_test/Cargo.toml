@@ -9,9 +9,10 @@ version      = "0.1.0"
 default-run  = "rev1_board"
 
 [features]
-default = ["hmi", "imu", "gps", "wifi"]
-bridge  = ["hmi", "usb", "wifi"]
-floating = ["hmi", "gps", "wifi", "set_gps_10hz"]  # GPS-only node: wait for RequestGpsCapture, reply with 5 samples
+default = ["hmi", "imu", "gps", "wifi", "jtag-log"]
+bridge  = ["hmi", "usb", "wifi", "jtag-log"]   # Bridge: USB for RPi + log (default)
+bridge_uart_log = ["hmi", "usb", "wifi", "uart-log"]  # Bridge: USB for RPi only, log on UART (serial port)
+floating = ["hmi", "gps", "wifi", "set_gps_10hz", "jtag-log"]  # GPS-only node: wait for RequestGpsCapture, reply with 5 samples
 hmi = []      # User LED, NeoPixel, Display
 imu = []      # IMU sensor (SPI)
 gps = []      # GPS sensor (UART)
@@ -19,6 +20,9 @@ set_gps_high_baud = [] # Optional: configure GPS to high baudrate (non-default)
 set_gps_10hz = []      # Optional: configure GPS update rate to 10Hz (non-default)
 wifi = []     # WiFi/ESP-NOW wireless communication
 usb = []      # USB Serial for bridge data forwarding
+# Log output: exactly one of jtag-log (USB) or uart-log (UART) when building. For devkit with serial debug port use bridge_uart_log.
+jtag-log = ["esp-println/jtag-serial"]
+uart-log = ["esp-println/uart"]
 
 # Car position for sensor nodes (mutually exclusive - pick one)
 # Usage: --features "pos_front_left" or set in default features
@@ -62,7 +66,8 @@ esp-hal = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package 
 esp-rtos = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-rtos", features = ["esp32c6", "esp-alloc", "embassy", "esp-radio"] }
 esp-alloc = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-alloc" }
 esp-bootloader-esp-idf = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-bootloader-esp-idf", features = ["esp32c6"] }
-esp-println = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-println", default-features = false, features = ["esp32c6", "log-04", "jtag-serial", "colors", "critical-section"] }
+# Log goes to JTAG (USB) by default; use uart-log feature for UART (e.g. devkit with serial debug port).
+esp-println = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-println", default-features = false, features = ["esp32c6", "log-04", "colors", "critical-section"] }
 
 # ESP-NOW wireless communication
 esp-radio = { git = "https://github.com/esp-rs/esp-hal", branch = "main", package = "esp-radio", features = ["esp32c6", "esp-now", "unstable", "esp-alloc"] }

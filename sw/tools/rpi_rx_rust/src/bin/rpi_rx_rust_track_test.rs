@@ -14,7 +14,7 @@ use std::thread;
 use std::time::{Duration, Instant};
 
 /// Default serial port (bridge). Override with RPI_RX_SERIAL_PORT (e.g. /dev/ttyACM0 for bridge, /dev/ttyACM1 if only one device).
-const DEFAULT_SERIAL_PORT: &str = "/dev/ttyACM0";
+const DEFAULT_SERIAL_PORT: &str = "/dev/ttyACM1";
 const DEFAULT_BAUD_RATE: u32 = 115_200;
 
 fn serial_port_name() -> String {
@@ -101,6 +101,7 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let run_session_stop = run.clone();
     let collecting_for_track = timesync_sender.collecting_for_track.clone();
 
+    let bridge_pending_cmd = timesync_sender.pending_bridge_cmd.clone();
     let tf = track_file.clone();
     let cn = cone_number.clone();
     let mut on_track_capture = move |lat: f64, lon: f64, alt: f32| {
@@ -127,6 +128,8 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             &mut should_stop,
             Some(collecting_for_track.as_ref()),
             Some(&mut on_track_capture),
+            Some(bridge_pending_cmd),
+            Some("Floating"),
         );
     });
 
@@ -156,6 +159,7 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                         }
                     }
                     cone_number.store(0, Ordering::Relaxed);
+                    timesync_sender.send_arm_track();
                     info!("Track armed: {}", path.display());
                 }
             }
@@ -170,6 +174,7 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             if let Ok(mut buf) = track_file.lock() {
                 *buf = None;
             }
+            timesync_sender.send_end_track();
             info!("Track capture ended");
         }
     }

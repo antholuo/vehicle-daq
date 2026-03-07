@@ -321,7 +321,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                 video_recording.set(!stop_video_recording());
             }
 
-            // Track capture: IO10 rising = new track file; IO9 rising = take location
+            // Track capture: IO10 rising = new track file (arm); IO10 falling = end; IO9 rising = take location
             if gpio10 && !prev_track_arm.get() {
                 let dir = track_dir_for_today();
                 if let Ok(()) = fs::create_dir_all(&dir) {
@@ -335,9 +335,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
                             let _ = w.flush();
                         }
                         cone_number.set(0);
+                        timesync_sender.send_arm_track();
                         info!("Track capture armed: {}", path.display());
                     }
                 }
+            } else if !gpio10 && prev_track_arm.get() {
+                timesync_sender.send_end_track();
             }
             prev_track_arm.set(gpio10);
 
@@ -359,6 +362,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             &mut should_stop,
             Some(&timesync_sender.collecting_for_track),
             Some(&mut on_track_capture),
+            Some(timesync_sender.pending_bridge_cmd.clone()),
+            None,
         ) {
             error!("Session error: {}", e);
         }

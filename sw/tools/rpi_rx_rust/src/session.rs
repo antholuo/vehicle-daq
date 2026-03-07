@@ -2,6 +2,7 @@
 //! Optional track capture: when collecting_for_track is set, next 5 GPS are averaged and passed to callback.
 
 use crate::ahrs::AhrsFilter;
+use crate::track_capture::{CMD_CAPTURE_SUCCESS, CMD_CAPTURE_TIMEOUT};
 use crate::types::{error_decoded_message, format_mac_address, parse_message};
 use cobs::decode;
 use csv::Writer;
@@ -9,11 +10,15 @@ use log::*;
 use std::collections::VecDeque;
 use std::io;
 use std::sync::atomic::Ordering;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 const COBS_DECODED_BUFFER_SIZE: usize = 128;
 const AHRS_SAMPLE_PERIOD_S: f64 = 1.0 / 400.0;
 const AHRS_BETA: f64 = 0.1;
 const TRACK_CAPTURE_NUM_GPS: usize = 5;
+/// If we don't receive 5 GPS samples within this time, we clear the capture and stop waiting.
+const TRACK_CAPTURE_TIMEOUT: Duration = Duration::from_secs(5);
 
 /// Source of bytes (e.g. serial with timeout, or stdin). Returns `None` when no byte available (e.g. timeout).
 pub trait ByteSource {
@@ -24,6 +29,9 @@ pub trait ByteSource {
 /// Logs raw CSV to `raw_wtr`; if `ahrs_wtr` is `Some`, also runs AHRS and writes at `ahrs_hz`.
 /// If `collecting_for_track` and `on_track_capture` are both `Some`, when the flag is true the next 5 GPS
 /// messages are averaged and the callback is invoked with (lat, lon, alt).
+/// If `bridge_pending_cmd` is `Some`, on success the session stores CMD_CAPTURE_SUCCESS for the bridge
+/// thread to send; on timeout it stores CMD_CAPTURE_TIMEOUT.
+/// If `only_log_node` is `Some("Floating")`, the per-message info! log is only emitted for that node.
 pub fn run_session<W, W2, B>(
     byte_source: &mut B,
     raw_wtr: &mut Writer<W>,
@@ -32,6 +40,8 @@ pub fn run_session<W, W2, B>(
     should_stop: &mut dyn FnMut() -> bool,
     collecting_for_track: Option<&std::sync::atomic::AtomicBool>,
     mut on_track_capture: Option<&mut dyn FnMut(f64, f64, f32)>,
+    bridge_pending_cmd: Option<Arc<std::sync::atomic::AtomicU8>>,
+    only_log_node: Option<&str>,
 ) -> Result<(), Box<dyn std::error::Error>>
 where
     W: std::io::Write,
@@ -49,6 +59,7 @@ where
 
     let mut message_count: u64 = 0;
     let mut track_gps_buf: Vec<(f64, f64, f32)> = Vec::with_capacity(TRACK_CAPTURE_NUM_GPS);
+    let mut track_capture_start: Option<Instant> = None;
 
     loop {
         let byte_opt = byte_source.next_byte();
@@ -75,46 +86,77 @@ where
                             match parse_message(raw_message) {
                                 Ok(msg) => {
                                     message_count += 1;
-                                    info!(
-                                        "[{}] Type={:?}, MAC={}, Node={}/{}, Timestamp={}us",
-                                        message_count,
-                                        msg.message_type,
-                                        format_mac_address(&msg.src_mac),
-                                        msg.node_position,
-                                        msg.node_instance,
-                                        msg.timestamp_us
-                                    );
+                                    let should_log = match only_log_node {
+                                        Some(node) => msg.node_position == node,
+                                        None => true,
+                                    };
+                                    if should_log {
+                                        info!(
+                                            "[{}] Type={:?}, MAC={}, Node={}/{}, Timestamp={}us",
+                                            message_count,
+                                            msg.message_type,
+                                            format_mac_address(&msg.src_mac),
+                                            msg.node_position,
+                                            msg.node_instance,
+                                            msg.timestamp_us
+                                        );
+                                    }
                                     raw_wtr.serialize(&msg)?;
                                     raw_wtr.flush()?;
 
-                                    // Track capture: collect 5 GPS when flag set, then average and callback
+                                    // Track capture: collect 5 GPS when flag set, then average and callback. Time out after 5s.
                                     if let (Some(collecting), Some(on_capture)) = (
                                         collecting_for_track.as_ref(),
                                         on_track_capture.as_mut(),
                                     ) {
+                                        if collecting.load(Ordering::Relaxed) && track_capture_start.is_none() {
+                                            track_capture_start = Some(Instant::now());
+                                        }
                                         if msg.message_type == "Gps"
                                             && collecting.load(Ordering::Relaxed)
                                             && msg.lat.is_some()
                                             && msg.lon.is_some()
                                             && msg.alt.is_some()
                                         {
-                                            let lat = msg.lat.unwrap();
-                                            let lon = msg.lon.unwrap();
-                                            let alt = msg.alt.unwrap();
-                                            track_gps_buf.push((lat, lon, alt));
-                                            if track_gps_buf.len() >= TRACK_CAPTURE_NUM_GPS {
-                                                let n = track_gps_buf.len();
-                                                let (slat, slon, salt) = track_gps_buf
-                                                    .drain(..)
-                                                    .fold((0.0_f64, 0.0_f64, 0.0_f32),
-                                                        |(a, b, c), (x, y, z)| (a + x, b + y, c + z));
+                                            if track_capture_start
+                                                .as_ref()
+                                                .map(|t| t.elapsed() > TRACK_CAPTURE_TIMEOUT)
+                                                .unwrap_or(false)
+                                            {
+                                                let got = track_gps_buf.len();
+                                                track_gps_buf.clear();
                                                 collecting.store(false, Ordering::Relaxed);
-                                                on_capture(
-                                                    slat / (n as f64),
-                                                    slon / (n as f64),
-                                                    salt / (n as f32),
+                                                track_capture_start = None;
+                                                if let Some(ref a) = bridge_pending_cmd {
+                                                    a.store(CMD_CAPTURE_TIMEOUT, Ordering::Relaxed);
+                                                }
+                                                warn!(
+                                                    "Track capture timed out after 5s (got {} samples), cone not recorded",
+                                                    got
                                                 );
-                                                info!("Track capture: averaged {} GPS samples", n);
+                                            } else {
+                                                let lat = msg.lat.unwrap();
+                                                let lon = msg.lon.unwrap();
+                                                let alt = msg.alt.unwrap();
+                                                track_gps_buf.push((lat, lon, alt));
+                                                if track_gps_buf.len() >= TRACK_CAPTURE_NUM_GPS {
+                                                    let n = track_gps_buf.len();
+                                                    let (slat, slon, salt) = track_gps_buf
+                                                        .drain(..)
+                                                        .fold((0.0_f64, 0.0_f64, 0.0_f32),
+                                                            |(a, b, c), (x, y, z)| (a + x, b + y, c + z));
+                                                    collecting.store(false, Ordering::Relaxed);
+                                                    track_capture_start = None;
+                                                    if let Some(ref a) = bridge_pending_cmd {
+                                                        a.store(CMD_CAPTURE_SUCCESS, Ordering::Relaxed);
+                                                    }
+                                                    on_capture(
+                                                        slat / (n as f64),
+                                                        slon / (n as f64),
+                                                        salt / (n as f32),
+                                                    );
+                                                    info!("Track capture: averaged {} GPS samples", n);
+                                                }
                                             }
                                         }
                                     }
