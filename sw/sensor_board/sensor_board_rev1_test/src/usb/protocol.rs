@@ -21,6 +21,9 @@ pub const MAX_PAYLOAD_SIZE: usize = 64;
 /// Total maximum message size
 pub const MAX_USB_MESSAGE_SIZE: usize = HEADER_SIZE + MAX_PAYLOAD_SIZE;
 
+/// Message type byte for track-capture heartbeat (bridge -> Pi when armed). No payload.
+pub const MSG_TRACK_CAPTURE_HEARTBEAT: u8 = 0xFE;
+
 /// Serialize a forwarded sensor message for USB transmission
 ///
 /// # Arguments
@@ -118,12 +121,33 @@ pub fn serialize_forwarded_message(
             buffer[offset] = hb.magic;
             offset += 1;
         }
-        SensorPayload::TimeSync(_) | SensorPayload::RequestGpsCapture => {
-            // TimeSync and RequestGpsCapture are not forwarded to USB host
+        SensorPayload::TimeSync(_)
+        | SensorPayload::RequestGpsCapture
+        | SensorPayload::TrackCaptureArmed
+        | SensorPayload::TrackCaptureEnded => {
+            // Bridge-originated or not forwarded to USB host
             return Err(ForwardError::UnsupportedPayload);
         }
     }
 
+    Ok(offset)
+}
+
+/// Serialize a track-capture heartbeat (bridge -> Pi). Sent periodically when track capture is armed.
+/// Format: MAC(6 zeros) + NodeId(2 zeros) + Timestamp(8) + MessageType(0xFE) = 17 bytes. No payload.
+pub fn serialize_track_capture_heartbeat(timestamp_us: u64, buffer: &mut [u8]) -> Result<usize, ForwardError> {
+    if buffer.len() < HEADER_SIZE {
+        return Err(ForwardError::BufferTooSmall);
+    }
+    let mut offset = 0;
+    buffer[offset..offset + 6].copy_from_slice(&[0u8; 6]);
+    offset += 6;
+    buffer[offset..offset + 2].copy_from_slice(&[0u8; 2]);
+    offset += 2;
+    LittleEndian::write_u64(&mut buffer[offset..], timestamp_us);
+    offset += 8;
+    buffer[offset] = MSG_TRACK_CAPTURE_HEARTBEAT;
+    offset += 1;
     Ok(offset)
 }
 

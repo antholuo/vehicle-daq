@@ -230,6 +230,26 @@ pub fn serialize_request_gps_capture(
     Ok(REQUEST_GPS_CAPTURE_SIZE)
 }
 
+/// Serialize TrackCaptureArmed (header only)
+pub fn serialize_track_capture_armed(timestamp_us: u64, buffer: &mut [u8]) -> Result<usize> {
+    if buffer.len() < HEADER_SIZE {
+        return Err(AirCommError::BufferTooSmall);
+    }
+    buffer[0] = MessageType::TrackCaptureArmed.to_u8();
+    LittleEndian::write_u64(&mut buffer[1..], timestamp_us);
+    Ok(HEADER_SIZE)
+}
+
+/// Serialize TrackCaptureEnded (header only)
+pub fn serialize_track_capture_ended(timestamp_us: u64, buffer: &mut [u8]) -> Result<usize> {
+    if buffer.len() < HEADER_SIZE {
+        return Err(AirCommError::BufferTooSmall);
+    }
+    buffer[0] = MessageType::TrackCaptureEnded.to_u8();
+    LittleEndian::write_u64(&mut buffer[1..], timestamp_us);
+    Ok(HEADER_SIZE)
+}
+
 /// Deserialize received data into a sensor message
 ///
 /// Reads the message type header, timestamp, and deserializes the appropriate payload
@@ -255,6 +275,8 @@ pub fn deserialize(data: &[u8], src_address: [u8; 6]) -> Result<SensorMessage> {
         MessageType::Imu => deserialize_imu(data, payload_offset)?,
         MessageType::Gps => deserialize_gps(data, payload_offset)?,
         MessageType::RequestGpsCapture => SensorPayload::RequestGpsCapture,
+        MessageType::TrackCaptureArmed => SensorPayload::TrackCaptureArmed,
+        MessageType::TrackCaptureEnded => SensorPayload::TrackCaptureEnded,
         MessageType::Heartbeat => deserialize_heartbeat(data, payload_offset)?,
         MessageType::TimeSync => deserialize_timesync(data, payload_offset)?,
     };

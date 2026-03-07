@@ -364,6 +364,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             Some(&mut on_track_capture),
             Some(timesync_sender.pending_bridge_cmd.clone()),
             None,
+            None,
         ) {
             error!("Session error: {}", e);
         }

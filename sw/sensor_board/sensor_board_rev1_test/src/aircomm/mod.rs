@@ -83,6 +83,24 @@ impl<'a> AirCommTransceiver<'a> {
         sender::send_request_gps_capture(&mut self.esp_now, timestamp_us, peer_addr).await
     }
 
+    /// Broadcast track capture armed (bridge -> all; non-floating nodes pause)
+    pub async fn send_track_capture_armed(
+        &mut self,
+        timestamp_us: u64,
+        peer_addr: &[u8; 6],
+    ) -> Result<()> {
+        sender::send_track_capture_armed(&mut self.esp_now, timestamp_us, peer_addr).await
+    }
+
+    /// Broadcast track capture ended (bridge -> all; non-floating nodes resume)
+    pub async fn send_track_capture_ended(
+        &mut self,
+        timestamp_us: u64,
+        peer_addr: &[u8; 6],
+    ) -> Result<()> {
+        sender::send_track_capture_ended(&mut self.esp_now, timestamp_us, peer_addr).await
+    }
+
     /// Receive sensor data (suspends until data arrives)
     pub async fn receive(&mut self) -> Result<SensorMessage> {
         receiver::receive(&mut self.esp_now).await

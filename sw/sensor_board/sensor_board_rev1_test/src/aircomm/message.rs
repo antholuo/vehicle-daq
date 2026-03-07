@@ -16,6 +16,10 @@ pub enum MessageType {
     Gps = 0x02,
     /// Request floating GPS capture: bridge broadcasts, floating node replies with 5 GPS samples
     RequestGpsCapture = 0xFD,
+    /// Track capture ended: bridge broadcasts, data nodes resume transmissions
+    TrackCaptureEnded = 0xFC,
+    /// Track capture armed: bridge broadcasts, data nodes (non-floating) pause transmissions
+    TrackCaptureArmed = 0xFB,
     /// Time synchronization from bridge/RPi
     TimeSync = 0xFE,
     /// Heartbeat/keep-alive message
@@ -28,6 +32,8 @@ impl MessageType {
             0x01 => Some(MessageType::Imu),
             0x02 => Some(MessageType::Gps),
             0xFD => Some(MessageType::RequestGpsCapture),
+            0xFC => Some(MessageType::TrackCaptureEnded),
+            0xFB => Some(MessageType::TrackCaptureArmed),
             0xFE => Some(MessageType::TimeSync),
             0xFF => Some(MessageType::Heartbeat),
             _ => None,
@@ -121,6 +127,10 @@ pub enum SensorPayload {
     Gps(GpsData),
     /// Request to capture next 5 GPS samples (no payload; bridge -> floating)
     RequestGpsCapture,
+    /// Track capture armed: non-floating nodes pause transmissions (bridge -> all)
+    TrackCaptureArmed,
+    /// Track capture ended: non-floating nodes resume (bridge -> all)
+    TrackCaptureEnded,
     Heartbeat(HeartbeatData),
     TimeSync(TimeSyncData),
 }
@@ -131,6 +141,8 @@ impl SensorPayload {
             SensorPayload::Imu(_) => MessageType::Imu,
             SensorPayload::Gps(_) => MessageType::Gps,
             SensorPayload::RequestGpsCapture => MessageType::RequestGpsCapture,
+            SensorPayload::TrackCaptureArmed => MessageType::TrackCaptureArmed,
+            SensorPayload::TrackCaptureEnded => MessageType::TrackCaptureEnded,
             SensorPayload::Heartbeat(_) => MessageType::Heartbeat,
             SensorPayload::TimeSync(_) => MessageType::TimeSync,
         }

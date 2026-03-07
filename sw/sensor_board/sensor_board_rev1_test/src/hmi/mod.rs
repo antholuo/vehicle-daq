@@ -35,18 +35,24 @@ pub async fn start_hmi(
 
     let mut led_on = false;
     let mut slow_blink_on = false;
+    let led_period = Duration::from_hz(led_rate_hz as u64);
+    let mut last_led_toggle = Instant::now();
 
     loop {
         let tick_start = Instant::now();
         trace!("[HMI] - Heartbeat OK");
 
-        // Toggle user LED as heartbeat
-        if led_on {
-            user_led.set_low();
-        } else {
-            user_led.set_high();
+        // Toggle user LED at normal rate (1 Hz) even when loop is fast for breathing
+        let now_early = Instant::now();
+        if now_early.duration_since(last_led_toggle) >= led_period {
+            if led_on {
+                user_led.set_low();
+            } else {
+                user_led.set_high();
+            }
+            led_on = !led_on;
+            last_led_toggle = now_early;
         }
-        led_on = !led_on;
 
         // Read HMI state to decide NeoPixel behaviour
         let mut state = crate::hmi::state::HMI_STATE.0.lock().await;
@@ -62,7 +68,7 @@ pub async fn start_hmi(
             }
         }
 
-        // Loop period: 4x when armed; when breathing (GPS fix) use 20 Hz for smooth animation; else base rate
+        // Loop period: 4x when armed (bridge); when breathing (GPS fix) use 40 Hz for smooth animation; else base rate
         let gps_fix_recent = state.gps_fix
             && state
                 .last_gps_timestamp
@@ -123,14 +129,14 @@ pub async fn start_hmi(
             drop(state);
 
             if gps_fix_recent {
-                // GPS fix -> breathe (half to max brightness) for clear "alive" indication
+                // GPS fix -> breathe (25% to max brightness) for clear "alive" indication
                 let breath_period_ms: u64 = 2000;
                 let elapsed_ms = (now.as_millis() as u64) % breath_period_ms;
                 let phase_256 = (elapsed_ms * 256 / breath_period_ms) as u32;
                 let factor = if phase_256 <= 128 {
-                    128 + phase_256
+                    64 + (phase_256 * 192) / 128
                 } else {
-                    384u32.saturating_sub(phase_256)
+                    64 + ((256 - phase_256) * 192) / 128
                 };
                 let breath_brightness = (neopixel_brightness as u32 * factor / 256).min(255) as u8;
                 neopixel
@@ -244,15 +250,15 @@ pub async fn start_hmi_floating(
             continue;
         }
 
-        // Idle: green GPS fix with breathe (half to max) for "alive" indication
+        // Idle: green GPS fix with breathe (25% to max) for "alive" indication
         if gps_fix_recent {
             let breath_period_ms: u64 = 2000;
             let elapsed_ms = (now.as_millis() as u64) % breath_period_ms;
             let phase_256 = (elapsed_ms * 256 / breath_period_ms) as u32;
             let factor = if phase_256 <= 128 {
-                128 + phase_256
+                64 + (phase_256 * 192) / 128
             } else {
-                384u32.saturating_sub(phase_256)
+                64 + ((256 - phase_256) * 192) / 128
             };
             let breath_brightness = (neopixel_brightness as u32 * factor / 256).min(255) as u8;
             neopixel

@@ -11,7 +11,7 @@ use std::collections::VecDeque;
 use std::io;
 use std::sync::atomic::Ordering;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 const COBS_DECODED_BUFFER_SIZE: usize = 128;
 const AHRS_SAMPLE_PERIOD_S: f64 = 1.0 / 400.0;
@@ -32,6 +32,7 @@ pub trait ByteSource {
 /// If `bridge_pending_cmd` is `Some`, on success the session stores CMD_CAPTURE_SUCCESS for the bridge
 /// thread to send; on timeout it stores CMD_CAPTURE_TIMEOUT.
 /// If `only_log_node` is `Some("Floating")`, the per-message info! log is only emitted for that node.
+/// If `last_message_time_ms` is `Some`, it is updated with current time (ms since UNIX_EPOCH) on every parsed message (for heartbeat timeout).
 pub fn run_session<W, W2, B>(
     byte_source: &mut B,
     raw_wtr: &mut Writer<W>,
@@ -42,6 +43,7 @@ pub fn run_session<W, W2, B>(
     mut on_track_capture: Option<&mut dyn FnMut(f64, f64, f32)>,
     bridge_pending_cmd: Option<Arc<std::sync::atomic::AtomicU8>>,
     only_log_node: Option<&str>,
+    last_message_time_ms: Option<Arc<std::sync::atomic::AtomicU64>>,
 ) -> Result<(), Box<dyn std::error::Error>>
 where
     W: std::io::Write,
@@ -85,6 +87,15 @@ where
                             let raw_message = &decoded_buffer[..decoded_len];
                             match parse_message(raw_message) {
                                 Ok(msg) => {
+                                    // Only track-capture heartbeat from bridge updates heartbeat timestamp (not every message).
+                                    if msg.message_type == "TrackCaptureHeartbeat" {
+                                        if let Some(ref t) = last_message_time_ms {
+                                            let _ = SystemTime::now()
+                                                .duration_since(UNIX_EPOCH)
+                                                .map(|d| t.store(d.as_millis() as u64, Ordering::Relaxed));
+                                        }
+                                        continue; // Skip CSV/log/track capture for heartbeat
+                                    }
                                     message_count += 1;
                                     let should_log = match only_log_node {
                                         Some(node) => msg.node_position == node,
