@@ -421,7 +421,7 @@ where
                             let sat_count = gga.satellite_count.unwrap_or(0);
 
                             if has_fix {
-                                debug!(
+                                info!(
                                     "t={:.3}s GPGGA ✓ VALID FIX: Lat={}, Lon={}, HDOP={}, SATS={}",
                                     elapsed_s,
                                     gga.latitude.unwrap_or(0.0),
@@ -469,7 +469,7 @@ where
                         nmea_parser::ParsedMessage::Rmc(rmc) => {
                             if let Some(time) = rmc.timestamp {
                                 let elapsed_s = crate::timebase::elapsed_seconds();
-                                debug!("t={:.3}s GPS rmc time is: {}", elapsed_s, time);
+                                info!("t={:.3}s GPS rmc time is: {}", elapsed_s, time);
 
                                 // Update cached time from RMC
                                 last_time = Some(GpsTime {
@@ -502,7 +502,7 @@ where
                             let speed_kph = vtg.sog_kph.unwrap_or(0.0);
                             let course = vtg.cog_true.unwrap_or(0.0);
                             let elapsed_s = crate::timebase::elapsed_seconds();
-                            debug!(
+                            info!(
                                 "t={:.3}s GNVTG VELOCITY: Speed={:.2} knots ({:.2} km/h); Heading: {}",
                                 elapsed_s, speed_knots, speed_kph, course
                             );
