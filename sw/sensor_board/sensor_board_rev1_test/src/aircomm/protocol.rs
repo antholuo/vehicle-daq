@@ -274,11 +274,11 @@ pub fn deserialize(data: &[u8], src_address: [u8; 6]) -> Result<SensorMessage> {
     let payload = match msg_type {
         MessageType::Imu => deserialize_imu(data, payload_offset)?,
         MessageType::Gps => deserialize_gps(data, payload_offset)?,
-        MessageType::RequestGpsCapture => SensorPayload::RequestGpsCapture,
         MessageType::TrackCaptureArmed => SensorPayload::TrackCaptureArmed,
         MessageType::TrackCaptureEnded => SensorPayload::TrackCaptureEnded,
-        MessageType::Heartbeat => deserialize_heartbeat(data, payload_offset)?,
+        MessageType::RequestGpsCapture => SensorPayload::RequestGpsCapture,
         MessageType::TimeSync => deserialize_timesync(data, payload_offset)?,
+        MessageType::Heartbeat => deserialize_heartbeat(data, payload_offset)?,
     };
 
     Ok(SensorMessage {
