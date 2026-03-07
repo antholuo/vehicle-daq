@@ -144,6 +144,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         None,
         None,
         None,
+        None,
     )?;
 
     info!("Finished processing input. Output written to {:?}", log_file_path_raw);

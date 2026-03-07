@@ -29,7 +29,7 @@ use crate::hmi::{neopixel, start_hmi, start_hmi_floating};
 use crate::imu::start_imu;
 #[cfg(feature = "floating")]
 use crate::types::GpsData;
-#[cfg(feature = "floating")]
+#[cfg(any(feature = "floating", feature = "wifi"))]
 use core::sync::atomic::{AtomicBool, Ordering};
 #[cfg(all(feature = "wifi", feature = "usb"))]
 use crate::types::NodeId;
@@ -37,6 +37,7 @@ use crate::types::NodeId;
 use crate::usb::{
     MAX_USB_MESSAGE_SIZE, UsbCommand, UsbError, UsbSerial, UsbSerialRx, format_mac,
     serialize_forwarded_message,
+    serialize_track_capture_heartbeat,
 };
 
 /// Capacity of the sensor data channel
@@ -55,6 +56,10 @@ static SENSOR_CHANNEL: Channel<CriticalSectionRawMutex, SensorPayload, SENSOR_CH
 static CAPTURE_CHANNEL: Channel<CriticalSectionRawMutex, GpsData, 5> = Channel::new();
 #[cfg(feature = "floating")]
 static CAPTURE_MODE: AtomicBool = AtomicBool::new(false);
+
+/// When true, non-floating data nodes pause all transmissions (set by bridge TrackCaptureArmed broadcast)
+#[cfg(feature = "wifi")]
+static TRACK_CAPTURE_ARMED: AtomicBool = AtomicBool::new(false);
 
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
     info!("app is starting execution now");
@@ -357,14 +362,23 @@ async fn espnow_transceiver_task(
 
         match embassy_time::with_timeout(timeout, transceiver.receive()).await {
             Ok(Ok(msg)) => {
-                if let SensorPayload::TimeSync(ts_data) = &msg.payload {
-                    crate::timebase::apply_sync(ts_data.session_time_us);
-                    info!(
-                        "[ESP-NOW RX] TimeSync applied: session={}us",
-                        ts_data.session_time_us
-                    );
-                } else {
-                    handle_received_message(&msg);
+                match &msg.payload {
+                    SensorPayload::TimeSync(ts_data) => {
+                        crate::timebase::apply_sync(ts_data.session_time_us);
+                        info!(
+                            "[ESP-NOW RX] TimeSync applied: session={}us",
+                            ts_data.session_time_us
+                        );
+                    }
+                    SensorPayload::TrackCaptureArmed => {
+                        TRACK_CAPTURE_ARMED.store(true, Ordering::SeqCst);
+                        info!("[ESP-NOW RX] Track capture armed - pausing transmissions");
+                    }
+                    SensorPayload::TrackCaptureEnded => {
+                        TRACK_CAPTURE_ARMED.store(false, Ordering::SeqCst);
+                        info!("[ESP-NOW RX] Track capture ended - resuming transmissions");
+                    }
+                    _ => handle_received_message(&msg),
                 }
             }
             Ok(Err(e)) => {
@@ -373,9 +387,11 @@ async fn espnow_transceiver_task(
             Err(_) => {}
         }
 
-        // Check if it's time to send heartbeat
+        // Check if it's time to send heartbeat (skip when track capture armed)
         if last_heartbeat.elapsed() >= HEARTBEAT_INTERVAL {
-            send_heartbeat(&mut transceiver).await;
+            if !TRACK_CAPTURE_ARMED.load(Ordering::SeqCst) {
+                send_heartbeat(&mut transceiver).await;
+            }
             last_heartbeat = Instant::now();
         }
     }
@@ -411,78 +427,81 @@ async fn espnow_sender_task(
             HEARTBEAT_INTERVAL - elapsed
         };
 
+        // Poll for incoming ESP-NOW (TimeSync, TrackCaptureArmed/Ended) with short timeout
+        match embassy_time::with_timeout(TIMESYNC_RX_POLL, transceiver.receive()).await {
+            Ok(Ok(msg)) => {
+                match &msg.payload {
+                    SensorPayload::TimeSync(ts_data) => {
+                        crate::timebase::apply_sync(ts_data.session_time_us);
+                        info!(
+                            "[ESP-NOW RX] TimeSync applied: session={}us",
+                            ts_data.session_time_us
+                        );
+                    }
+                    SensorPayload::TrackCaptureArmed => {
+                        TRACK_CAPTURE_ARMED.store(true, Ordering::SeqCst);
+                        info!("[ESP-NOW RX] Track capture armed - pausing transmissions");
+                    }
+                    SensorPayload::TrackCaptureEnded => {
+                        TRACK_CAPTURE_ARMED.store(false, Ordering::SeqCst);
+                        info!("[ESP-NOW RX] Track capture ended - resuming transmissions");
+                    }
+                    _ => {}
+                }
+            }
+            Ok(Err(e)) => {
+                warn!("[ESP-NOW RX] Error during poll: {:?}", e);
+            }
+            Err(_) => {}
+        }
+
         // Try to receive sensor data from channel with timeout
         match embassy_time::with_timeout(timeout, SENSOR_CHANNEL.receive()).await {
             Ok(payload) => {
-                let timestamp_us = crate::timebase::synced_timestamp_us();
+                if TRACK_CAPTURE_ARMED.load(Ordering::SeqCst) {
+                    // Pause transmissions so floating node's GPS packets get through
+                    trace!("[ESP-NOW TX] Dropping {:?} (track capture armed)", payload.message_type());
+                } else {
+                    let timestamp_us = crate::timebase::synced_timestamp_us();
 
-                let result = match &payload {
-                    SensorPayload::Imu(data) => {
-                        info!(
-                            "[ESP-NOW TX] Sending IMU data, timestamp_us={}",
-                            timestamp_us
-                        );
-                        transceiver.send_imu(timestamp_us, data, &BROADCAST).await
-                    }
-                    SensorPayload::Gps(data) => {
-                        info!(
-                            "[ESP-NOW TX] Sending GPS data, timestamp_us={}",
-                            timestamp_us
-                        );
-                        transceiver.send_gps(timestamp_us, data, &BROADCAST).await
-                    }
-                    SensorPayload::Heartbeat(data) => {
-                        debug!("[ESP-NOW TX] Sending Heartbeat");
-                        transceiver
-                            .send_heartbeat(timestamp_us, data, &BROADCAST)
-                            .await
-                    }
-                    SensorPayload::TimeSync(_) => {
-                        // TimeSync payloads are not sent from data nodes
-                        Ok(())
-                    }
-                    SensorPayload::RequestGpsCapture => {
-                        // Only bridge sends this; data nodes ignore
-                        Ok(())
-                    }
-                };
+                    let result = match &payload {
+                        SensorPayload::Imu(data) => {
+                            info!(
+                                "[ESP-NOW TX] Sending IMU data, timestamp_us={}",
+                                timestamp_us
+                            );
+                            transceiver.send_imu(timestamp_us, data, &BROADCAST).await
+                        }
+                        SensorPayload::Gps(data) => {
+                            info!(
+                                "[ESP-NOW TX] Sending GPS data, timestamp_us={}",
+                                timestamp_us
+                            );
+                            transceiver.send_gps(timestamp_us, data, &BROADCAST).await
+                        }
+                        SensorPayload::Heartbeat(data) => {
+                            debug!("[ESP-NOW TX] Sending Heartbeat");
+                            transceiver
+                                .send_heartbeat(timestamp_us, data, &BROADCAST)
+                                .await
+                        }
+                        SensorPayload::TimeSync(_) => Ok(()),
+                        SensorPayload::RequestGpsCapture => Ok(()),
+                        SensorPayload::TrackCaptureArmed | SensorPayload::TrackCaptureEnded => Ok(()),
+                    };
 
-                match result {
-                    Ok(()) => {
-                        trace!("[ESP-NOW TX] Sent {:?}", payload.message_type());
-                    }
-                    Err(e) => {
+                    if let Err(e) = result {
                         warn!("[ESP-NOW TX] Send failed: {:?}", e);
                     }
                 }
             }
-            Err(_) => {
-                // Timeout - no sensor data, that's fine
-            }
-        }
-
-        // Poll for incoming ESP-NOW TimeSync from bridge (very short timeout)
-        match embassy_time::with_timeout(TIMESYNC_RX_POLL, transceiver.receive()).await {
-            Ok(Ok(msg)) => {
-                if let SensorPayload::TimeSync(ts_data) = &msg.payload {
-                    crate::timebase::apply_sync(ts_data.session_time_us);
-                    info!(
-                        "[ESP-NOW RX] TimeSync applied: session={}us",
-                        ts_data.session_time_us
-                    );
-                }
-                // Other message types received here are from other nodes; ignore
-            }
-            Ok(Err(e)) => {
-                warn!("[ESP-NOW RX] Error during TimeSync poll: {:?}", e);
-            }
-            Err(_) => {
-                // No incoming message -- expected
-            }
+            Err(_) => {}
         }
 
         if last_heartbeat.elapsed() >= HEARTBEAT_INTERVAL {
-            send_heartbeat(&mut transceiver).await;
+            if !TRACK_CAPTURE_ARMED.load(Ordering::SeqCst) {
+                send_heartbeat(&mut transceiver).await;
+            }
             last_heartbeat = Instant::now();
         }
     }
@@ -523,11 +542,69 @@ async fn espnow_bridge_task(
     /// Collecting 5 GPS from floating node for RequestFloatingGps response
     let mut floating_gps_remaining: u8 = 0;
     let mut floating_gps_mac: Option<[u8; 6]> = None;
+    /// Last time we received any USB command from Pi; when armed, 3 missed heartbeats (~2s) triggers auto-end.
+    let mut last_usb_from_pi: Option<embassy_time::Instant> = None;
+    const PI_HEARTBEAT_TIMEOUT: Duration = Duration::from_millis(2000);
+    /// When armed, send track-capture heartbeat to Pi every 500 ms so Pi can detect bridge alive.
+    let mut last_heartbeat_send: Option<embassy_time::Instant> = None;
+    const TRACK_HEARTBEAT_INTERVAL: Duration = Duration::from_millis(500);
 
     loop {
+        // --- If armed and no USB from Pi for 3 heartbeats, auto-end track capture (e.g. Pi crashed) ---
+        {
+            let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+            if hmi.track_armed {
+                if let Some(ts) = last_usb_from_pi {
+                    if embassy_time::Instant::now().duration_since(ts) >= PI_HEARTBEAT_TIMEOUT {
+                        warn!("[BRIDGE] No USB from Pi for {} ms, auto-ending track capture", PI_HEARTBEAT_TIMEOUT.as_millis());
+                        hmi.track_armed = false;
+                        drop(hmi);
+                        last_usb_from_pi = None;
+                        last_heartbeat_send = None;
+                        let ts = crate::timebase::synced_timestamp_us();
+                        if let Err(e) = transceiver.send_track_capture_ended(ts, &BROADCAST).await {
+                            warn!("[BRIDGE] TrackCaptureEnded broadcast failed: {:?}", e);
+                        }
+                    } else {
+                        drop(hmi);
+                    }
+                } else {
+                    drop(hmi);
+                }
+            }
+        }
+
+        // --- When armed, send track-capture heartbeat to Pi so it knows bridge is alive ---
+        {
+            let hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+            if hmi.track_armed {
+                let now = embassy_time::Instant::now();
+                let should_send = last_heartbeat_send
+                    .map(|t| now.duration_since(t) >= TRACK_HEARTBEAT_INTERVAL)
+                    .unwrap_or(true);
+                drop(hmi);
+                if should_send {
+                    match serialize_track_capture_heartbeat(
+                        crate::timebase::synced_timestamp_us(),
+                        &mut msg_buffer,
+                    ) {
+                        Ok(len) => {
+                            if usb_serial.write_framed(&msg_buffer[..len]).await.is_ok() {
+                                last_heartbeat_send = Some(now);
+                            }
+                        }
+                        Err(_) => {}
+                    }
+                }
+            } else {
+                last_heartbeat_send = None;
+            }
+        }
+
         // --- Poll USB RX for commands from RPi (non-blocking) ---
         if let Some(ref mut rx) = usb_rx {
             while let Some(cmd) = rx.poll_command() {
+                last_usb_from_pi = Some(embassy_time::Instant::now());
                 match cmd {
                     UsbCommand::TimeSync { session_time_us } => {
                         timesync_count += 1;
@@ -563,11 +640,22 @@ async fn espnow_bridge_task(
                         info!("[BRIDGE] received arm (track capture armed)");
                         let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
                         hmi.track_armed = true;
+                        drop(hmi);
+                        let ts = crate::timebase::synced_timestamp_us();
+                        if let Err(e) = transceiver.send_track_capture_armed(ts, &BROADCAST).await {
+                            warn!("[BRIDGE] TrackCaptureArmed broadcast failed: {:?}", e);
+                        }
                     }
                     UsbCommand::EndTrack => {
                         info!("[BRIDGE] received end (track capture ended)");
+                        last_heartbeat_send = None;
                         let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
                         hmi.track_armed = false;
+                        drop(hmi);
+                        let ts = crate::timebase::synced_timestamp_us();
+                        if let Err(e) = transceiver.send_track_capture_ended(ts, &BROADCAST).await {
+                            warn!("[BRIDGE] TrackCaptureEnded broadcast failed: {:?}", e);
+                        }
                     }
                     UsbCommand::CaptureSuccess => {
                         info!("[BRIDGE] received capture success (show green 1s)");
@@ -1012,6 +1100,9 @@ fn handle_received_message(msg: &SensorMessage) {
         SensorPayload::RequestGpsCapture => {
             // Bridge -> floating; regular nodes ignore
             trace!("[ESP-NOW RX] RequestGpsCapture (ignored)");
+        }
+        SensorPayload::TrackCaptureArmed | SensorPayload::TrackCaptureEnded => {
+            // Handled in task to update TRACK_CAPTURE_ARMED
         }
     }
 }

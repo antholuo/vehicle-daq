@@ -145,10 +145,14 @@ async fn send_ubx_packet(
 /// Baud rates to try when auto-detecting GPS (before sending any configuration).
 #[cfg(feature = "floating")]
 const DETECT_BAUD_RATES: &[u32] = &[9600, 38400, 115200, 460800];
+/// Time to listen at each baud rate for a GGA sentence (GPS may be slow after power-up).
 #[cfg(feature = "floating")]
-const DETECT_READ_MS: u64 = 700;
+const DETECT_READ_MS: u64 = 1200;
 #[cfg(feature = "floating")]
 const DETECT_CHUNK_MS: u64 = 50;
+/// Delay before first baud try so the GPS module has time to power up and start sending NMEA.
+#[cfg(feature = "floating")]
+const DETECT_STARTUP_DELAY_MS: u64 = 2500;
 
 /// Try common baud rates, read NMEA without sending config, and return (uart at detected baud, detected baud).
 /// Logs "Trying baud X...", "Could not parse..." or "Parsed GG* ... NUM SATS: N".
@@ -157,6 +161,12 @@ pub async fn detect_gps_baud_and_init(
     mut uart: Uart<'static, esp_hal::Blocking>,
 ) -> Uart<'static, Async> {
     use embassy_time::Timer;
+
+    info!(
+        "GPS baud detection: waiting {} ms for module to start sending...",
+        DETECT_STARTUP_DELAY_MS
+    );
+    Timer::after_millis(DETECT_STARTUP_DELAY_MS).await;
 
     let mut parser = nmea_parser::NmeaParser::new();
     let mut line_buf: heapless::String<{ NMEA_0183_MAX_LENGTH + 2 }> = heapless::String::new();

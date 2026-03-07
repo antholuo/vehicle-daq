@@ -77,6 +77,8 @@ impl NodeId {
 pub enum MessageType {
     Imu = 0x01,
     Gps = 0x02,
+    /// Bridge sends this to Pi when track capture is armed (heartbeat so Pi can detect bridge alive).
+    TrackCaptureHeartbeat = 0xFE,
     Heartbeat = 0xFF,
     Unknown = 0x00,
 }
@@ -86,6 +88,7 @@ impl MessageType {
         match value {
             0x01 => MessageType::Imu,
             0x02 => MessageType::Gps,
+            0xFE => MessageType::TrackCaptureHeartbeat,
             0xFF => MessageType::Heartbeat,
             _ => MessageType::Unknown,
         }
@@ -272,6 +275,9 @@ pub fn parse_message(buffer: &[u8]) -> Result<DecodedMessage, ParserError> {
             }
             let mut payload_reader = io::Cursor::new(payload_data);
             decoded_msg.magic = Some(payload_reader.read_u8()?);
+        }
+        MessageType::TrackCaptureHeartbeat => {
+            // No payload; bridge sends this when track capture is armed so Pi can treat it as heartbeat.
         }
         MessageType::Unknown => {
             return Err(ParserError::InvalidMessageType(msg_type_byte));

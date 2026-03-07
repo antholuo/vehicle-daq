@@ -15,6 +15,7 @@ use nb::Error as NbError;
 pub use protocol::{
     ForwardError, MAX_USB_MESSAGE_SIZE, UsbCommand, format_mac, parse_usb_command,
     serialize_forwarded_message,
+    serialize_track_capture_heartbeat,
 };
 
 #[allow(unused_imports)]

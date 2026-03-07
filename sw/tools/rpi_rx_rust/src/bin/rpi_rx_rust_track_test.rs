@@ -8,19 +8,21 @@ use rpi_rx_rust::session::{run_session, ByteSource};
 use rpi_rx_rust::TimeSyncSender;
 use std::io::{self, BufRead, Read, Write};
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicBool, AtomicU32, Ordering};
+use std::sync::atomic::{AtomicBool, AtomicU32, AtomicU64, Ordering};
 use std::sync::{Arc, Mutex};
 use std::thread;
-use std::time::{Duration, Instant};
+use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
 
 /// Default serial port (bridge). Override with RPI_RX_SERIAL_PORT (e.g. /dev/ttyACM0 for bridge, /dev/ttyACM1 if only one device).
-const DEFAULT_SERIAL_PORT: &str = "/dev/ttyACM1";
+const DEFAULT_SERIAL_PORT: &str = "/dev/ttyACM0";
 const DEFAULT_BAUD_RATE: u32 = 115_200;
 
 fn serial_port_name() -> String {
     std::env::var("RPI_RX_SERIAL_PORT").unwrap_or_else(|_| DEFAULT_SERIAL_PORT.to_string())
 }
 const SERIAL_READ_TIMEOUT_MS: u64 = 200;
+/// No data from bridge for this long (ms) → auto-end track capture (e.g. bridge disconnected).
+const BRIDGE_SILENCE_MS: u64 = 3000;
 
 fn track_dir_for_today() -> PathBuf {
     let date_str = Local::now().format("%Y-%m-%d").to_string();
@@ -81,7 +83,7 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     };
 
     let session_start = Instant::now();
-    let timesync_sender = TimeSyncSender::start(write_port, session_start);
+    let timesync_sender = Arc::new(TimeSyncSender::start(write_port, session_start));
     thread::sleep(Duration::from_millis(200));
     if let Err(e) = read_port.clear(serialport::ClearBuffer::Input) {
         warn!("Failed to clear serial input: {}", e);
@@ -91,6 +93,7 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let cone_number = Arc::new(AtomicU32::new(0));
     let running = Arc::new(AtomicBool::new(true));
     let run = running.clone();
+    let last_message_time_ms = Arc::new(AtomicU64::new(0));
 
     let stdin = io::stdin();
     let mut stdin_lock = stdin.lock();
@@ -102,6 +105,7 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     let collecting_for_track = timesync_sender.collecting_for_track.clone();
 
     let bridge_pending_cmd = timesync_sender.pending_bridge_cmd.clone();
+    let last_message_ms_for_session = last_message_time_ms.clone();
     let tf = track_file.clone();
     let cn = cone_number.clone();
     let mut on_track_capture = move |lat: f64, lon: f64, alt: f32| {
@@ -130,7 +134,38 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
             Some(&mut on_track_capture),
             Some(bridge_pending_cmd),
             Some("Floating"),
+            Some(last_message_ms_for_session),
         );
+    });
+
+    // Watcher: if armed and no data from bridge for 3s, auto-end track capture (e.g. bridge disconnected / Pi about to crash).
+    let watch_track_file = track_file.clone();
+    let watch_last_ms = last_message_time_ms.clone();
+    let watch_timesync = timesync_sender.clone();
+    let watch_running = running.clone();
+    let watcher_handle = thread::spawn(move || {
+        while watch_running.load(Ordering::Relaxed) {
+            thread::sleep(Duration::from_secs(1));
+            let armed = watch_track_file.lock().map(|g| g.is_some()).unwrap_or(false);
+            if !armed {
+                continue;
+            }
+            let now_ms = SystemTime::now()
+                .duration_since(UNIX_EPOCH)
+                .unwrap_or(Duration::from_secs(0))
+                .as_millis() as u64;
+            let last = watch_last_ms.load(Ordering::Relaxed);
+            if last != 0 && now_ms.saturating_sub(last) > BRIDGE_SILENCE_MS {
+                info!(
+                    "No data from bridge for {} ms, ending track capture",
+                    BRIDGE_SILENCE_MS
+                );
+                if let Ok(mut g) = watch_track_file.lock() {
+                    *g = None;
+                }
+                watch_timesync.send_end_track();
+            }
+        }
     });
 
     while running.load(std::sync::atomic::Ordering::Relaxed) {
@@ -160,6 +195,11 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
                     }
                     cone_number.store(0, Ordering::Relaxed);
                     timesync_sender.send_arm_track();
+                    // Mark that we're expecting data (watcher uses last_message_time_ms != 0)
+                    last_message_time_ms.store(
+                        SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_millis() as u64,
+                        Ordering::Relaxed,
+                    );
                     info!("Track armed: {}", path.display());
                 }
             }
@@ -179,7 +219,11 @@ fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
         }
     }
 
-    timesync_sender.stop();
+    running.store(false, Ordering::Relaxed);
+    let _ = watcher_handle.join();
+    if let Ok(sender) = Arc::try_unwrap(timesync_sender) {
+        sender.stop();
+    }
     info!("Bye");
     Ok(())
 }
