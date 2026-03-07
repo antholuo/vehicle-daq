@@ -19,6 +19,8 @@ pub enum CarPosition {
     RearCenter = 7,
     RearRight = 8,
     Roof = 9,
+    /// Floating (GPS-only) node for track capture
+    Floating = 254,
     /// Custom/unassigned position
     Custom = 255,
 }
@@ -37,6 +39,7 @@ impl CarPosition {
             7 => CarPosition::RearCenter,
             8 => CarPosition::RearRight,
             9 => CarPosition::Roof,
+            254 => CarPosition::Floating,
             _ => CarPosition::Custom,
         }
     }
@@ -59,6 +62,7 @@ impl CarPosition {
             CarPosition::RearCenter => "RearCenter",
             CarPosition::RearRight => "RearRight",
             CarPosition::Roof => "Roof",
+            CarPosition::Floating => "Floating",
             CarPosition::Custom => "Custom",
         }
     }
@@ -151,6 +155,10 @@ pub const fn configured_position() -> CarPosition {
     #[cfg(feature = "pos_roof")]
     {
         return CarPosition::Roof;
+    }
+    #[cfg(feature = "floating")]
+    {
+        return CarPosition::Floating;
     }
 
     // Default when no position feature is set

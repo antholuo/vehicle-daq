@@ -539,21 +539,49 @@ async fn espnow_bridge_task(
                         if let Err(e) = transceiver.send_timesync(ts, &data, &BROADCAST).await {
                             warn!("[BRIDGE] TimeSync broadcast failed: {:?}", e);
                         } else {
-                            info!(
+                            trace!(
                                 "[BRIDGE] TimeSync #{}: session={}us, broadcast OK",
                                 timesync_count, session_time_us
                             );
                         }
                     }
                     UsbCommand::RequestFloatingGps => {
+                        info!("[BRIDGE] received take (RequestFloatingGps)");
+                        {
+                            let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+                            hmi.capture_led_phase = crate::hmi::state::CAPTURE_PHASE_REQUEST_SENT;
+                        }
                         let ts = crate::timebase::synced_timestamp_us();
                         if let Err(e) = transceiver.send_request_gps_capture(ts, &BROADCAST).await {
                             warn!("[BRIDGE] RequestGpsCapture broadcast failed: {:?}", e);
                         } else {
-                            info!("[BRIDGE] RequestFloatingGps: broadcast RequestGpsCapture, collecting 5 GPS");
                             floating_gps_remaining = 5;
                             floating_gps_mac = None;
                         }
+                    }
+                    UsbCommand::ArmTrack => {
+                        info!("[BRIDGE] received arm (track capture armed)");
+                        let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+                        hmi.track_armed = true;
+                    }
+                    UsbCommand::EndTrack => {
+                        info!("[BRIDGE] received end (track capture ended)");
+                        let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+                        hmi.track_armed = false;
+                    }
+                    UsbCommand::CaptureSuccess => {
+                        info!("[BRIDGE] received capture success (show green 1s)");
+                        let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+                        hmi.capture_led_phase = crate::hmi::state::CAPTURE_PHASE_SUCCESS;
+                        hmi.capture_phase_deadline =
+                            Some(embassy_time::Instant::now() + Duration::from_secs(1));
+                    }
+                    UsbCommand::CaptureTimeout => {
+                        info!("[BRIDGE] received capture timeout (show rainbow 1s)");
+                        let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+                        hmi.capture_led_phase = crate::hmi::state::CAPTURE_PHASE_TIMEOUT;
+                        hmi.capture_phase_deadline =
+                            Some(embassy_time::Instant::now() + Duration::from_secs(1));
                     }
                 }
             }
@@ -652,7 +680,7 @@ async fn espnow_bridge_task(
                                             floating_gps_remaining -= 1;
                                             if floating_gps_remaining == 0 {
                                                 floating_gps_mac = None;
-                                                info!("[BRIDGE] Floating GPS: 5 samples forwarded to RPi");
+                                                info!("[BRIDGE] received responses (5 GPS forwarded to RPi)");
                                             }
                                         }
                                     }
@@ -724,8 +752,8 @@ async fn floating_espnow_task(
                         hmi.acquiring_gps_capture = true;
                     }
                     CAPTURE_MODE.store(true, Ordering::SeqCst);
-                    // Brief yield so the GPS task can see CAPTURE_MODE before we block on receive()
-                    Timer::after_millis(20).await;
+                    // Give GPS task time to see CAPTURE_MODE and for next GGA to arrive (10 Hz = 100 ms period)
+                    Timer::after_millis(150).await;
 
                     let mut sent = 0u32;
                     for _ in 0..NUM_SAMPLES {
@@ -748,6 +776,18 @@ async fn floating_espnow_task(
                         "[FLOATING] Sent {} GPS samples in response to capture request",
                         sent
                     );
+                    if sent == 0 {
+                        warn!(
+                            "[FLOATING] No GPS samples: ensure the receiver has a fix (outdoor, antenna) and outputs GGA with position"
+                        );
+                        crate::gps::with_last_raw_gga(|opt| {
+                            if let Some(raw) = opt {
+                                info!("[FLOATING] Last parsed GGA (raw): {}", raw);
+                            } else {
+                                info!("[FLOATING] No GGA sentence parsed yet (no fix or no NMEA?)");
+                            }
+                        });
+                    }
 
                     CAPTURE_MODE.store(false, Ordering::SeqCst);
                     {
@@ -801,7 +841,10 @@ pub async fn app_run_floating<B: BoardPeripherals>(spawner: embassy_executor::Sp
     }
 
     let _ = board.take_disp_spi_device();
-    let gps2_uart = board.take_gps2_uart();
+    let gps2_uart = match board.take_gps2_uart_blocking() {
+        Some(blocking) => crate::gps::detect_gps_baud_and_init(blocking).await,
+        None => init_gps(board.take_gps2_uart()).await,
+    };
 
     if let Some(wifi) = board.take_wifi() {
         match AirCommTransceiver::new(wifi.esp_now) {
@@ -831,8 +874,46 @@ pub async fn app_run_floating<B: BoardPeripherals>(spawner: embassy_executor::Sp
         ))
         .expect("HMI floating task did not spawn");
 
+    spawner
+        .spawn(gps_stale_watchdog_task())
+        .expect("GPS stale watchdog task did not spawn");
+
     loop {
         Timer::after_secs(1).await;
+    }
+}
+
+/// Warns or errors if no successfully parsed GPS (GGA) in the last 1s or 5s.
+#[cfg(feature = "floating")]
+#[embassy_executor::task]
+async fn gps_stale_watchdog_task() {
+    const WARN_THRESHOLD: Duration = Duration::from_secs(1);
+    const ERROR_THRESHOLD: Duration = Duration::from_secs(5);
+
+    loop {
+        Timer::after_secs(1).await;
+        let state = crate::hmi::state::HMI_STATE.0.lock().await;
+        let now = embassy_time::Instant::now();
+        let stale = match state.last_gps_timestamp {
+            Some(ts) => now.duration_since(ts),
+            None => {
+                drop(state);
+                warn!("[FLOATING] No successfully parsed GPS (GGA) message yet");
+                continue;
+            }
+        };
+        drop(state);
+        if stale >= ERROR_THRESHOLD {
+            error!(
+                "[FLOATING] No GPS (GGA) parsed for {}s - check antenna, fix, and NMEA output",
+                stale.as_secs()
+            );
+        } else if stale >= WARN_THRESHOLD {
+            warn!(
+                "[FLOATING] No GPS (GGA) parsed in the last {}s",
+                stale.as_secs()
+            );
+        }
     }
 }
 

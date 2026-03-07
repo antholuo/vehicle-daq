@@ -1,5 +1,7 @@
 use core::fmt::Write;
 use esp_hal::Async;
+#[cfg(feature = "floating")]
+use esp_hal::uart::Config;
 use esp_hal::uart::Uart;
 use heapless::String;
 #[cfg(feature = "set_gps_10hz")]
@@ -11,6 +13,51 @@ use crate::types::{GpsData, GpsTime};
 use embassy_time::Instant;
 
 const NMEA_0183_MAX_LENGTH: usize = 83;
+const LAST_RAW_GGA_CAP: usize = 84;
+
+/// Last successfully parsed GGA sentence (raw NMEA), for diagnostic logging when capture gets 0 samples.
+/// Stored as bytes to avoid Rust 2024 static_mut_refs; copied out byte-wise in with_last_raw_gga.
+static mut LAST_RAW_GGA_BUF: [u8; LAST_RAW_GGA_CAP] = [0; LAST_RAW_GGA_CAP];
+static mut LAST_RAW_GGA_LEN: u8 = 0;
+
+/// Store the raw GGA sentence (call when a GGA is parsed). Truncates to fit.
+pub fn set_last_raw_gga(sentence: &str) {
+    let end = sentence
+        .char_indices()
+        .nth(NMEA_0183_MAX_LENGTH)
+        .map(|(i, _)| i)
+        .unwrap_or(sentence.len());
+    let trunc = &sentence[..end.min(sentence.len())];
+    let bytes = trunc.as_bytes();
+    let len = bytes.len().min(LAST_RAW_GGA_CAP) as u8;
+    critical_section::with(|_| unsafe {
+        for (i, &b) in bytes.iter().take(LAST_RAW_GGA_CAP).enumerate() {
+            LAST_RAW_GGA_BUF[i] = b;
+        }
+        LAST_RAW_GGA_LEN = len;
+    });
+}
+
+/// Run a closure with the last raw GGA sentence (if any), for logging.
+pub fn with_last_raw_gga<F, R>(f: F) -> R
+where
+    F: FnOnce(Option<&str>) -> R,
+{
+    let mut local_buf = [0u8; LAST_RAW_GGA_CAP];
+    let len = critical_section::with(|_| unsafe {
+        let n = LAST_RAW_GGA_LEN as usize;
+        for i in 0..n {
+            local_buf[i] = LAST_RAW_GGA_BUF[i];
+        }
+        n
+    });
+    let opt_str = if len > 0 {
+        core::str::from_utf8(&local_buf[..len]).ok()
+    } else {
+        None
+    };
+    f(opt_str)
+}
 const MAX_SENTENCE_LENGTH: usize = NMEA_0183_MAX_LENGTH + 2; // give ourselves buffer for newlines
 const NUM_NMEA_SENTENCES: usize = 5; // RMC, VTG, GGA
 const CHUNK_BUFF_SIZE: usize = MAX_SENTENCE_LENGTH * (NUM_NMEA_SENTENCES + 1); // buffer
@@ -93,6 +140,103 @@ async fn send_ubx_packet(
         Ok(_) => info!("UBX {} sent.", name),
         Err(e) => error!("Failed to send UBX {}: {:?}", name, e),
     }
+}
+
+/// Baud rates to try when auto-detecting GPS (before sending any configuration).
+#[cfg(feature = "floating")]
+const DETECT_BAUD_RATES: &[u32] = &[9600, 38400, 115200, 460800];
+#[cfg(feature = "floating")]
+const DETECT_READ_MS: u64 = 700;
+#[cfg(feature = "floating")]
+const DETECT_CHUNK_MS: u64 = 50;
+
+/// Try common baud rates, read NMEA without sending config, and return (uart at detected baud, detected baud).
+/// Logs "Trying baud X...", "Could not parse..." or "Parsed GG* ... NUM SATS: N".
+#[cfg(feature = "floating")]
+pub async fn detect_gps_baud_and_init(
+    mut uart: Uart<'static, esp_hal::Blocking>,
+) -> Uart<'static, Async> {
+    use embassy_time::Timer;
+
+    let mut parser = nmea_parser::NmeaParser::new();
+    let mut line_buf: heapless::String<{ NMEA_0183_MAX_LENGTH + 2 }> = heapless::String::new();
+    let mut read_buf = [0u8; 128];
+    let mut detected_baud: Option<u32> = None;
+
+    for &baud in DETECT_BAUD_RATES {
+        info!("Trying baud {}...", baud);
+        let config = Config::default().with_baudrate(baud);
+        if uart.apply_config(&config).is_err() {
+            warn!("Could not set baud {} on UART", baud);
+            continue;
+        }
+        // Drain any stale bytes from previous baud
+        loop {
+            match uart.read_buffered(&mut read_buf) {
+                Ok(0) => break,
+                Ok(_) => {}
+                Err(_) => break,
+            }
+        }
+        Timer::after_millis(DETECT_CHUNK_MS).await;
+
+        let deadline = embassy_time::Instant::now() + embassy_time::Duration::from_millis(DETECT_READ_MS);
+        let mut got_gga = false;
+        let mut num_sats: Option<u8> = None;
+
+        while embassy_time::Instant::now() < deadline {
+            match uart.read_buffered(&mut read_buf) {
+                Ok(n) if n > 0 => {
+                    for &b in &read_buf[..n] {
+                        if b == b'\n' || b == b'\r' {
+                            if !line_buf.is_empty() {
+                                let sentence = line_buf.as_str().trim();
+                                if sentence.len() >= 7 && (sentence.starts_with("$GPGGA") || sentence.starts_with("$GNGGA")) {
+                                    match parser.parse_sentence(sentence) {
+                                        Ok(nmea_parser::ParsedMessage::Gga(gga)) => {
+                                            let sats = gga.satellite_count.unwrap_or(0);
+                                            num_sats = Some(sats);
+                                            got_gga = true;
+                                            info!(
+                                                "Parsed {} ... NUM SATS: {}",
+                                                &sentence[..sentence.len().min(20)],
+                                                sats
+                                            );
+                                            break;
+                                        }
+                                        _ => {}
+                                    }
+                                }
+                                line_buf.clear();
+                            }
+                        } else if line_buf.push(b as char).is_err() {
+                            line_buf.clear();
+                        }
+                    }
+                    if got_gga {
+                        break;
+                    }
+                }
+                _ => {}
+            }
+            Timer::after_millis(10).await;
+        }
+
+        if got_gga {
+            detected_baud = Some(baud);
+            info!("GPS baud detected: {} (NUM SATS: {:?})", baud, num_sats);
+            break;
+        }
+        info!("Could not parse GGA at baud {} (no valid $GP* / $GN* GGA in {} ms)", baud, DETECT_READ_MS);
+    }
+
+    let baud = detected_baud.unwrap_or(9600);
+    if detected_baud.is_none() {
+        warn!("Using default baud {} (no GGA seen at any tried rate)", baud);
+    }
+
+    let uart_async = uart.into_async();
+    init_gps(uart_async).await
 }
 
 pub async fn init_gps(mut gps2_uart: Uart<'static, Async>) -> esp_hal::uart::Uart<'static, Async> {
@@ -261,12 +405,13 @@ where
                 match parser.parse_sentence(sentence) {
                     Ok(parsed_data) => match parsed_data {
                         nmea_parser::ParsedMessage::Gga(gga) => {
+                            set_last_raw_gga(sentence);
                             let elapsed_s = crate::timebase::elapsed_seconds();
                             let has_fix = gga.latitude.is_some() && gga.longitude.is_some();
                             let sat_count = gga.satellite_count.unwrap_or(0);
 
                             if has_fix {
-                                info!(
+                                debug!(
                                     "t={:.3}s GPGGA ✓ VALID FIX: Lat={}, Lon={}, HDOP={}, SATS={}",
                                     elapsed_s,
                                     gga.latitude.unwrap_or(0.0),
@@ -314,7 +459,7 @@ where
                         nmea_parser::ParsedMessage::Rmc(rmc) => {
                             if let Some(time) = rmc.timestamp {
                                 let elapsed_s = crate::timebase::elapsed_seconds();
-                                info!("t={:.3}s GPS rmc time is: {}", elapsed_s, time);
+                                debug!("t={:.3}s GPS rmc time is: {}", elapsed_s, time);
 
                                 // Update cached time from RMC
                                 last_time = Some(GpsTime {
@@ -347,7 +492,7 @@ where
                             let speed_kph = vtg.sog_kph.unwrap_or(0.0);
                             let course = vtg.cog_true.unwrap_or(0.0);
                             let elapsed_s = crate::timebase::elapsed_seconds();
-                            info!(
+                            debug!(
                                 "t={:.3}s GNVTG VELOCITY: Speed={:.2} knots ({:.2} km/h); Heading: {}",
                                 elapsed_s, speed_knots, speed_kph, course
                             );

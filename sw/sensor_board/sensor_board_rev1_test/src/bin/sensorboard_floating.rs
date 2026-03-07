@@ -41,7 +41,7 @@ pub struct FloatingBoard {
     pub user_led: Option<esp_hal::gpio::Output<'static>>,
     pub neopixel: Option<neopixel::NeoPixel<'static>>,
     pub disp_spi: Option<SharedSpiDevice>,
-    pub gps2_uart: Option<esp_hal::uart::Uart<'static, esp_hal::Async>>,
+    pub gps2_uart: Option<esp_hal::uart::Uart<'static, esp_hal::Blocking>>,
     pub wifi: Option<WifiResources>,
 }
 
@@ -62,12 +62,12 @@ impl FloatingBoard {
             .into_async();
         let neopixel = neopixel::NeoPixel::new(rmt.channel0, peripherals.GPIO18);
 
-        let gps2_uart_config = esp_hal::uart::Config::default().with_baudrate(460800);
+        // Start at 9600 for baud detection; do not into_async() until after detect_gps_baud_and_init
+        let gps2_uart_config = esp_hal::uart::Config::default().with_baudrate(9600);
         let gps2_uart = esp_hal::uart::Uart::new(peripherals.UART1, gps2_uart_config)
             .unwrap()
             .with_rx(peripherals.GPIO23)
-            .with_tx(peripherals.GPIO22)
-            .into_async();
+            .with_tx(peripherals.GPIO22);
 
         let spi_config = esp_hal::spi::master::Config::default()
             .with_frequency(esp_hal::time::Rate::from_khz(100))
@@ -126,7 +126,11 @@ impl BoardPeripherals for FloatingBoard {
     }
 
     fn take_gps2_uart(&mut self) -> esp_hal::uart::Uart<'static, esp_hal::Async> {
-        self.gps2_uart.take().expect("gps2_uart already taken")
+        panic!("floating board: use take_gps2_uart_blocking() and detect_gps_baud_and_init");
+    }
+
+    fn take_gps2_uart_blocking(&mut self) -> Option<esp_hal::uart::Uart<'static, esp_hal::Blocking>> {
+        self.gps2_uart.take()
     }
 
     fn take_wifi(&mut self) -> Option<WifiResources> {

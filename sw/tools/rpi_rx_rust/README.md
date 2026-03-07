@@ -119,7 +119,7 @@ Interaction is via command-line flags and serial/stdin; see “Usage” below.
   `cargo build --release --features gpio`
 - **Install**: Copy the binary to e.g. `/opt/rpi_rx_rust/bin/rpi_rx_rust_gpio`.
 - **Log paths**: `~/daq/logs/<date>/<time>_raw.csv` and `<time>_postprocess.csv` (when GPIO19 is high). Track files: `~/daq/tracks/<date>/<time>.csv`. Base path override: `RPI_RX_OUTPUT_DIR` (logs under `<base>/logs/<date>/`, tracks under `<base>/tracks/<date>/`).
-- **Serial port**: Default `/dev/ttyACM0` (bridge). If the bridge is on a different port (e.g. only one device on ACM1), set `RPI_RX_SERIAL_PORT`.
+- **Serial port**: Default `/dev/ttyACM0` (bridge). Which device is ACM0 vs ACM1 depends on USB enumeration order (e.g. bridge may be `/dev/ttyACM1` and sensor board `/dev/ttyACM0`). Set `RPI_RX_SERIAL_PORT` to the **bridge** port so the RPi talks to the bridge (e.g. `RPI_RX_SERIAL_PORT=/dev/ttyACM1`).
 - **Environment** (optional):
   - `RPI_RX_OUTPUT_DIR`: base directory (default `$HOME`; then `daq/logs/<date>/` and `daq/tracks/<date>/`).
   - `RPI_RX_SERIAL_PORT`: serial device for bridge (default: `/dev/ttyACM0`).
