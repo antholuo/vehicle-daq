@@ -6,7 +6,8 @@
 use super::error::Result;
 use super::message::*;
 use super::protocol::{
-    MAX_PAYLOAD_SIZE, serialize_gps, serialize_heartbeat, serialize_imu, serialize_timesync,
+    serialize_request_gps_capture, MAX_PAYLOAD_SIZE, serialize_gps, serialize_heartbeat,
+    serialize_imu, serialize_timesync,
 };
 use esp_radio::esp_now::EspNow;
 
@@ -70,5 +71,17 @@ pub(crate) async fn send_timesync(
 
     esp_now.send_async(peer_addr, &buffer[..size]).await?;
 
+    Ok(())
+}
+
+/// Broadcast request for floating node to capture and send 5 GPS samples (bridge -> floating)
+pub(crate) async fn send_request_gps_capture(
+    esp_now: &mut EspNow<'_>,
+    timestamp_us: u64,
+    peer_addr: &[u8; 6],
+) -> Result<()> {
+    let mut buffer = [0u8; MAX_PAYLOAD_SIZE];
+    let size = serialize_request_gps_capture(timestamp_us, &mut buffer)?;
+    esp_now.send_async(peer_addr, &buffer[..size]).await?;
     Ok(())
 }

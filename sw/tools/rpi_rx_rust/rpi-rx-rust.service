@@ -21,7 +21,8 @@ WorkingDirectory=/opt/rpi_rx_rust
 ExecStart=/opt/rpi_rx_rust/bin/rpi_rx_rust_gpio
 
 # Logs go to ~/daq/logs/<date>/<time>_raw.csv and <time>_postprocess.csv (user's HOME when run as User=)
-# Optional: override serial port or log base directory
+# Optional: override serial port (default /dev/ttyACM0) or log base directory.
+# If bridge is on ACM0 and another board on ACM1, leave unset for ACM0.
 # Environment="RPI_RX_SERIAL_PORT=/dev/ttyACM0"
 # Environment="RPI_RX_OUTPUT_DIR=/path/to/base"   # logs under <base>/logs/<date>/
 

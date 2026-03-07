@@ -7,6 +7,8 @@ pub struct HmiStateData {
     pub gps_fix: bool,
     pub last_gps_timestamp: Option<Instant>,
     pub last_gps_rx_timestamp: Option<Instant>,
+    /// When true, floating node shows solid orange 50ms then rapid orange blink (acquiring GPS)
+    pub acquiring_gps_capture: bool,
 }
 
 impl Default for HmiStateData {
@@ -16,6 +18,7 @@ impl Default for HmiStateData {
             gps_fix: false,
             last_gps_timestamp: None,
             last_gps_rx_timestamp: None,
+            acquiring_gps_capture: false,
         }
     }
 }
@@ -29,6 +32,7 @@ impl HmiState {
             gps_fix: false,
             last_gps_timestamp: None,
             last_gps_rx_timestamp: None,
+            acquiring_gps_capture: false,
         }))
     }
 }

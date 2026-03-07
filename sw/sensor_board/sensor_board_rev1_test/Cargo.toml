@@ -11,6 +11,7 @@ default-run  = "rev1_board"
 [features]
 default = ["hmi", "imu", "gps", "wifi"]
 bridge  = ["hmi", "usb", "wifi"]
+floating = ["hmi", "gps", "wifi", "set_gps_10hz"]  # GPS-only node: wait for RequestGpsCapture, reply with 5 samples
 hmi = []      # User LED, NeoPixel, Display
 imu = []      # IMU sensor (SPI)
 gps = []      # GPS sensor (UART)
@@ -47,6 +48,11 @@ path = "./src/bin/sensorboard_rev1.rs"
 [[bin]]
 name = "devkit_c"
 path = "./src/bin/devkit_c.rs"
+
+[[bin]]
+name = "sensorboard_floating"
+path = "./src/bin/sensorboard_floating.rs"
+required-features = ["floating"]
 
 [dependencies]
 # esp-hal ecosystem - using git directly until crates.io catches up with async RMT API

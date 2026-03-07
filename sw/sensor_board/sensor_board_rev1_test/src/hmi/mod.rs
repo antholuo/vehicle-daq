@@ -106,3 +106,101 @@ pub async fn start_hmi(
         }
     }
 }
+
+/// HMI loop for floating (GPS-only) node: GREEN = GPS fix when idle; when acquiring,
+/// solid orange 50ms then rapid orange blink (50 Hz) until acquisition done.
+pub async fn start_hmi_floating(
+    mut user_led: Output<'static>,
+    led_rate_hz: u32,
+    mut neopixel: NeoPixel<'static>,
+    neopixel_brightness: u8,
+) {
+    let period = Duration::from_hz(led_rate_hz as u64);
+    let mut led_on = false;
+    let mut slow_blink_on = false;
+
+    loop {
+        let tick_start = Instant::now();
+        trace!("[HMI floating] tick");
+
+        if led_on {
+            user_led.set_low();
+        } else {
+            user_led.set_high();
+        }
+        led_on = !led_on;
+
+        let state = crate::hmi::state::HMI_STATE.0.lock().await;
+        let now = Instant::now();
+        let acquiring = state.acquiring_gps_capture;
+        let gps_fix_recent = state.gps_fix
+            && state
+                .last_gps_timestamp
+                .map(|ts| now.duration_since(ts).as_secs() <= 3)
+                .unwrap_or(false);
+        let gps_rx_recent = state
+            .last_gps_rx_timestamp
+            .map(|ts| now.duration_since(ts).as_secs() <= 3)
+            .unwrap_or(false);
+        drop(state);
+
+        if acquiring {
+            // Solid orange 50 ms
+            neopixel
+                .set_color_with_brightness(Color::Orange, neopixel_brightness)
+                .await;
+            Timer::after_millis(50).await;
+            // Rapid blink orange (50 Hz) until acquiring clears (up to ~500 ms total for 5 samples)
+            let blink_period_ms = 20u64; // 50 Hz
+            let blink_start = Instant::now();
+            loop {
+                let still_acquiring =
+                    crate::hmi::state::HMI_STATE.0.lock().await.acquiring_gps_capture;
+                if !still_acquiring || blink_start.elapsed().as_millis() >= 600 {
+                    break;
+                }
+                neopixel
+                    .set_color_with_brightness(Color::Orange, neopixel_brightness)
+                    .await;
+                Timer::after_millis(blink_period_ms / 2).await;
+                neopixel.clear().await;
+                Timer::after_millis(blink_period_ms / 2).await;
+            }
+            continue;
+        }
+
+        // Idle: same green GPS fix indicator as main board
+        if gps_fix_recent {
+            neopixel
+                .set_color_with_brightness(Color::Green, neopixel_brightness)
+                .await;
+        } else if gps_rx_recent {
+            neopixel
+                .set_color_with_brightness(Color::Green, neopixel_brightness)
+                .await;
+            Timer::after_millis(100).await;
+            neopixel.clear().await;
+            Timer::after_millis(100).await;
+            neopixel
+                .set_color_with_brightness(Color::Green, neopixel_brightness)
+                .await;
+            Timer::after_millis(100).await;
+            neopixel.clear().await;
+            Timer::after_millis(700).await;
+        } else {
+            slow_blink_on = !slow_blink_on;
+            if slow_blink_on {
+                neopixel
+                    .set_color_with_brightness(Color::Green, neopixel_brightness)
+                    .await;
+            } else {
+                neopixel.clear().await;
+            }
+        }
+
+        let elapsed = tick_start.elapsed();
+        if elapsed < period {
+            Timer::after(period - elapsed).await;
+        }
+    }
+}
