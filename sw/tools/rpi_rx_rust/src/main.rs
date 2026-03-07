@@ -11,12 +11,39 @@ use rpi_rx_rust::session::{run_session, ByteSource};
 
 const DEFAULT_SERIAL_PORT: &str = "/dev/ttyACM0";
 const DEFAULT_BAUD_RATE: u32 = 115_200;
+/// Serial read timeout; on timeout we return None so the session keeps polling instead of exiting.
+const SERIAL_READ_TIMEOUT_MS: u64 = 200;
 
 // =============================================================================
 // ByteSource implementations for main binary
 // =============================================================================
 
-/// Byte source from an iterator (stdin or serial without timeout); EOF yields None.
+/// Byte source from serial with timeout: returns None on timeout so the session keeps running;
+/// only real errors are propagated. Avoids exiting when the bridge is idle (e.g. no nodes in range).
+struct SerialTimeoutByteSource {
+    port: Box<dyn serialport::SerialPort>,
+    buf: [u8; 1],
+}
+
+impl SerialTimeoutByteSource {
+    fn new(port: Box<dyn serialport::SerialPort>) -> Self {
+        Self { port, buf: [0u8; 1] }
+    }
+}
+
+impl ByteSource for SerialTimeoutByteSource {
+    fn next_byte(&mut self) -> Option<io::Result<u8>> {
+        match self.port.read(&mut self.buf) {
+            Ok(0) => None,
+            Ok(1) => Some(Ok(self.buf[0])),
+            Ok(_) => unreachable!(),
+            Err(e) if e.kind() == io::ErrorKind::TimedOut => None,
+            Err(e) => Some(Err(e)),
+        }
+    }
+}
+
+/// Byte source from an iterator (stdin); EOF yields None.
 struct IteratorByteSource<I>(I)
 where
     I: Iterator<Item = io::Result<u8>>;
@@ -97,23 +124,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         );
     }
 
-    struct SerialAsRead(Box<dyn serialport::SerialPort>);
-    impl Read for SerialAsRead {
-        fn read(&mut self, buf: &mut [u8]) -> io::Result<usize> {
-            self.0.as_mut().read(buf)
-        }
-    }
-
-    let mut serial_port_reader: Option<SerialAsRead> = None;
+    let mut serial_port: Option<Box<dyn serialport::SerialPort>> = None;
     let mut input_source = "stdin".to_string();
 
     match serialport::new(DEFAULT_SERIAL_PORT, DEFAULT_BAUD_RATE)
-        .timeout(Duration::from_millis(100))
+        .timeout(Duration::from_millis(SERIAL_READ_TIMEOUT_MS))
         .open()
     {
         Ok(port) => {
             info!("Successfully opened serial port: {}", DEFAULT_SERIAL_PORT);
-            serial_port_reader = Some(SerialAsRead(port));
+            serial_port = Some(port);
             input_source = format!("serial port {}", DEFAULT_SERIAL_PORT);
         }
         Err(e) => {
@@ -126,14 +146,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     info!("Reading data from {}", input_source);
 
-    let mut byte_source: Box<dyn ByteSource> = if let Some(reader) = serial_port_reader {
-        Box::new(IteratorByteSource(reader.bytes()))
+    let mut byte_source: Box<dyn ByteSource> = if let Some(port) = serial_port {
+        Box::new(SerialTimeoutByteSource::new(port))
     } else {
         Box::new(IteratorByteSource(io::stdin().bytes()))
     };
 
-    // Break when byte source returns None (EOF)
-    let mut should_stop = || true;
+    // Run until Ctrl+C (or fatal error). Session only stops when should_stop() is true.
+    let mut should_stop = || false;
     run_session(
         &mut *byte_source,
         &mut wtr,
