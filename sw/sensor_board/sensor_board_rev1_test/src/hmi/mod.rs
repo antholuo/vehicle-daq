@@ -31,8 +31,6 @@ pub async fn start_hmi(
     mut neopixel: NeoPixel<'static>,
     neopixel_brightness: u8,
 ) {
-    info!("[HMI] Task started (LED + NeoPixel, {} Hz)", led_rate_hz);
-
     let mut led_on = false;
     let mut slow_blink_on = false;
     let led_period = Duration::from_hz(led_rate_hz as u64);
@@ -185,15 +183,6 @@ pub async fn start_hmi_floating(
     mut neopixel: NeoPixel<'static>,
     neopixel_brightness: u8,
 ) {
-    info!("[HMI] Floating task started (LED + NeoPixel, {} Hz)", led_rate_hz);
-    // Immediate test: flash NeoPixel at high brightness so we confirm it's driven (pin GPIO18)
-    neopixel
-        .set_color_with_brightness(Color::Green, 80)
-        .await;
-    Timer::after_millis(500).await;
-    neopixel.clear().await;
-    Timer::after_millis(200).await;
-
     // Fast idle tick (40 Hz) so we see acquiring_gps_capture within 25 ms and get smooth breathing
     const IDLE_TICK_MS: u64 = 25;
     let period = Duration::from_millis(IDLE_TICK_MS);
@@ -250,8 +239,7 @@ pub async fn start_hmi_floating(
             continue;
         }
 
-        // Idle: green GPS fix with breathe (25% to max) for "alive" indication
-        if gps_fix_recent {
+        if gps_fix_recent { // Breathing green
             let breath_period_ms: u64 = 2000;
             let elapsed_ms = (now.as_millis() as u64) % breath_period_ms;
             let phase_256 = (elapsed_ms * 256 / breath_period_ms) as u32;
@@ -264,7 +252,7 @@ pub async fn start_hmi_floating(
             neopixel
                 .set_color_with_brightness(Color::Green, breath_brightness)
                 .await;
-        } else if gps_rx_recent {
+        } else if gps_rx_recent { // Double Blink green
             neopixel
                 .set_color_with_brightness(Color::Green, neopixel_brightness)
                 .await;
@@ -277,7 +265,7 @@ pub async fn start_hmi_floating(
             Timer::after_millis(100).await;
             neopixel.clear().await;
             Timer::after_millis(700).await;
-        } else {
+        } else { // Single Blink green
             slow_blink_on = !slow_blink_on;
             if slow_blink_on {
                 neopixel
