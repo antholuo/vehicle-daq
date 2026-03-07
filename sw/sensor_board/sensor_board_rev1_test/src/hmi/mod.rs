@@ -20,6 +20,7 @@ pub async fn start_hmi(
     mut neopixel: NeoPixel<'static>,
     neopixel_brightness: u8,
 ) {
+    info!("[HMI] Task started (LED + NeoPixel, {} Hz)", led_rate_hz);
     let period = Duration::from_hz(led_rate_hz as u64);
 
     let mut led_on = false;
@@ -115,6 +116,15 @@ pub async fn start_hmi_floating(
     mut neopixel: NeoPixel<'static>,
     neopixel_brightness: u8,
 ) {
+    info!("[HMI] Floating task started (LED + NeoPixel, {} Hz)", led_rate_hz);
+    // Immediate test: flash NeoPixel at high brightness so we confirm it's driven (pin GPIO18)
+    neopixel
+        .set_color_with_brightness(Color::Green, 80)
+        .await;
+    Timer::after_millis(500).await;
+    neopixel.clear().await;
+    Timer::after_millis(200).await;
+
     let period = Duration::from_hz(led_rate_hz as u64);
     let mut led_on = false;
     let mut slow_blink_on = false;

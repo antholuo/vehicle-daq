@@ -251,9 +251,12 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     // FIXME: Moving this here so that esp-now can be handled within app.rs
     // NOTE: this is not correct behaviour, but it'll be ok ish for now
     #[cfg(feature = "hmi")]
-    spawner
-        .spawn(start_hmi_task(user_led, neopixel))
-        .expect("HMI task did not spawn");
+    {
+        info!("[HMI] Spawning HMI task (user LED + NeoPixel)");
+        spawner
+            .spawn(start_hmi_task(user_led, neopixel))
+            .expect("HMI task did not spawn");
+    }
 
 
     loop {
@@ -720,7 +723,9 @@ async fn floating_espnow_task(
                         let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
                         hmi.acquiring_gps_capture = true;
                     }
-                    CAPTURE_MODE.store(true, Ordering::Relaxed);
+                    CAPTURE_MODE.store(true, Ordering::SeqCst);
+                    // Brief yield so the GPS task can see CAPTURE_MODE before we block on receive()
+                    Timer::after_millis(20).await;
 
                     let mut sent = 0u32;
                     for _ in 0..NUM_SAMPLES {
@@ -744,7 +749,7 @@ async fn floating_espnow_task(
                         sent
                     );
 
-                    CAPTURE_MODE.store(false, Ordering::Relaxed);
+                    CAPTURE_MODE.store(false, Ordering::SeqCst);
                     {
                         let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
                         hmi.acquiring_gps_capture = false;
@@ -768,14 +773,31 @@ pub async fn app_run_floating<B: BoardPeripherals>(spawner: embassy_executor::Sp
     let mut user_led = board.take_user_led();
     let mut neopixel = board.take_neopixel();
 
-    // Startup: brief orange flash
+    // Startup delay: show rainbow cycle on NeoPixel (same as regular sensor board)
     {
         use crate::hmi::Color;
-        neopixel
-            .set_color_with_brightness(Color::Orange, 30)
-            .await;
-        Timer::after_millis(500).await;
-        neopixel.clear().await;
+        let startup_duration = Duration::from_secs(3);
+        let step = Duration::from_millis(80);
+        let steps = (startup_duration.as_millis() / step.as_millis()) as u32;
+        fn wheel(pos: u8) -> (u8, u8, u8) {
+            if pos < 85 {
+                (255 - pos * 3, pos * 3, 0)
+            } else if pos < 170 {
+                let pos = pos - 85;
+                (0, 255 - pos * 3, pos * 3)
+            } else {
+                let pos = pos - 170;
+                (pos * 3, 0, 255 - pos * 3)
+            }
+        }
+        for i in 0..=steps {
+            let pos = ((i * 256 / (steps.max(1))) % 256) as u8;
+            let (r, g, b) = wheel(pos);
+            neopixel
+                .set_color_with_brightness(Color::Custom(r, g, b), 50)
+                .await;
+            Timer::after(step).await;
+        }
     }
 
     let _ = board.take_disp_spi_device();
@@ -797,7 +819,9 @@ pub async fn app_run_floating<B: BoardPeripherals>(spawner: embassy_executor::Sp
         .expect("GPS task did not spawn");
 
     let led_rate_hz = 1u32;
-    let neopixel_brightness = 10u8;
+    // Use higher NeoPixel brightness (50) so the single WS2812 is clearly visible; 10 is very dim
+    let neopixel_brightness = 50u8;
+    info!("[FLOATING] Spawning HMI floating task (user LED + NeoPixel)");
     spawner
         .spawn(start_hmi_floating_task(
             user_led,
@@ -819,8 +843,10 @@ async fn start_gps_task_floating(
 ) {
     gps2_uart = init_gps(gps2_uart).await;
     let on_data = |data: GpsData| {
-        if CAPTURE_MODE.load(Ordering::Relaxed) {
-            let _ = CAPTURE_CHANNEL.try_send(data);
+        if CAPTURE_MODE.load(Ordering::SeqCst) {
+            if CAPTURE_CHANNEL.try_send(data).is_ok() {
+                info!("[FLOATING] GPS sample pushed to capture channel (lat={:.6}, lon={:.6})", data.lat, data.lon);
+            }
         }
     };
     start_gps(gps2_uart, on_data).await;

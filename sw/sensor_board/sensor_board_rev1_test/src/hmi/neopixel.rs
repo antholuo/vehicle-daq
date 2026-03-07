@@ -4,9 +4,10 @@
 //! - WS2812B Datasheet: <https://cdn-shop.adafruit.com/datasheets/WS2812B.pdf>
 //! - esp-hal RMT examples: <https://github.com/esp-rs/esp-hal/tree/main/examples>
 
+use core::sync::atomic::{AtomicBool, Ordering};
 use esp_hal::gpio::{Level, OutputPin};
 use esp_hal::rmt::{Channel, PulseCode, Tx, TxChannelConfig, TxChannelCreator};
-use log::warn;
+use log::{info, warn};
 
 /// Simple color enum for a single NeoPixel.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -90,6 +91,10 @@ impl<'d> NeoPixel<'d> {
     /// Async set color (non-blocking RMT transfer).
     pub async fn set_color(&mut self, color: Color) {
         self.fill_buffer(color);
+        static FIRST: AtomicBool = AtomicBool::new(true);
+        if FIRST.swap(false, Ordering::Relaxed) {
+            info!("[NeoPixel] first transmit (driver reached)");
+        }
         if let Err(e) = self.channel.transmit(&self.buffer).await {
             warn!("[NeoPixel] Transmit error: {:?}", e);
         }
