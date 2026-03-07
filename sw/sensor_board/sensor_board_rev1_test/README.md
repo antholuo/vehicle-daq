@@ -4,9 +4,11 @@ This project was originally supposed to just be a test project for the ESP-HAL:1
 
 ## Binaries
 
-`rev1_board` | **Sensor node**: streams IMU + GPS + heartbeat over ESP-NOW. Pauses transmissions when track capture is armed (to avoid dropping floating-node packets). Optional position feature (e.g. `pos_center`) for node ID.
-`sensorboard_floating` | **Floating (GPS-only) Sensor node**: waits for RequestGpsCapture over ESP-NOW, replies with the next 5 GPS samples. Used with RPi track capture.
-`devkit_c` | **Bridge node**: receives ESP-NOW from nodes, forwards to host over USB (COBS). Accepts TimeSync, Arm/End track, RequestFloatingGps, CaptureSuccess/CaptureTimeout. When track capture is armed, sends a **track-capture heartbeat** (0xFE) to the Pi every 500 ms; if no USB from Pi for 2 s, auto-ends and broadcasts TrackCaptureEnded.
+| Binary | Purpose |
+|--------|--------|
+| `rev1_board` | **Sensor node**: streams IMU + GPS + heartbeat over ESP-NOW. Pauses transmissions when track capture is armed (to avoid dropping floating-node packets). Optional position feature (e.g. `pos_center`) for node ID. |
+| `sensorboard_floating` | **Floating (GPS-only) Sensor node**: waits for RequestGpsCapture over ESP-NOW, replies with the next 5 GPS samples. Used with RPi track capture. |
+| `devkit_c` | **Bridge node**: receives ESP-NOW from nodes, forwards to host over USB (COBS). Accepts TimeSync, Arm/End track, RequestFloatingGps, CaptureSuccess/CaptureTimeout. When track capture is armed, sends a **track-capture heartbeat** (0xFE) to the Pi every 500 ms; if no USB from Pi for 2 s, auto-ends and broadcasts TrackCaptureEnded. |
 
 ## Build commands
 
