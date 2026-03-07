@@ -24,9 +24,13 @@ use crate::aircomm::TimeSyncData;
 #[cfg(feature = "gps")]
 use crate::gps::{init_gps, start_gps};
 #[cfg(feature = "hmi")]
-use crate::hmi::{neopixel, start_hmi};
+use crate::hmi::{neopixel, start_hmi, start_hmi_floating};
 #[cfg(feature = "imu")]
 use crate::imu::start_imu;
+#[cfg(feature = "floating")]
+use crate::types::GpsData;
+#[cfg(feature = "floating")]
+use core::sync::atomic::{AtomicBool, Ordering};
 #[cfg(all(feature = "wifi", feature = "usb"))]
 use crate::types::NodeId;
 #[cfg(feature = "usb")]
@@ -45,6 +49,12 @@ const SENSOR_CHANNEL_CAPACITY: usize = 8;
 #[cfg(feature = "wifi")]
 static SENSOR_CHANNEL: Channel<CriticalSectionRawMutex, SensorPayload, SENSOR_CHANNEL_CAPACITY> =
     Channel::new();
+
+/// Floating node: channel for collecting 5 GPS samples when RequestGpsCapture is received
+#[cfg(feature = "floating")]
+static CAPTURE_CHANNEL: Channel<CriticalSectionRawMutex, GpsData, 5> = Channel::new();
+#[cfg(feature = "floating")]
+static CAPTURE_MODE: AtomicBool = AtomicBool::new(false);
 
 pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
     info!("app is starting execution now");
@@ -428,6 +438,10 @@ async fn espnow_sender_task(
                         // TimeSync payloads are not sent from data nodes
                         Ok(())
                     }
+                    SensorPayload::RequestGpsCapture => {
+                        // Only bridge sends this; data nodes ignore
+                        Ok(())
+                    }
                 };
 
                 match result {
@@ -503,6 +517,9 @@ async fn espnow_bridge_task(
     let mut messages_forwarded: u32 = 0;
     let mut errors: u32 = 0;
     let mut timesync_count: u32 = 0;
+    /// Collecting 5 GPS from floating node for RequestFloatingGps response
+    let mut floating_gps_remaining: u8 = 0;
+    let mut floating_gps_mac: Option<[u8; 6]> = None;
 
     loop {
         // --- Poll USB RX for commands from RPi (non-blocking) ---
@@ -523,6 +540,16 @@ async fn espnow_bridge_task(
                                 "[BRIDGE] TimeSync #{}: session={}us, broadcast OK",
                                 timesync_count, session_time_us
                             );
+                        }
+                    }
+                    UsbCommand::RequestFloatingGps => {
+                        let ts = crate::timebase::synced_timestamp_us();
+                        if let Err(e) = transceiver.send_request_gps_capture(ts, &BROADCAST).await {
+                            warn!("[BRIDGE] RequestGpsCapture broadcast failed: {:?}", e);
+                        } else {
+                            info!("[BRIDGE] RequestFloatingGps: broadcast RequestGpsCapture, collecting 5 GPS");
+                            floating_gps_remaining = 5;
+                            floating_gps_mac = None;
                         }
                     }
                 }
@@ -590,38 +617,62 @@ async fn espnow_bridge_task(
                     .copied()
                     .unwrap_or_else(|| NodeId::new(CarPosition::Custom, 0));
 
-                // Serialize the message
-                match serialize_forwarded_message(
-                    &src_mac,
-                    &node_id,
-                    timestamp_us,
-                    &msg.payload,
-                    &mut msg_buffer,
-                ) {
-                    Ok(len) => {
-                        // Send via USB with COBS framing
-                        match usb_serial.write_framed(&msg_buffer[..len]).await {
-                            Ok(()) => {
-                                messages_forwarded += 1;
-                                trace!(
-                                    "[BRIDGE] Forwarded {:?} from {} ({}:{}) (total: {})",
-                                    msg.payload.message_type(),
-                                    format_mac(&src_mac),
-                                    node_id.position.as_str(),
-                                    node_id.instance,
-                                    messages_forwarded
-                                );
-                            }
-                            Err(UsbError::NotReady) => {}
-                            Err(e) => {
-                                errors += 1;
-                                warn!("[BRIDGE] USB write error: {:?}", e);
+                // When collecting floating GPS, only forward the 5 GPS from the floating node (first GPS sender)
+                let should_forward = if floating_gps_remaining > 0 {
+                    if let SensorPayload::Gps(_) = &msg.payload {
+                        let is_floating = floating_gps_mac.map(|m| m == src_mac).unwrap_or(true);
+                        if is_floating && floating_gps_mac.is_none() {
+                            floating_gps_mac = Some(src_mac);
+                        }
+                        is_floating
+                    } else {
+                        false
+                    }
+                } else {
+                    true
+                };
+
+                if should_forward {
+                    match serialize_forwarded_message(
+                        &src_mac,
+                        &node_id,
+                        timestamp_us,
+                        &msg.payload,
+                        &mut msg_buffer,
+                    ) {
+                        Ok(len) => {
+                            match usb_serial.write_framed(&msg_buffer[..len]).await {
+                                Ok(()) => {
+                                    messages_forwarded += 1;
+                                    if let SensorPayload::Gps(_) = &msg.payload {
+                                        if floating_gps_remaining > 0 {
+                                            floating_gps_remaining -= 1;
+                                            if floating_gps_remaining == 0 {
+                                                floating_gps_mac = None;
+                                                info!("[BRIDGE] Floating GPS: 5 samples forwarded to RPi");
+                                            }
+                                        }
+                                    }
+                                    trace!(
+                                        "[BRIDGE] Forwarded {:?} from {} ({}:{}) (total: {})",
+                                        msg.payload.message_type(),
+                                        format_mac(&src_mac),
+                                        node_id.position.as_str(),
+                                        node_id.instance,
+                                        messages_forwarded
+                                    );
+                                }
+                                Err(UsbError::NotReady) => {}
+                                Err(e) => {
+                                    errors += 1;
+                                    warn!("[BRIDGE] USB write error: {:?}", e);
+                                }
                             }
                         }
-                    }
-                    Err(e) => {
-                        errors += 1;
-                        warn!("[BRIDGE] Serialize error: {:?}", e);
+                        Err(e) => {
+                            errors += 1;
+                            warn!("[BRIDGE] Serialize error: {:?}", e);
+                        }
                     }
                 }
 
@@ -641,6 +692,149 @@ async fn espnow_bridge_task(
             }
         }
     }
+}
+
+// =============================================================================
+// Floating (GPS-only) node: wait for RequestGpsCapture, reply with 5 GPS samples
+// =============================================================================
+
+#[cfg(all(feature = "floating", feature = "wifi"))]
+#[embassy_executor::task]
+async fn floating_espnow_task(
+    mut transceiver: AirCommTransceiver<'static>,
+    _wifi_controller: esp_radio::wifi::WifiController<'static>,
+) {
+    use crate::aircomm::SensorPayload;
+
+    info!("[FLOATING] ESP-NOW task started (wait for RequestGpsCapture, reply with 5 GPS)");
+
+    const COLLECT_TIMEOUT: Duration = Duration::from_millis(800);
+    const NUM_SAMPLES: u32 = 5;
+
+    loop {
+        match transceiver.receive().await {
+            Ok(msg) => {
+                if let SensorPayload::RequestGpsCapture = msg.payload {
+                    info!("[FLOATING] RequestGpsCapture received, collecting 5 GPS samples");
+                    {
+                        let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+                        hmi.acquiring_gps_capture = true;
+                    }
+                    CAPTURE_MODE.store(true, Ordering::Relaxed);
+
+                    let mut sent = 0u32;
+                    for _ in 0..NUM_SAMPLES {
+                        match embassy_time::with_timeout(
+                            COLLECT_TIMEOUT,
+                            CAPTURE_CHANNEL.receive(),
+                        )
+                        .await
+                        {
+                            Ok(gps) => {
+                                let ts = crate::timebase::synced_timestamp_us();
+                                if transceiver.send_gps(ts, &gps, &BROADCAST).await.is_ok() {
+                                    sent += 1;
+                                }
+                            }
+                            Err(_) => break,
+                        }
+                    }
+                    info!(
+                        "[FLOATING] Sent {} GPS samples in response to capture request",
+                        sent
+                    );
+
+                    CAPTURE_MODE.store(false, Ordering::Relaxed);
+                    {
+                        let mut hmi = crate::hmi::state::HMI_STATE.0.lock().await;
+                        hmi.acquiring_gps_capture = false;
+                    }
+                }
+                // Ignore other message types (TimeSync, Heartbeat, etc.)
+            }
+            Err(e) => {
+                warn!("[FLOATING] Receive error: {:?}", e);
+            }
+        }
+    }
+}
+
+#[cfg(feature = "floating")]
+pub async fn app_run_floating<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mut board: B) {
+    info!("[FLOATING] app starting (GPS-only, wait for RequestGpsCapture)");
+
+    crate::timebase::set_program_start();
+
+    let mut user_led = board.take_user_led();
+    let mut neopixel = board.take_neopixel();
+
+    // Startup: brief orange flash
+    {
+        use crate::hmi::Color;
+        neopixel
+            .set_color_with_brightness(Color::Orange, 30)
+            .await;
+        Timer::after_millis(500).await;
+        neopixel.clear().await;
+    }
+
+    let _ = board.take_disp_spi_device();
+    let gps2_uart = board.take_gps2_uart();
+
+    if let Some(wifi) = board.take_wifi() {
+        match AirCommTransceiver::new(wifi.esp_now) {
+            Ok(transceiver) => {
+                spawner
+                    .spawn(floating_espnow_task(transceiver, wifi.controller))
+                    .expect("floating ESP-NOW task did not spawn");
+            }
+            Err(e) => warn!("[FLOATING] AirComm init failed: {:?}", e),
+        }
+    }
+
+    spawner
+        .spawn(start_gps_task_floating(gps2_uart))
+        .expect("GPS task did not spawn");
+
+    let led_rate_hz = 1u32;
+    let neopixel_brightness = 10u8;
+    spawner
+        .spawn(start_hmi_floating_task(
+            user_led,
+            neopixel,
+            led_rate_hz,
+            neopixel_brightness,
+        ))
+        .expect("HMI floating task did not spawn");
+
+    loop {
+        Timer::after_secs(1).await;
+    }
+}
+
+#[cfg(feature = "floating")]
+#[embassy_executor::task]
+async fn start_gps_task_floating(
+    mut gps2_uart: esp_hal::uart::Uart<'static, esp_hal::Async>,
+) {
+    gps2_uart = init_gps(gps2_uart).await;
+    let on_data = |data: GpsData| {
+        if CAPTURE_MODE.load(Ordering::Relaxed) {
+            let _ = CAPTURE_CHANNEL.try_send(data);
+        }
+    };
+    start_gps(gps2_uart, on_data).await;
+}
+
+#[cfg(feature = "floating")]
+#[embassy_executor::task]
+async fn start_hmi_floating_task(
+    user_led: esp_hal::gpio::Output<'static>,
+    neopixel: neopixel::NeoPixel<'static>,
+    led_rate_hz: u32,
+    neopixel_brightness: u8,
+) {
+    start_hmi_floating(user_led, led_rate_hz, neopixel, neopixel_brightness).await;
 }
 
 // =============================================================================
@@ -707,6 +901,10 @@ fn handle_received_message(msg: &SensorMessage) {
                 "[ESP-NOW RX] TimeSync from {:02X}:{:02X}:{:02X}:{:02X}:{:02X}:{:02X} | session={}us",
                 src[0], src[1], src[2], src[3], src[4], src[5], data.session_time_us
             );
+        }
+        SensorPayload::RequestGpsCapture => {
+            // Bridge -> floating; regular nodes ignore
+            trace!("[ESP-NOW RX] RequestGpsCapture (ignored)");
         }
     }
 }

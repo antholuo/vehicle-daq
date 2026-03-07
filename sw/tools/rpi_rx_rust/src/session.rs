@@ -1,4 +1,5 @@
 //! Logging session: byte source abstraction and run loop (decode COBS, write CSV, optional AHRS).
+//! Optional track capture: when collecting_for_track is set, next 5 GPS are averaged and passed to callback.
 
 use crate::ahrs::AhrsFilter;
 use crate::types::{error_decoded_message, format_mac_address, parse_message};
@@ -7,10 +8,12 @@ use csv::Writer;
 use log::*;
 use std::collections::VecDeque;
 use std::io;
+use std::sync::atomic::Ordering;
 
 const COBS_DECODED_BUFFER_SIZE: usize = 128;
 const AHRS_SAMPLE_PERIOD_S: f64 = 1.0 / 400.0;
 const AHRS_BETA: f64 = 0.1;
+const TRACK_CAPTURE_NUM_GPS: usize = 5;
 
 /// Source of bytes (e.g. serial with timeout, or stdin). Returns `None` when no byte available (e.g. timeout).
 pub trait ByteSource {
@@ -19,12 +22,16 @@ pub trait ByteSource {
 
 /// Runs the decode/write loop until EOF or `should_stop()` returns true.
 /// Logs raw CSV to `raw_wtr`; if `ahrs_wtr` is `Some`, also runs AHRS and writes at `ahrs_hz`.
+/// If `collecting_for_track` and `on_track_capture` are both `Some`, when the flag is true the next 5 GPS
+/// messages are averaged and the callback is invoked with (lat, lon, alt).
 pub fn run_session<W, W2, B>(
     byte_source: &mut B,
     raw_wtr: &mut Writer<W>,
     mut ahrs_wtr: Option<&mut Writer<W2>>,
     ahrs_hz: u32,
     should_stop: &mut dyn FnMut() -> bool,
+    collecting_for_track: Option<&std::sync::atomic::AtomicBool>,
+    mut on_track_capture: Option<&mut dyn FnMut(f64, f64, f32)>,
 ) -> Result<(), Box<dyn std::error::Error>>
 where
     W: std::io::Write,
@@ -41,6 +48,7 @@ where
     let with_ahrs = ahrs_wtr.is_some();
 
     let mut message_count: u64 = 0;
+    let mut track_gps_buf: Vec<(f64, f64, f32)> = Vec::with_capacity(TRACK_CAPTURE_NUM_GPS);
 
     loop {
         let byte_opt = byte_source.next_byte();
@@ -78,6 +86,38 @@ where
                                     );
                                     raw_wtr.serialize(&msg)?;
                                     raw_wtr.flush()?;
+
+                                    // Track capture: collect 5 GPS when flag set, then average and callback
+                                    if let (Some(collecting), Some(on_capture)) = (
+                                        collecting_for_track.as_ref(),
+                                        on_track_capture.as_mut(),
+                                    ) {
+                                        if msg.message_type == "Gps"
+                                            && collecting.load(Ordering::Relaxed)
+                                            && msg.lat.is_some()
+                                            && msg.lon.is_some()
+                                            && msg.alt.is_some()
+                                        {
+                                            let lat = msg.lat.unwrap();
+                                            let lon = msg.lon.unwrap();
+                                            let alt = msg.alt.unwrap();
+                                            track_gps_buf.push((lat, lon, alt));
+                                            if track_gps_buf.len() >= TRACK_CAPTURE_NUM_GPS {
+                                                let n = track_gps_buf.len();
+                                                let (slat, slon, salt) = track_gps_buf
+                                                    .drain(..)
+                                                    .fold((0.0_f64, 0.0_f64, 0.0_f32),
+                                                        |(a, b, c), (x, y, z)| (a + x, b + y, c + z));
+                                                collecting.store(false, Ordering::Relaxed);
+                                                on_capture(
+                                                    slat / (n as f64),
+                                                    slon / (n as f64),
+                                                    salt / (n as f32),
+                                                );
+                                                info!("Track capture: averaged {} GPS samples", n);
+                                            }
+                                        }
+                                    }
 
                                     if with_ahrs {
                                         if msg.message_type == "Gps" {

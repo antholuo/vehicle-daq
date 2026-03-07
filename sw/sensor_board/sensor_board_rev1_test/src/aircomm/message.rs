@@ -14,6 +14,8 @@ pub enum MessageType {
     Imu = 0x01,
     /// GPS sensor data
     Gps = 0x02,
+    /// Request floating GPS capture: bridge broadcasts, floating node replies with 5 GPS samples
+    RequestGpsCapture = 0xFD,
     /// Time synchronization from bridge/RPi
     TimeSync = 0xFE,
     /// Heartbeat/keep-alive message
@@ -25,6 +27,7 @@ impl MessageType {
         match value {
             0x01 => Some(MessageType::Imu),
             0x02 => Some(MessageType::Gps),
+            0xFD => Some(MessageType::RequestGpsCapture),
             0xFE => Some(MessageType::TimeSync),
             0xFF => Some(MessageType::Heartbeat),
             _ => None,
@@ -116,6 +119,8 @@ pub struct SensorMessage {
 pub enum SensorPayload {
     Imu(ImuData),
     Gps(GpsData),
+    /// Request to capture next 5 GPS samples (no payload; bridge -> floating)
+    RequestGpsCapture,
     Heartbeat(HeartbeatData),
     TimeSync(TimeSyncData),
 }
@@ -125,6 +130,7 @@ impl SensorPayload {
         match self {
             SensorPayload::Imu(_) => MessageType::Imu,
             SensorPayload::Gps(_) => MessageType::Gps,
+            SensorPayload::RequestGpsCapture => MessageType::RequestGpsCapture,
             SensorPayload::Heartbeat(_) => MessageType::Heartbeat,
             SensorPayload::TimeSync(_) => MessageType::TimeSync,
         }

@@ -118,8 +118,8 @@ pub fn serialize_forwarded_message(
             buffer[offset] = hb.magic;
             offset += 1;
         }
-        SensorPayload::TimeSync(_) => {
-            // TimeSync is not forwarded to USB host; bridge handles it internally
+        SensorPayload::TimeSync(_) | SensorPayload::RequestGpsCapture => {
+            // TimeSync and RequestGpsCapture are not forwarded to USB host
             return Err(ForwardError::UnsupportedPayload);
         }
     }
@@ -157,17 +157,21 @@ pub enum ForwardError {
 
 /// USB command type byte values (RPi -> Bridge)
 pub const CMD_TIME_SYNC: u8 = 0x01;
+/// Request floating GPS capture: bridge broadcasts RequestGpsCapture, collects 5 GPS, forwards to RPi
+pub const CMD_REQUEST_FLOATING_GPS: u8 = 0x02;
 
 /// Parsed USB command from the RPi host
 #[derive(Debug, Clone, Copy)]
 pub enum UsbCommand {
     /// TimeSync: RPi sends its session-elapsed time (microseconds)
     TimeSync { session_time_us: u64 },
+    /// Request floating GPS: broadcast to floating node, collect 5 GPS samples, forward to RPi
+    RequestFloatingGps,
 }
 
 /// Parse a COBS-decoded command buffer into a `UsbCommand`.
 ///
-/// Minimum size: 1 (command type) + 8 (payload for TimeSync) = 9 bytes.
+/// TimeSync: 1 + 8 = 9 bytes. RequestFloatingGps: 1 byte.
 pub fn parse_usb_command(buffer: &[u8]) -> Result<UsbCommand, ForwardError> {
     if buffer.is_empty() {
         return Err(ForwardError::BufferTooSmall);
@@ -181,6 +185,7 @@ pub fn parse_usb_command(buffer: &[u8]) -> Result<UsbCommand, ForwardError> {
             let session_time_us = LittleEndian::read_u64(&buffer[1..]);
             Ok(UsbCommand::TimeSync { session_time_us })
         }
+        CMD_REQUEST_FLOATING_GPS => Ok(UsbCommand::RequestFloatingGps),
         _ => Err(ForwardError::UnsupportedPayload),
     }
 }

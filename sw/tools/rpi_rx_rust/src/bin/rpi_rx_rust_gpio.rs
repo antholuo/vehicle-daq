@@ -13,7 +13,7 @@ use gpiod::{Chip, EdgeDetect, Options, Bias};
 use log::*;
 use rpi_rx_rust::session::{run_session, ByteSource};
 use rpi_rx_rust::TimeSyncSender;
-use std::cell::Cell;
+use std::cell::{Cell, RefCell};
 use std::fs;
 use std::io::{self, Read, Write};
 use std::net::TcpStream;
@@ -24,6 +24,9 @@ use std::time::{Duration, Instant};
 const GPIO_INIT: u32 = 11;   // BCM 11: init / raw
 const GPIO_POST: u32 = 19;   // BCM 19: postprocessed logging
 const GPIO_VIDEO: u32 = 26;  // BCM 26: video recording control
+const GPIO_TRACK_ARM: u32 = 10;    // BCM 10: arm track capture (high = new track file)
+const GPIO_TRACK_CAPTURE: u32 = 9; // BCM 9: rising edge = take location (request floating GPS)
+/// Serial port for bridge. Set RPI_RX_SERIAL_PORT if bridge is not on ACM0 (e.g. bridge=ACM0, other board=ACM1).
 const DEFAULT_SERIAL_PORT: &str = "/dev/ttyACM0";
 const DEFAULT_BAUD_RATE: u32 = 115_200;
 const SERIAL_READ_TIMEOUT_MS: u64 = 200;
@@ -65,6 +68,18 @@ fn log_dir_for_today() -> PathBuf {
         Err(_) => {
             let home = std::env::var("HOME").unwrap_or_else(|_| "/opt/rpi_rx_rust".to_string());
             PathBuf::from(home).join("daq").join("logs").join(date_str)
+        }
+    }
+}
+
+/// Track directory: ~/daq/tracks/<date>. Same base as logs when RPI_RX_OUTPUT_DIR is set.
+fn track_dir_for_today() -> PathBuf {
+    let date_str = Local::now().format("%Y-%m-%d").to_string();
+    match std::env::var("RPI_RX_OUTPUT_DIR") {
+        Ok(custom) => PathBuf::from(custom).join("tracks").join(date_str),
+        Err(_) => {
+            let home = std::env::var("HOME").unwrap_or_else(|_| "/opt/rpi_rx_rust".to_string());
+            PathBuf::from(home).join("daq").join("tracks").join(date_str)
         }
     }
 }
@@ -152,30 +167,32 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         .filter_level(log::LevelFilter::Info)
         .init();
 
-    info!("rpi_rx_rust_gpio: GPIO {} (init), GPIO {} (post), GPIO {} (video); logs under ~/daq/logs/<date>/", GPIO_INIT, GPIO_POST, GPIO_VIDEO);
+    info!("rpi_rx_rust_gpio: GPIO {} (init), {} (post), {} (video), {} (track arm), {} (track capture); logs under ~/daq/logs/<date>/", GPIO_INIT, GPIO_POST, GPIO_VIDEO, GPIO_TRACK_ARM, GPIO_TRACK_CAPTURE);
 
     let chip = Chip::new("gpiochip0").or_else(|_| Chip::new(0))?;
-    let opts = Options::input([GPIO_INIT, GPIO_POST, GPIO_VIDEO])
+    let opts = Options::input([GPIO_INIT, GPIO_POST, GPIO_VIDEO, GPIO_TRACK_ARM, GPIO_TRACK_CAPTURE])
         .edge(EdgeDetect::Both)
         .bias(Bias::PullDown)
         .consumer("rpi_rx_rust_gpio");
     let mut inputs = chip.request_lines(opts)?;
-    info!("GPIO {}, {}, and {} requested (edge both, pull-down enabled)", GPIO_INIT, GPIO_POST, GPIO_VIDEO);
+    info!("GPIO {} (init), {} (post), {} (video), {} (track arm), {} (track capture) requested", GPIO_INIT, GPIO_POST, GPIO_VIDEO, GPIO_TRACK_ARM, GPIO_TRACK_CAPTURE);
 
-    let initial_values: [bool; 3] = inputs.get_values([false, false, false])?;
-    info!("Initial GPIO state: GPIO{}={}, GPIO{}={}, GPIO{}={}",
-          GPIO_INIT, initial_values[0], GPIO_POST, initial_values[1], GPIO_VIDEO, initial_values[2]);
+    let initial_values: [bool; 5] = inputs.get_values([false, false, false, false, false])?;
+    info!("Initial GPIO state: init={}, post={}, video={}, track_arm={}, track_capture={}",
+          initial_values[0], initial_values[1], initial_values[2], initial_values[3], initial_values[4]);
 
     let video_recording = Cell::new(false);
 
     loop {
         let _event = inputs.read_event()?;
-        let values: [bool; 3] = inputs.get_values([false, false, false])?;
+        let values: [bool; 5] = inputs.get_values([false, false, false, false, false])?;
         let gpio11_high = values[0];
         let gpio19_high = values[1];
         let gpio26_high = values[2];
-        info!("GPIO edge detected: GPIO{}={}, GPIO{}={}, GPIO{}={}",
-              GPIO_INIT, gpio11_high, GPIO_POST, gpio19_high, GPIO_VIDEO, gpio26_high);
+        let gpio10_high = values[3];
+        let gpio9_high = values[4];
+        info!("GPIO edge: init={}, post={}, video={}, track_arm={}, track_capture={}",
+              gpio11_high, gpio19_high, gpio26_high, gpio10_high, gpio9_high);
 
         // Handle video recording control (GPIO 26) — outside session, no timestamp yet
         if gpio26_high && !video_recording.get() {
@@ -271,20 +288,64 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         info!("Flushed serial input buffer after TimeSync propagation delay");
 
         let mut byte_source = SerialTimeoutByteSource::new(read_port);
+        let track_file: RefCell<Option<Writer<std::fs::File>>> = RefCell::new(None);
+        let cone_number = Cell::new(0u32);
+        let prev_track_arm = Cell::new(false);
+        let prev_track_capture = Cell::new(false);
+
+        let mut on_track_capture = |lat: f64, lon: f64, alt: f32| {
+            if let Some(ref mut wtr) = *track_file.borrow_mut() {
+                let n = cone_number.get();
+                if wtr.write_record([n.to_string(), lat.to_string(), lon.to_string(), alt.to_string()]).is_ok() {
+                    let _ = wtr.flush();
+                    info!("Track capture: cone #{} lat={:.6} lon={:.6} alt={:.1}", n, lat, lon, alt);
+                    cone_number.set(n + 1);
+                }
+            }
+        };
+
         let mut should_stop = || {
-            let values: [bool; 3] = match inputs.get_values([false, false, false]) {
+            let values: [bool; 5] = match inputs.get_values([false, false, false, false, false]) {
                 Ok(v) => v,
                 Err(_) => return true,
             };
             let gpio11 = values[0];
             let gpio19 = values[1];
             let gpio26 = values[2];
+            let gpio10 = values[3];
+            let gpio9 = values[4];
 
             if gpio26 && !video_recording.get() {
                 video_recording.set(start_video_recording(&session_start));
             } else if !gpio26 && video_recording.get() {
                 video_recording.set(!stop_video_recording());
             }
+
+            // Track capture: IO10 rising = new track file; IO9 rising = take location
+            if gpio10 && !prev_track_arm.get() {
+                let dir = track_dir_for_today();
+                if let Ok(()) = fs::create_dir_all(&dir) {
+                    let time_str = Local::now().format("%H-%M-%S").to_string();
+                    let path = dir.join(format!("{}.csv", time_str));
+                    if let Ok(wtr) = Writer::from_path(&path) {
+                        let mut buf = track_file.borrow_mut();
+                        *buf = Some(wtr);
+                        if let Some(ref mut w) = buf.as_mut() {
+                            let _ = w.write_record(["Cone #", "Lat", "Lon", "Alt"]);
+                            let _ = w.flush();
+                        }
+                        cone_number.set(0);
+                        info!("Track capture armed: {}", path.display());
+                    }
+                }
+            }
+            prev_track_arm.set(gpio10);
+
+            if gpio9 && !prev_track_capture.get() && track_file.borrow().is_some() {
+                timesync_sender.request_floating_gps_capture();
+                info!("Track capture: requested floating GPS (IO9 rising)");
+            }
+            prev_track_capture.set(gpio9);
 
             let active = gpio11 || gpio19;
             !active
@@ -296,6 +357,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
             ahrs_wtr.as_mut(),
             DEFAULT_AHRS_HZ,
             &mut should_stop,
+            Some(&timesync_sender.collecting_for_track),
+            Some(&mut on_track_capture),
         ) {
             error!("Session error: {}", e);
         }

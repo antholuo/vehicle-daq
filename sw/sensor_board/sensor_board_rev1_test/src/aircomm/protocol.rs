@@ -214,6 +214,22 @@ pub fn serialize_timesync(
     Ok(offset)
 }
 
+/// RequestGpsCapture has no payload; header only (9 bytes)
+pub const REQUEST_GPS_CAPTURE_SIZE: usize = HEADER_SIZE;
+
+/// Serialize RequestGpsCapture (header only)
+pub fn serialize_request_gps_capture(
+    timestamp_us: u64,
+    buffer: &mut [u8],
+) -> Result<usize> {
+    if buffer.len() < REQUEST_GPS_CAPTURE_SIZE {
+        return Err(AirCommError::BufferTooSmall);
+    }
+    buffer[0] = MessageType::RequestGpsCapture.to_u8();
+    LittleEndian::write_u64(&mut buffer[1..], timestamp_us);
+    Ok(REQUEST_GPS_CAPTURE_SIZE)
+}
+
 /// Deserialize received data into a sensor message
 ///
 /// Reads the message type header, timestamp, and deserializes the appropriate payload
@@ -238,6 +254,7 @@ pub fn deserialize(data: &[u8], src_address: [u8; 6]) -> Result<SensorMessage> {
     let payload = match msg_type {
         MessageType::Imu => deserialize_imu(data, payload_offset)?,
         MessageType::Gps => deserialize_gps(data, payload_offset)?,
+        MessageType::RequestGpsCapture => SensorPayload::RequestGpsCapture,
         MessageType::Heartbeat => deserialize_heartbeat(data, payload_offset)?,
         MessageType::TimeSync => deserialize_timesync(data, payload_offset)?,
     };

@@ -140,6 +140,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         wtr_ahrs.as_mut(),
         args.ahrs_hz,
         &mut should_stop,
+        None,
+        None,
     )?;
 
     info!("Finished processing input. Output written to {:?}", log_file_path_raw);

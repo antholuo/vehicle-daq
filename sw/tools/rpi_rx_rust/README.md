@@ -1,6 +1,6 @@
 # rpi_rx_rust
 
-Raspberry Pi receiver for the sensor_board COBS-over-serial stream. Decodes IMU, GPS, and heartbeat messages, writes CSV logs, and optionally runs real-time AHRS (attitude/heading reference system) with synthesized GPS and velocity integration.
+Raspberry Pi receiver for the sensor_board COBS-over-serial stream. Decodes IMU, GPS, and heartbeat messages, writes CSV logs, and optionally runs real-time AHRS (attitude/heading reference system) with synthesized GPS and velocity integration. Can also request floating GPS for track capture (cone/waypoint logging).
 
 ## Features
 
@@ -8,18 +8,47 @@ Raspberry Pi receiver for the sensor_board COBS-over-serial stream. Decodes IMU,
 - **CSV logging**: Writes one row per decoded message to a raw CSV (MAC, node position/instance, timestamp, type, and type-specific fields).
 - **Real-time AHRS** (optional): Madgwick orientation filter plus velocity/position integration in NED. Uses the first IMU node as primary; first 10 seconds are treated as “at rest” for gyro bias and velocity zeroing. Outputs synthesized lat/lon/alt, vehicle heading, ground track, roll/pitch/yaw, and NED velocity at a fixed rate (default 10 Hz).
 - **Post-process AHRS**: The `ahrs_postprocess` binary runs AHRS on an existing raw log CSV (e.g. for re-runs with different parameters or when real-time AHRS was not used).
-- **Unified log layout**: All binaries write under `~/daq/logs/<date>/` with `<time>_raw.csv` and `<time>_postprocess.csv` (postprocess = AHRS output).
-- **GPIO-controlled service**: The `rpi_rx_rust_gpio` binary (Linux, `--features gpio`) uses GPIOs to control logging and video recording with no CLI flags, suitable for a systemd service that starts on boot.
+- **Unified log layout**: Logs under `~/daq/logs/<date>/` with `<time>_raw.csv` and `<time>_postprocess.csv` (postprocess = AHRS output). Track capture CSVs under `~/daq/tracks/<date>/`.
+- **GPIO-controlled service**: The `rpi_rx_rust_gpio` binary (Linux, `--features gpio`) uses GPIOs to control logging, video recording, and track capture with no CLI, suitable for systemd.
+- **Track capture**: Request 5-sample averaged GPS from a floating sensor node; log cone/waypoint positions to CSV (GPIO or interactive `rpi_rx_rust_track_test`).
+
+## Building all binaries
+
+From this directory (`sw/tools/rpi_rx_rust/`):
+
+| Binary | Build command |
+|--------|----------------|
+| `rpi_rx_rust` | `cargo build --release` |
+| `ahrs_postprocess` | `cargo build --release --bin ahrs_postprocess` |
+| `gps_extract` | `cargo build --release --bin gps_extract` |
+| `rpi_rx_rust_gpio` | `cargo build --release --features gpio` (Linux, libgpiod) |
+| `rpi_rx_rust_track_test` | `cargo build --release --bin rpi_rx_rust_track_test` |
+
+One-liner to build everything that doesn’t require optional features:
+
+```bash
+cargo build --release --bin rpi_rx_rust --bin ahrs_postprocess --bin gps_extract --bin rpi_rx_rust_track_test
+cargo build --release --features gpio  # separately, for GPIO binary (Linux)
+```
 
 ## Binaries
 
-| Binary              | Purpose |
-|---------------------|--------|
-| `rpi_rx_rust`      | Interactive/CLI: read from serial (or stdin), log raw CSV and optionally real-time AHRS. |
-| `ahrs_postprocess`  | Offline: run AHRS on a raw log CSV; output `<stem>_ahrs_postprocess.csv`. |
-| `rpi_rx_rust_gpio` | Service: GPIO-controlled start/stop; no CLI. Build with `cargo build --release --features gpio` (Linux only). |
+| Binary | Purpose |
+|--------|--------|
+| `rpi_rx_rust` | Interactive/CLI: read from serial (or stdin), log raw CSV and optionally real-time AHRS. |
+| `ahrs_postprocess` | Offline: run AHRS on a raw log CSV; output `<stem>_ahrs_postprocess.csv`. |
+| `gps_extract` | Extract or filter GPS data from logs (see binary help). |
+| `rpi_rx_rust_gpio` | Service: GPIO-controlled logging, video, and track capture; no CLI. Requires `--features gpio` (Linux). |
+| `rpi_rx_rust_track_test` | Interactive track capture: type “arm track capture”, “take location”, “end track capture” to test without GPIO. |
 
 ## Usage
+
+### Summary: how you interact with each binary
+
+- **rpi_rx_rust**: CLI flags + serial (or stdin). No GPIO.
+- **rpi_rx_rust_gpio**: GPIO only (11, 19, 26, 10, 9). No CLI; for systemd.
+- **rpi_rx_rust_track_test**: Serial + typed commands (“arm track capture”, “take location”, “end track capture”, “quit”). For testing track capture without GPIO.
+- **ahrs_postprocess** / **gps_extract**: Offline; input/output files and CLI args.
 
 ### rpi_rx_rust (CLI)
 
@@ -34,7 +63,16 @@ cargo run -- --with-ahrs
 cargo run -- --with-ahrs --ahrs-hz 50
 ```
 
-Serial defaults: `/dev/ttyACM0`, 115200 baud. If the port cannot be opened, input falls back to stdin.
+Serial defaults: `/dev/ttyACM0`, 115200 baud. If the port cannot be opened, input falls back to stdin. Set `RPI_RX_SERIAL_PORT` if the bridge is on another port.
+
+### rpi_rx_rust_track_test
+
+```bash
+cargo run --bin rpi_rx_rust_track_test
+# or: ./target/release/rpi_rx_rust_track_test
+```
+
+Then type: `arm track capture`, then `take location` for each cone/waypoint, then `end track capture` when done. Optional: `RPI_RX_SERIAL_PORT=/dev/ttyACM0` (default).
 
 ### ahrs_postprocess
 
@@ -44,23 +82,47 @@ cargo run --bin ahrs_postprocess -- --input path/to/raw.csv [--output path/to/ou
 
 Assumes the first 10 seconds of the log are at rest. Uses first GPS fix as origin. Output defaults to `<input_stem>_ahrs_postprocess.csv`.
 
-### rpi_rx_rust_gpio (service binary)
+### rpi_rx_rust_gpio (service binary) — GPIO “HMI”
 
-- **GPIO #11 (BCM 11)**: Init — start raw logging and allow AHRS to initialize (vehicle assumed level and stationary).
-- **GPIO #19 (BCM 19)**: Postprocessed — when high, also log AHRS output at the default rate (10 Hz).
-- **GPIO #26 (BCM 26)**: Video recording — when high, start video recording via camera server; when low, stop recording.
+All interaction is via GPIO; no CLI.
 
-Data logging runs while **either** GPIO #11 or #19 is high. Logs **stop only when both GPIOs are low**. Temporary loss of serial data does not stop the session; only both GPIOs going low does.
+| GPIO (BCM) | Function |
+|------------|----------|
+| **11** | Init — start raw logging; AHRS init (vehicle assumed level and stationary). |
+| **19** | Postprocessed — when high, also log AHRS at 10 Hz. |
+| **26** | Video — high = start recording, low = stop (camera server on `localhost:8888`). |
+| **10** | Track arm — **rising edge** opens a new track file under `~/daq/tracks/<date>/<time>.csv` and resets cone #. |
+| **9** | Track capture — **rising edge** (with track armed) requests floating GPS, averages 5 samples, appends one row (Cone #, Lat, Lon, Alt) and increments cone #. |
 
-Video recording is controlled independently by GPIO #26. The service communicates with a camera server running on `localhost:8888` (e.g., the `record.py` server from `/home/hardy/daq/FYDP-CV-Piside/`).
+- Data logging runs while **either** GPIO #11 or #19 is high. Logs **stop only when both are low**.
+- Video is independent of logging (GPIO #26).
+- Track capture only runs when a session is active (GPIO 11 or 19 high). Arm with GPIO 10 (high), then trigger each cone/waypoint with a rising edge on GPIO 9.
+
+### rpi_rx_rust_track_test — interactive “HMI”
+
+No GPIO; all interaction is by typing commands (bridge must be on serial, default `/dev/ttyACM0`):
+
+| Command | Action |
+|---------|--------|
+| `arm track capture` | Create a new track file and arm; next “take location” will append to it. |
+| `take location` | Send RequestFloatingGps to bridge; receive 5 GPS samples, average, append one row (Cone #, Lat, Lon, Alt). |
+| `end track capture` | Close the current track file. |
+| `quit` | Exit. |
+
+Track files are written under `~/daq/tracks/<date>/<time>.csv` (or under `RPI_RX_OUTPUT_DIR` if set). Override serial port with `RPI_RX_SERIAL_PORT` (e.g. `/dev/ttyACM0` for bridge when it’s on ACM0).
+
+### rpi_rx_rust (CLI) — no physical HMI
+
+Interaction is via command-line flags and serial/stdin; see “Usage” below.
 
 - **Build** (on Linux, with libgpiod):  
   `cargo build --release --features gpio`
 - **Install**: Copy the binary to e.g. `/opt/rpi_rx_rust/bin/rpi_rx_rust_gpio`.
-- **Log paths**: Same as CLI — `~/daq/logs/<date>/<time>_raw.csv` and `<time>_postprocess.csv` (when GPIO19 is high). Default is `$HOME/daq/logs/<date>/`; override with `RPI_RX_OUTPUT_DIR` (base path; logs go under `<RPI_RX_OUTPUT_DIR>/logs/<date>/`).
+- **Log paths**: `~/daq/logs/<date>/<time>_raw.csv` and `<time>_postprocess.csv` (when GPIO19 is high). Track files: `~/daq/tracks/<date>/<time>.csv`. Base path override: `RPI_RX_OUTPUT_DIR` (logs under `<base>/logs/<date>/`, tracks under `<base>/tracks/<date>/`).
+- **Serial port**: Default `/dev/ttyACM0` (bridge). If the bridge is on a different port (e.g. only one device on ACM1), set `RPI_RX_SERIAL_PORT`.
 - **Environment** (optional):
-  - `RPI_RX_OUTPUT_DIR`: base directory for logs (default: `$HOME`; then logs under `daq/logs/<date>/`).
-  - `RPI_RX_SERIAL_PORT`: serial device (default: `/dev/ttyACM0`).
+  - `RPI_RX_OUTPUT_DIR`: base directory (default `$HOME`; then `daq/logs/<date>/` and `daq/tracks/<date>/`).
+  - `RPI_RX_SERIAL_PORT`: serial device for bridge (default: `/dev/ttyACM0`).
 
 ## Systemd service
 
