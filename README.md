@@ -2,6 +2,8 @@
 
 Vehicle data-acquisition system: **ESP32-C6 sensor nodes** stream IMU and GPS over **ESP-NOW** to a **bridge**; the bridge forwards data over **USB** to a **Raspberry Pi**, which logs CSV, runs optional AHRS, and supports **track capture** (waypoint logging via a GPS-only “floating” node).
 
+**note:** Correspondent REPLAY system is hosted here: https://github.com/Trotyl15/vehicle-replay
+
 The two main software pieces are:
 
 | Component | Location | Role |
