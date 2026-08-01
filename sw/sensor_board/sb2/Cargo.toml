@@ -3,10 +3,22 @@ edition      = "2024"
 name         = "sb2"
 rust-version = "1.88"
 version      = "0.1.0"
+default-run  = "rev_b" # Setting the "rev_b" binary to be the default
 
 [[bin]]
+# Default binary for this project
 name = "sb2"
 path = "./src/bin/main.rs"
+
+[[bin]]
+# SensorBoard RevB (Internally known as Rev1)
+name = "rev_b"
+path = "./src/bin/sensorboard_revb.rs"
+
+[[bin]]
+# Devkit-C (esp32c6-devkit whatever)
+name = "devkit_c"
+path = "./src/bin/devkit_c.rs"
 
 [dependencies]
 esp-hal = { version = "~1.1.0", features = ["defmt", "esp32c6", "unstable"] }
