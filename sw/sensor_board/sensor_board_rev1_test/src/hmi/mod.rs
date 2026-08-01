@@ -179,7 +179,7 @@ pub async fn start_hmi(
 /// 500ms solid orange (operator notice) then rapid orange blink until 5 samples done.
 pub async fn start_hmi_floating(
     mut user_led: Output<'static>,
-    led_rate_hz: u32,
+    _led_rate_hz: u32,
     mut neopixel: NeoPixel<'static>,
     neopixel_brightness: u8,
 ) {

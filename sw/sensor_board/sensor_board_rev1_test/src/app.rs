@@ -24,7 +24,7 @@ use crate::aircomm::TimeSyncData;
 #[cfg(feature = "gps")]
 use crate::gps::{init_gps, start_gps};
 #[cfg(feature = "hmi")]
-use crate::hmi::{neopixel, start_hmi, start_hmi_floating};
+use crate::hmi::{neopixel, start_hmi};
 #[cfg(feature = "imu")]
 use crate::imu::start_imu;
 #[cfg(feature = "floating")]
@@ -68,7 +68,7 @@ pub async fn app_run<B: BoardPeripherals>(spawner: embassy_executor::Spawner, mu
     crate::timebase::set_program_start();
 
     #[cfg(feature = "hmi")]
-    let mut user_led = board.take_user_led();
+    let user_led = board.take_user_led();
     #[cfg(feature = "hmi")]
     trace!("User Led initialized!");
 
