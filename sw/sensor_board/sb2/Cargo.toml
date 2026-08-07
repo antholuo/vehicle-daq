@@ -5,6 +5,11 @@ rust-version = "1.88"
 version      = "0.1.0"
 default-run  = "rev_b" # Setting the "rev_b" binary to be the default
 
+[features]
+default = ["hmi"]
+hmi = ["user_led"] # Group of HMI devices
+user_led = [] # User-facing LED (simple single LED)
+
 [[bin]]
 # Default binary for this project
 name = "sb2"
