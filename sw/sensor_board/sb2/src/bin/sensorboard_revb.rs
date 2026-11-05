@@ -11,7 +11,7 @@
 #![deny(clippy::large_stack_frames)]
 
 #[allow(unused_imports)]
-use defmt::{debug, error, fatal, info, trace, warn};
+use defmt::{debug, error, info, trace, warn};
 use embassy_executor::Spawner;
 use embassy_time::{Duration, Timer};
 use esp_backtrace as _;
