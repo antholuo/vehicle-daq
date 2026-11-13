@@ -64,6 +64,13 @@ impl SensorBoardRevB {
     }
 }
 
+impl BoardPeripherals for SensorBoardRevB {
+    #[cfg(feature = "user_led")]
+    fn take_user_led(&mut self) -> esp_hal::gpio::Output<'static> {
+        self.user_led.take().expect("user LED already taken")
+    }
+}
+
 #[allow(
     clippy::large_stack_frames,
     reason = "it's not unusual to allocate larger buffers etc. in main"
@@ -96,4 +103,8 @@ async fn main(spawner: Spawner) -> ! {
 
     info!("Configuration complete - attempting to start app execution now");
     app_run(spawner, SensorBoardRevB::from_peripherals(peripherals)).await;
+
+    loop {
+        Timer::after(Duration::from_secs(1)).await;
+    }
 }
